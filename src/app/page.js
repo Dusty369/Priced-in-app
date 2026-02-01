@@ -614,6 +614,7 @@ export default function PricedInApp() {
         {showSaveDialog && (
           <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
             <SaveProjectDialog
+              isOpen={showSaveDialog}
               saveProjectName={saveProjectName}
               setSaveProjectName={setSaveProjectName}
               projectNotes={projectNotes}
