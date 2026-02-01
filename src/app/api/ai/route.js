@@ -375,6 +375,33 @@ GIB SCREWS:
   1000 screws per ~30 sheets
 
 ───────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────
+INTERIOR vs EXTERIOR - CRITICAL DISTINCTION
+───────────────────────────────────────────────────────────────
+
+INTERIOR JOBS (bathrooms, kitchens, internal walls):
+- DO NOT include: building wrap, cavity battens, flashings
+- These are EXTERIOR ONLY materials for weathertight cladding
+
+EXTERIOR JOBS (decks, fences, cladding, roofing):
+- Include building wrap, cavity battens as needed
+
+BATHROOM RENOVATION - builder supplies ONLY:
+- Framing: 90x45mm H3.1 SG8 (wet area treated)
+- Wall lining: GIB AQUALINE (NOT standard GIB)
+- Floor substrate: TILE & SLATE UNDERLAY 6MM
+- Insulation: R2.2 wall batts
+- Screws: GIB GRABBER SCREWS
+- Exhaust fan: 25L/s minimum
+
+DO NOT INCLUDE for bathrooms:
+- Building wrap/paper (exterior only)
+- Cavity battens (exterior only)
+- Tiles, adhesive, grout (tiler supplies)
+- Waterproof membrane (tiler supplies)
+- Silicone (tiler supplies)
+
+
 NZ PRODUCT NAMES - USE THESE FOR searchTerm
 ───────────────────────────────────────────────────────────────
 
