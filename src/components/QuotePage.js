@@ -31,6 +31,8 @@ export default function QuotePage({
   onRemoveFromCart,
   onUpdateLabourHours,
   onRemoveLabourItem,
+  onAddLabourItem,
+  onUpdateLabourRole,
   pdfGenerating,
   labourRates
 }) {
@@ -332,13 +334,27 @@ export default function QuotePage({
             <Users size={20} className="text-purple-600" />
             Labour ({labourItems.length})
           </h2>
-          <span className="text-purple-600 font-bold">${labourSubtotal.toFixed(2)}</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => onAddLabourItem({ role: "builder", hours: 1, description: "Labour" })}
+              className="px-3 py-1 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm flex items-center gap-1"
+            >
+              <Plus size={16} /> Add
+            </button>
+            <span className="text-purple-600 font-bold">${labourSubtotal.toFixed(2)}</span>
+          </div>
         </div>
         
         {labourItems.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             <Users size={48} className="mx-auto mb-3 text-gray-300" />
-            <p>No labour items yet. Use AI Assistant to get estimates.</p>
+            <p>No labour items yet.</p>
+            <button
+              onClick={() => onAddLabourItem({ role: "builder", hours: 1, description: "Labour" })}
+              className="mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2 mx-auto"
+            >
+              <Plus size={18} /> Add Labour
+            </button>
           </div>
         ) : (
           <div className="divide-y">
@@ -352,9 +368,7 @@ export default function QuotePage({
                     <div className="flex items-center gap-2 mb-1">
                       <select
                         value={item.role}
-                        onChange={(e) => {
-                          // Update role logic here
-                        }}
+                        onChange={(e) => onUpdateLabourRole(item.id, e.target.value)}
                         className="px-2 py-1 border rounded text-sm font-medium"
                       >
                         <option value="builder">Builder</option>

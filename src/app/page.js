@@ -525,39 +525,66 @@ export default function PricedInApp() {
   const addMaterialsToQuote = (materials, msgIndex) => {
     if (!materials || materials.length === 0) return;
     
+    const newItems = [];
     materials.forEach(suggested => {
-      // Try to find matching material in database
-      const match = allMaterials.find(m => {
-      const searchTerm = (suggested.searchTerm || suggested.name || "").toLowerCase();
-      const matName = m.name.toLowerCase();
-      const searchWords = searchTerm.replace(/[^a-z0-9]/g, " ").split(" ").filter(w => w.length > 2);
-      const matchCount = searchWords.filter(word => matName.includes(word)).length;
-      return matchCount >= Math.min(2, searchWords.length);
-    }) || allMaterials.find(m => 
-        m.name.toLowerCase().includes(suggested.searchTerm?.toLowerCase() || suggested.name?.toLowerCase())
+      const searchTerm = (suggested.searchTerm || suggested.name || "").toUpperCase();
+      const searchWords = searchTerm.replace(/[^A-Z0-9.]/g, " ").split(" ").filter(w => w.length > 1);
+      
+      // Find best match - prioritize key product words
+      let bestMatch = null;
+      let bestScore = 0;
+      
+      // Key words that MUST match if present (product identifiers)
+      const keyWords = searchWords.filter(w => 
+        ["AQUALINE", "ULTRALINE", "FYRELINE", "STANDARD", "PINK", "EARTHWOOL", "H3.1", "H3.2", "H4", "H1.2"].includes(w)
       );
       
-      if (match) {
-        // Check if already in cart
-        const existing = cart.find(i => i.id === match.id);
+      allMaterials.forEach(m => {
+        const matName = m.name.toUpperCase();
+        
+        // If we have key words, they must ALL match
+        if (keyWords.length > 0) {
+          const keyMatches = keyWords.every(kw => matName.includes(kw));
+          if (!keyMatches) return;
+        }
+        
+        // Score by total word matches
+        const score = searchWords.filter(word => matName.includes(word)).length;
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = m;
+        }
+      });
+      
+      if (bestMatch) {
+        const existing = newItems.find(i => i.id === bestMatch.id);
         if (existing) {
-          // Update quantity
-          setCart(cart.map(i => 
-            i.id === match.id ? {...i, qty: i.qty + (suggested.qty || 1)} : i
-          ));
+          existing.qty += (suggested.qty || 1);
         } else {
-          // Add new item
-          setCart(prev => [...prev, { ...match, qty: suggested.qty || 1 }]);
+          newItems.push({ ...bestMatch, qty: suggested.qty || 1 });
         }
       }
     });
     
-    // Mark message as added
+    // Add all matched items to cart
+    if (newItems.length > 0) {
+      setCart(prev => {
+        const updated = [...prev];
+        newItems.forEach(item => {
+          const existing = updated.find(i => i.id === item.id);
+          if (existing) {
+            existing.qty += item.qty;
+          } else {
+            updated.push(item);
+          }
+        });
+        return updated;
+      });
+    }
+    
     setChatHistory(prev => prev.map((msg, idx) => 
       idx === msgIndex ? {...msg, added: true} : msg
     ));
-    
-    // Switch to quote page
     setPage('quote');
   };
 
@@ -628,6 +655,7 @@ export default function PricedInApp() {
         {showLabourSettings && (
           <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
             <LabourSettingsDialog
+              isOpen={showLabourSettings}
               labourRates={labourRates}
               setLabourRates={setLabourRates}
               onClose={() => setShowLabourSettings(false)}
@@ -659,6 +687,7 @@ export default function PricedInApp() {
         {showCompanySettings && (
           <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
             <CompanySettingsDialog
+              isOpen={showCompanySettings}
               companyInfo={companyInfo}
               setCompanyInfo={setCompanyInfo}
               onClose={() => setShowCompanySettings(false)}
@@ -705,6 +734,8 @@ export default function PricedInApp() {
               ));
             }}
             onRemoveLabourItem={(id) => setLabourItems(labourItems.filter(i => i.id !== id))}
+            onAddLabourItem={addLabourItem}
+            onUpdateLabourRole={(id, role) => setLabourItems(labourItems.map(i => i.id === id ? {...i, role} : i))}
             pdfGenerating={pdfGenerating}
             labourRates={labourRates}
           />
