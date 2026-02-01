@@ -527,7 +527,13 @@ export default function PricedInApp() {
     
     materials.forEach(suggested => {
       // Try to find matching material in database
-      const match = allMaterials.find(m => 
+      const match = allMaterials.find(m => {
+      const searchTerm = (suggested.searchTerm || suggested.name || "").toLowerCase();
+      const matName = m.name.toLowerCase();
+      const searchWords = searchTerm.replace(/[^a-z0-9]/g, " ").split(" ").filter(w => w.length > 2);
+      const matchCount = searchWords.filter(word => matName.includes(word)).length;
+      return matchCount >= Math.min(2, searchWords.length);
+    }) || allMaterials.find(m => 
         m.name.toLowerCase().includes(suggested.searchTerm?.toLowerCase() || suggested.name?.toLowerCase())
       );
       

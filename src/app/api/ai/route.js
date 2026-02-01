@@ -401,6 +401,12 @@ DO NOT INCLUDE for bathrooms:
 - Waterproof membrane (tiler supplies)
 - Silicone (tiler supplies)
 
+ELECTRICAL & PLUMBING:
+- Do NOT include electrical or plumbing materials unless specifically requested
+- These are typically supplied by licensed electricians and plumbers
+- If user asks for a complete job, list electrical/plumbing separately with note:
+  "Electrical items (supplied by electrician):" and "Plumbing items (supplied by plumber):"
+
 
 NZ PRODUCT NAMES - USE THESE FOR searchTerm
 ───────────────────────────────────────────────────────────────
