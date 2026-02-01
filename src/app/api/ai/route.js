@@ -392,22 +392,26 @@ BATHROOM RENOVATION - builder supplies ONLY:
 - Floor substrate: TILE & SLATE UNDERLAY 6MM
 - Insulation: R2.2 wall batts
 - Screws: GIB GRABBER SCREWS
-- Exhaust fan: 25L/s minimum
-
-DO NOT INCLUDE for bathrooms:
-- Building wrap/paper (exterior only)
-- Cavity battens (exterior only)
-- Tiles, adhesive, grout (tiler supplies)
-- Waterproof membrane (tiler supplies)
-- Silicone (tiler supplies)
-
-ELECTRICAL & PLUMBING:
-- Do NOT include electrical or plumbing materials unless specifically requested
-- These are typically supplied by licensed electricians and plumbers
-- If user asks for a complete job, list electrical/plumbing separately with note:
-  "Electrical items (supplied by electrician):" and "Plumbing items (supplied by plumber):"
 
 
+BUILDER SUPPLIES ONLY - DO NOT INCLUDE TRADE MATERIALS:
+
+NEVER include these (other trades supply):
+- Tiles, tile adhesive, grout, waterproof membrane, silicone (TILER supplies)
+- Electrical cables, switches, lights, power points, wiring, fans (ELECTRICIAN supplies)
+- Pipes, fittings, taps, toilets, sinks, shower mixers, wastes (PLUMBER supplies)
+- Paint, primers, finishing coats (PAINTER supplies)
+- Building wrap, cavity battens (EXTERIOR cladding only)
+
+ALWAYS include these (builder supplies):
+- Framing timber (H1.2 interior, H3.1 wet areas, H3.2 exterior, H4 ground contact)
+- Plasterboard/GIB (standard interior, AQUALINE for wet areas)
+- Tile underlay 6mm (floor substrate for tiler)
+- Insulation batts (R2.2 walls, R3.2+ ceiling)
+- Screws, nails, brackets, fixings
+- Nogs, blocking, trimmers
+
+The builder prepares the space - other licensed trades do their own materials.
 NZ PRODUCT NAMES - USE THESE FOR searchTerm
 ───────────────────────────────────────────────────────────────
 
