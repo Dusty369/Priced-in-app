@@ -1,8 +1,8 @@
 'use client';
 
-import { FolderOpen, Plus, TrendingUp, DollarSign } from 'lucide-react';
+import { FolderOpen, Plus, TrendingUp, DollarSign, Trash2 } from 'lucide-react';
 
-export default function Dashboard({ projects, onNewProject, onLoadProject }) {
+export default function Dashboard({ projects, onNewProject, onLoadProject, onDeleteProject }) {
   const totalValue = projects.reduce((sum, p) => {
     const projectTotal = (p.cart || []).reduce((s, i) => s + i.price * i.qty, 0);
     return sum + projectTotal;
@@ -74,9 +74,18 @@ export default function Dashboard({ projects, onNewProject, onLoadProject }) {
                       {new Date(project.updatedAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <p className="font-bold text-emerald-600">
-                    ${((project.cart || []).reduce((s, i) => s + i.price * i.qty, 0)).toFixed(0)}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <p className="font-bold text-emerald-600">
+                      ${((project.cart || []).reduce((s, i) => s + i.price * i.qty, 0)).toFixed(0)}
+                    </p>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onDeleteProject(project.id); }}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                      title="Delete project"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
               </button>
             ))}
