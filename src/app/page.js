@@ -746,6 +746,7 @@ export default function PricedInApp() {
             projects={projects}
             onNewProject={newProject}
             onLoadProject={loadProject}
+            onDeleteProject={deleteProject}
           />
         )}
 
