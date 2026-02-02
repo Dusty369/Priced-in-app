@@ -286,130 +286,254 @@ export default function PricedInApp() {
     setPdfGenerating(true);
     try {
       const { jsPDF } = await import('jspdf');
+      const autoTable = (await import('jspdf-autotable')).default;
+
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
       const pageHeight = doc.internal.pageSize.height;
+      const leftMargin = 14;
+      const rightMargin = 14;
+      const contentWidth = pageWidth - leftMargin - rightMargin;
       let yPos = 20;
-      
-      doc.setFontSize(20);
+
+      // Helper to format currency
+      const formatCurrency = (amount) => `$${amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      // Company header (left side)
+      doc.setFontSize(18);
       doc.setTextColor(16, 185, 129);
-      doc.text(companyInfo.name || 'Quote', 20, yPos);
-      
-      yPos += 10;
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      if (companyInfo.phone) doc.text(companyInfo.phone, 20, yPos);
-      if (companyInfo.email) doc.text(companyInfo.email, 20, yPos + 5);
-      if (companyInfo.address) doc.text(companyInfo.address, 20, yPos + 10);
-      
-      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text(companyInfo.name || 'Quote', leftMargin, yPos);
+
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(80, 80, 80);
+      let contactY = yPos + 6;
+      if (companyInfo.phone) { doc.text(companyInfo.phone, leftMargin, contactY); contactY += 4; }
+      if (companyInfo.email) { doc.text(companyInfo.email, leftMargin, contactY); contactY += 4; }
+      if (companyInfo.address) { doc.text(companyInfo.address, leftMargin, contactY); contactY += 4; }
+
+      // Quote details (right side)
+      doc.setFontSize(9);
       doc.setTextColor(60, 60, 60);
-      doc.text(`Quote Date: ${new Date().toLocaleDateString('en-NZ')}`, pageWidth - 20, 20, { align: 'right' });
-      doc.text(`Quote #: ${Date.now().toString().slice(-6)}`, pageWidth - 20, 26, { align: 'right' });
-      
-      yPos += 20;
-      
+      doc.text(`Quote Date: ${new Date().toLocaleDateString('en-NZ')}`, pageWidth - rightMargin, yPos, { align: 'right' });
+      doc.text(`Quote #: ${Date.now().toString().slice(-6)}`, pageWidth - rightMargin, yPos + 5, { align: 'right' });
+
+      yPos = Math.max(contactY, yPos + 15) + 8;
+
+      // Divider line
+      doc.setDrawColor(200, 200, 200);
+      doc.line(leftMargin, yPos, pageWidth - rightMargin, yPos);
+      yPos += 10;
+
+      // Project name
       if (currentProjectName) {
         doc.setFontSize(14);
         doc.setTextColor(40, 40, 40);
-        doc.text(`Project: ${currentProjectName}`, 20, yPos);
+        doc.setFont(undefined, 'bold');
+        doc.text(`Project: ${currentProjectName}`, leftMargin, yPos);
+        doc.setFont(undefined, 'normal');
         yPos += 10;
       }
-      
+
+      // Materials table
       if (cart.length > 0) {
-        yPos += 5;
-        doc.setFontSize(12);
+        doc.setFontSize(11);
         doc.setTextColor(16, 185, 129);
-        doc.text('MATERIALS', 20, yPos);
-        yPos += 8;
-        
-        doc.setFontSize(9);
-        doc.setTextColor(40, 40, 40);
-        
-        cart.forEach(item => {
-          const desc = item.name.substring(0, 50);
-          const total = item.price * item.qty;
-          doc.text(`${desc}`, 20, yPos);
-          doc.text(`${item.qty}x @ $${item.price.toFixed(2)}`, 130, yPos);
-          doc.text(`$${total.toFixed(2)}`, pageWidth - 25, yPos, { align: 'right' });
-          yPos += 4;
+        doc.setFont(undefined, 'bold');
+        doc.text('MATERIALS', leftMargin, yPos);
+        doc.setFont(undefined, 'normal');
+        yPos += 2;
+
+        const materialsData = cart.map(item => [
+          item.name.length > 55 ? item.name.substring(0, 52) + '...' : item.name,
+          item.qty.toString(),
+          item.unit || 'EA',
+          formatCurrency(item.price),
+          formatCurrency(item.price * item.qty)
+        ]);
+
+        autoTable(doc, {
+          startY: yPos,
+          head: [['Description', 'Qty', 'Unit', 'Unit Price', 'Total']],
+          body: materialsData,
+          theme: 'striped',
+          headStyles: {
+            fillColor: [240, 240, 240],
+            textColor: [60, 60, 60],
+            fontStyle: 'bold',
+            fontSize: 8
+          },
+          bodyStyles: { fontSize: 8, textColor: [40, 40, 40] },
+          columnStyles: {
+            0: { cellWidth: contentWidth * 0.45 },
+            1: { cellWidth: contentWidth * 0.08, halign: 'center' },
+            2: { cellWidth: contentWidth * 0.10, halign: 'center' },
+            3: { cellWidth: contentWidth * 0.17, halign: 'right' },
+            4: { cellWidth: contentWidth * 0.20, halign: 'right' }
+          },
+          margin: { left: leftMargin, right: rightMargin },
+          tableLineColor: [200, 200, 200],
+          tableLineWidth: 0.1
         });
-        yPos += 3;
+
+        yPos = doc.lastAutoTable.finalY + 8;
       }
-      
+
+      // Labour table
       if (labourItems.length > 0) {
-        doc.setFontSize(12);
+        // Check if we need a new page
+        if (yPos > pageHeight - 80) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        doc.setFontSize(11);
         doc.setTextColor(16, 185, 129);
-        doc.text('LABOUR', 20, yPos);
-        yPos += 8;
-        
-        doc.setFontSize(9);
-        doc.setTextColor(40, 40, 40);
-        
-        labourItems.forEach(item => {
+        doc.setFont(undefined, 'bold');
+        doc.text('LABOUR', leftMargin, yPos);
+        doc.setFont(undefined, 'normal');
+        yPos += 2;
+
+        const labourData = labourItems.map(item => {
           const rate = labourRates[item.role] || DEFAULT_LABOUR_RATES[item.role] || 0;
-          const total = item.hours * rate;
           const roleLabel = LABOUR_ROLES[item.role]?.label || item.role.charAt(0).toUpperCase() + item.role.slice(1);
-          
-          doc.text(`${item.description}`, 20, yPos);
-          doc.text(`${item.hours}h @ $${rate}/h (${roleLabel})`, 130, yPos);
-          doc.text(`$${total.toFixed(2)}`, pageWidth - 25, yPos, { align: 'right' });
-          yPos += 4;
+          return [
+            item.description || roleLabel,
+            roleLabel,
+            `${item.hours}h`,
+            `${formatCurrency(rate)}/h`,
+            formatCurrency(item.hours * rate)
+          ];
         });
-        yPos += 3;
+
+        autoTable(doc, {
+          startY: yPos,
+          head: [['Description', 'Role', 'Hours', 'Rate', 'Total']],
+          body: labourData,
+          theme: 'striped',
+          headStyles: {
+            fillColor: [240, 240, 240],
+            textColor: [60, 60, 60],
+            fontStyle: 'bold',
+            fontSize: 8
+          },
+          bodyStyles: { fontSize: 8, textColor: [40, 40, 40] },
+          columnStyles: {
+            0: { cellWidth: contentWidth * 0.35 },
+            1: { cellWidth: contentWidth * 0.20 },
+            2: { cellWidth: contentWidth * 0.12, halign: 'center' },
+            3: { cellWidth: contentWidth * 0.15, halign: 'right' },
+            4: { cellWidth: contentWidth * 0.18, halign: 'right' }
+          },
+          margin: { left: leftMargin, right: rightMargin },
+          tableLineColor: [200, 200, 200],
+          tableLineWidth: 0.1
+        });
+
+        yPos = doc.lastAutoTable.finalY + 8;
       }
-      
-      yPos += 5;
-      doc.setFontSize(10);
-      doc.setTextColor(60, 60, 60);
-      
+
+      // Calculate totals
       const materialTotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-      const labourTotalPDF = labourItems.reduce((sum, item) => sum + item.hours * labourRates[item.role], 0);
+      const labourTotalPDF = labourItems.reduce((sum, item) => {
+        const rate = labourRates[item.role] || DEFAULT_LABOUR_RATES[item.role] || 0;
+        return sum + item.hours * rate;
+      }, 0);
       const subtotalPDF = materialTotal + labourTotalPDF;
-      const withWastagePDF = subtotalPDF * (1 + wastage / 100);
-      const withMarginPDF = withWastagePDF * (1 + margin / 100);
-      const gstAmount = withMarginPDF * 0.15;
+      const wastageAmount = subtotalPDF * (wastage / 100);
+      const withWastagePDF = subtotalPDF + wastageAmount;
+      const marginAmount = withWastagePDF * (margin / 100);
+      const withMarginPDF = withWastagePDF + marginAmount;
+      const gstAmount = gst ? withMarginPDF * 0.15 : 0;
       const totalPDF = withMarginPDF + gstAmount;
-      
-      doc.setDrawColor(200, 200, 200);
-      doc.rect(130, yPos - 2, 65, 35);
-      
-      doc.text('Subtotal:', 135, yPos + 2);
-      doc.text(`$${subtotalPDF.toFixed(2)}`, pageWidth - 10, yPos + 2, { align: 'right' });
-      
-      doc.text(`Margin (${margin}%):`, 135, yPos + 7);
-      doc.text(`$${(withMarginPDF - withWastagePDF).toFixed(2)}`, pageWidth - 10, yPos + 7, { align: 'right' });
-      
-      doc.text('GST (15%):', 135, yPos + 12);
-      doc.text(`$${gstAmount.toFixed(2)}`, pageWidth - 10, yPos + 12, { align: 'right' });
-      
+
+      // Check if we need a new page for totals
+      if (yPos > pageHeight - 70) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      // Totals section - right aligned box
+      const totalsX = pageWidth - rightMargin - 75;
+      const totalsWidth = 75;
+      yPos += 5;
+
+      // Build totals rows
+      const totalsRows = [];
+      if (cart.length > 0) totalsRows.push(['Materials:', formatCurrency(materialTotal)]);
+      if (labourItems.length > 0) totalsRows.push(['Labour:', formatCurrency(labourTotalPDF)]);
+      totalsRows.push(['Subtotal:', formatCurrency(subtotalPDF)]);
+      if (wastage > 0) totalsRows.push([`Wastage (${wastage}%):`, formatCurrency(wastageAmount)]);
+      if (margin > 0) totalsRows.push([`Margin (${margin}%):`, formatCurrency(marginAmount)]);
+      if (gst) totalsRows.push(['GST (15%):', formatCurrency(gstAmount)]);
+
+      autoTable(doc, {
+        startY: yPos,
+        body: totalsRows,
+        theme: 'plain',
+        bodyStyles: { fontSize: 9, textColor: [60, 60, 60] },
+        columnStyles: {
+          0: { cellWidth: 35, fontStyle: 'normal' },
+          1: { cellWidth: 40, halign: 'right' }
+        },
+        margin: { left: totalsX },
+        tableLineColor: [200, 200, 200],
+        tableLineWidth: 0
+      });
+
+      yPos = doc.lastAutoTable.finalY + 2;
+
+      // Grand total with emphasis
+      doc.setDrawColor(16, 185, 129);
+      doc.setLineWidth(0.5);
+      doc.line(totalsX, yPos, totalsX + totalsWidth, yPos);
+      yPos += 6;
+
       doc.setFontSize(12);
       doc.setTextColor(16, 185, 129);
       doc.setFont(undefined, 'bold');
-      doc.text('TOTAL:', 135, yPos + 20);
-      doc.text(`$${totalPDF.toFixed(2)}`, pageWidth - 10, yPos + 20, { align: 'right' });
-      
-      yPos += 40;
+      doc.text('TOTAL:', totalsX, yPos);
+      doc.text(formatCurrency(totalPDF), totalsX + totalsWidth, yPos, { align: 'right' });
+      doc.setFont(undefined, 'normal');
+
+      yPos += 15;
+
+      // Notes section
       if (projectNotes) {
-        doc.setFont(undefined, 'normal');
+        if (yPos > pageHeight - 40) {
+          doc.addPage();
+          yPos = 20;
+        }
+
         doc.setFontSize(10);
         doc.setTextColor(60, 60, 60);
-        doc.text('Notes:', 20, yPos);
+        doc.setFont(undefined, 'bold');
+        doc.text('Notes:', leftMargin, yPos);
+        doc.setFont(undefined, 'normal');
         yPos += 5;
         doc.setFontSize(9);
-        const splitNotes = doc.splitTextToSize(projectNotes, pageWidth - 40);
-        doc.text(splitNotes, 20, yPos);
+        const splitNotes = doc.splitTextToSize(projectNotes, contentWidth);
+        doc.text(splitNotes, leftMargin, yPos);
       }
-      
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text('Generated by Priced In - Building Estimator', pageWidth / 2, pageHeight - 15, { align: 'center' });
-      doc.text(`Quote valid for 30 days from ${new Date().toLocaleDateString('en-NZ')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-      
-      const fileName = currentProjectName 
+
+      // Footer on each page
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text('Generated by Priced In - Building Estimator', pageWidth / 2, pageHeight - 12, { align: 'center' });
+        doc.text(`Quote valid for 30 days from ${new Date().toLocaleDateString('en-NZ')}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+        if (pageCount > 1) {
+          doc.text(`Page ${i} of ${pageCount}`, pageWidth - rightMargin, pageHeight - 8, { align: 'right' });
+        }
+      }
+
+      const fileName = currentProjectName
         ? `Quote_${currentProjectName.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`
         : `Quote_${new Date().toISOString().slice(0, 10)}.pdf`;
-      
+
       doc.save(fileName);
     } catch (error) {
       console.error('PDF generation failed:', error);
