@@ -434,19 +434,21 @@ export default function PricedInApp() {
         yPos = doc.lastAutoTable.finalY + 8;
       }
 
-      // Calculate totals
+      // Calculate totals - apply wastage to materials, margin to both, hide breakdown from client
       const materialTotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
       const labourTotalPDF = labourItems.reduce((sum, item) => {
         const rate = labourRates[item.role] || DEFAULT_LABOUR_RATES[item.role] || 0;
         return sum + item.hours * rate;
       }, 0);
-      const subtotalPDF = materialTotal + labourTotalPDF;
-      const wastageAmount = subtotalPDF * (wastage / 100);
-      const withWastagePDF = subtotalPDF + wastageAmount;
-      const marginAmount = withWastagePDF * (margin / 100);
-      const withMarginPDF = withWastagePDF + marginAmount;
-      const gstAmount = gst ? withMarginPDF * 0.15 : 0;
-      const totalPDF = withMarginPDF + gstAmount;
+
+      // Materials: apply wastage then margin
+      const materialsWithMarkup = materialTotal * (1 + wastage / 100) * (1 + margin / 100);
+      // Labour: apply margin only (no wastage on labour)
+      const labourWithMarkup = labourTotalPDF * (1 + margin / 100);
+      // Subtotal is the sum of marked-up values
+      const subtotalPDF = materialsWithMarkup + labourWithMarkup;
+      const gstAmount = gst ? subtotalPDF * 0.15 : 0;
+      const totalPDF = subtotalPDF + gstAmount;
 
       // Check if we need a new page for totals
       if (yPos > pageHeight - 70) {
@@ -459,13 +461,11 @@ export default function PricedInApp() {
       const totalsWidth = 75;
       yPos += 5;
 
-      // Build totals rows
+      // Build totals rows - hide wastage/margin breakdown from client
       const totalsRows = [];
-      if (cart.length > 0) totalsRows.push(['Materials:', formatCurrency(materialTotal)]);
-      if (labourItems.length > 0) totalsRows.push(['Labour:', formatCurrency(labourTotalPDF)]);
+      if (cart.length > 0) totalsRows.push(['Materials:', formatCurrency(materialsWithMarkup)]);
+      if (labourItems.length > 0) totalsRows.push(['Labour:', formatCurrency(labourWithMarkup)]);
       totalsRows.push(['Subtotal:', formatCurrency(subtotalPDF)]);
-      if (wastage > 0) totalsRows.push([`Wastage (${wastage}%):`, formatCurrency(wastageAmount)]);
-      if (margin > 0) totalsRows.push([`Margin (${margin}%):`, formatCurrency(marginAmount)]);
       if (gst) totalsRows.push(['GST (15%):', formatCurrency(gstAmount)]);
 
       autoTable(doc, {
