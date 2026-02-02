@@ -15,6 +15,7 @@ const SaveProjectDialog = lazy(() => import('../components/SaveProjectDialog'));
 const LabourSettingsDialog = lazy(() => import('../components/LabourSettingsDialog'));
 const PriceComparisonModal = lazy(() => import('../components/PriceComparisonModal'));
 const CompanySettingsDialog = lazy(() => import('../components/CompanySettingsDialog'));
+const AddMaterialModal = lazy(() => import('../components/AddMaterialModal'));
 import { 
   DEFAULT_LABOUR_RATES, 
   LABOUR_ROLES, 
@@ -66,6 +67,7 @@ export default function PricedInApp() {
   const [companyInfo, setCompanyInfo] = useState(DEFAULT_COMPANY_INFO);
   const [pdfGenerating, setPdfGenerating] = useState(false);
   const [showPriceComparison, setShowPriceComparison] = useState(null);
+  const [showAddMaterial, setShowAddMaterial] = useState(false);
 
   // Plan upload state
   const [planFile, setPlanFile] = useState(null);
@@ -819,6 +821,16 @@ export default function PricedInApp() {
           </Suspense>
         )}
 
+        {showAddMaterial && (
+          <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
+            <AddMaterialModal
+              isOpen={showAddMaterial}
+              onClose={() => setShowAddMaterial(false)}
+              onAddToCart={addToCart}
+            />
+          </Suspense>
+        )}
+
         {page === 'materials' && (
           <Suspense fallback={<div className="p-4 text-center text-gray-500">Loading materials...</div>}>
             <MaterialsPage onAddToCart={addToCart} />
@@ -862,6 +874,7 @@ export default function PricedInApp() {
             onUpdateLabourRole={(id, role) => setLabourItems(labourItems.map(i => i.id === id ? {...i, role} : i))}
             pdfGenerating={pdfGenerating}
             labourRates={labourRates}
+            onOpenAddMaterial={() => setShowAddMaterial(true)}
           />
         )}
 
