@@ -1,21 +1,39 @@
 // Optimized materials loader with fuzzy search and supplier balancing
-import materialsData from '../data/materials.json';
+// Uses processed/structured materials for better search and filtering
+
+import processedMaterialsData from '../data/materials-processed.json';
 
 // Cache for better performance
 let cachedMaterials = null;
 let cachedCategories = null;
 let cachedSuppliers = null;
 let cachedBySupplier = null;
+let cachedTypes = null;
+let cachedTreatments = null;
 
 // ============================================================================
 // CORE DATA ACCESS
 // ============================================================================
 
+/**
+ * Get all materials with backward-compatible format
+ * Adds 'name' property from 'displayName' for compatibility
+ */
 export function getAllMaterials() {
   if (!cachedMaterials) {
-    cachedMaterials = materialsData;
+    cachedMaterials = processedMaterialsData.map(m => ({
+      ...m,
+      name: m.displayName, // Backward compatibility
+    }));
   }
   return cachedMaterials;
+}
+
+/**
+ * Get raw processed materials (with full parsed structure)
+ */
+export function getProcessedMaterials() {
+  return processedMaterialsData;
 }
 
 export function getMaterialsBySupplierCache() {
@@ -32,7 +50,7 @@ export function getMaterialsBySupplierCache() {
 export function getCategories() {
   if (!cachedCategories) {
     const all = getAllMaterials();
-    cachedCategories = ['All', ...new Set(all.map(m => m.category))].sort();
+    cachedCategories = ['All', ...new Set(all.map(m => m.category).filter(Boolean))].sort();
   }
   return cachedCategories;
 }
@@ -42,6 +60,34 @@ export function getSuppliers() {
     cachedSuppliers = ['All', 'Carters', 'ITM'];
   }
   return cachedSuppliers;
+}
+
+/**
+ * Get material types from parsed data
+ */
+export function getTypes() {
+  if (!cachedTypes) {
+    const all = getAllMaterials();
+    cachedTypes = ['All', ...new Set(all.map(m => m.parsed?.type).filter(Boolean))].sort();
+  }
+  return cachedTypes;
+}
+
+/**
+ * Get treatments from parsed data
+ */
+export function getTreatments() {
+  if (!cachedTreatments) {
+    const all = getAllMaterials();
+    const treatments = [...new Set(all.map(m => m.parsed?.treatment).filter(Boolean))];
+    // Sort treatments in logical order
+    cachedTreatments = ['All', ...treatments.sort((a, b) => {
+      const aNum = parseFloat(a.replace('H', ''));
+      const bNum = parseFloat(b.replace('H', ''));
+      return aNum - bNum;
+    })];
+  }
+  return cachedTreatments;
 }
 
 // ============================================================================
@@ -156,7 +202,7 @@ function isFuzzyMatch(searchWord, targetWord, maxDistance = 2) {
 }
 
 // ============================================================================
-// RELEVANCE SCORING
+// RELEVANCE SCORING (Enhanced with parsed data)
 // ============================================================================
 
 /**
@@ -164,13 +210,14 @@ function isFuzzyMatch(searchWord, targetWord, maxDistance = 2) {
  * Higher score = better match
  */
 function scoreMatch(material, searchTerms, normalizedQuery) {
-  const searchableName = createSearchableText(material.name);
-  const searchableCategory = createSearchableText(material.category);
+  const searchableName = createSearchableText(material.displayName || material.name);
+  const searchableCategory = createSearchableText(material.category || '');
   const searchableSubcategory = createSearchableText(material.subcategory || '');
   const searchableCode = createSearchableText(material.code || '');
   const searchableSupplier = material.supplier?.toLowerCase() || '';
+  const searchableAI = createSearchableText(material.aiDescription || '');
 
-  const allSearchable = `${searchableName} ${searchableCategory} ${searchableSubcategory} ${searchableCode} ${searchableSupplier}`;
+  const allSearchable = `${searchableName} ${searchableCategory} ${searchableSubcategory} ${searchableCode} ${searchableSupplier} ${searchableAI}`;
 
   let score = 0;
   let allTermsFound = true;
@@ -188,6 +235,10 @@ function scoreMatch(material, searchTerms, normalizedQuery) {
         if (searchableName.startsWith(term) || searchableName.includes(' ' + term)) {
           score += 20;
         }
+      }
+      // Match in AI description (parsed data)
+      else if (searchableAI.includes(term)) {
+        score += 45;
       }
       // Match in code
       else if (searchableCode.includes(term)) {
@@ -215,6 +266,30 @@ function scoreMatch(material, searchTerms, normalizedQuery) {
   // Bonus for matching all terms
   if (allTermsFound && searchTerms.length > 1) {
     score += 30;
+  }
+
+  // Bonus for matching in aiSearchTerms
+  if (material.aiSearchTerms) {
+    for (const term of searchTerms) {
+      if (material.aiSearchTerms.some(t => t.toLowerCase().includes(term))) {
+        score += 15;
+      }
+    }
+  }
+
+  // Bonus for exact dimension match
+  if (material.parsed?.width && material.parsed?.depth) {
+    const dimStr = `${material.parsed.width}×${material.parsed.depth}`;
+    if (normalizedQuery.includes(dimStr)) {
+      score += 40;
+    }
+  }
+
+  // Bonus for exact treatment match
+  if (material.parsed?.treatment) {
+    if (normalizedQuery.includes(material.parsed.treatment.toLowerCase())) {
+      score += 30;
+    }
   }
 
   // Penalize if only fuzzy matches
@@ -368,6 +443,67 @@ export function getMaterialsByCategory(category, limit = 500, supplier = 'All') 
   return interleaveBySupplier(filtered).slice(0, limit);
 }
 
+/**
+ * Get materials by type (from parsed data)
+ *
+ * @param {string} type - Material type (framing, decking, etc.)
+ * @param {number} limit - Max results
+ * @param {string} supplier - Supplier filter
+ * @returns {Array} - Materials of given type
+ */
+export function getMaterialsByType(type, limit = 500, supplier = 'All') {
+  const all = getAllMaterials();
+
+  let filtered = all.filter(m => m.parsed?.type === type);
+
+  if (supplier !== 'All') {
+    filtered = filtered.filter(m => m.supplier === supplier);
+    return filtered.slice(0, limit);
+  }
+
+  return interleaveBySupplier(filtered).slice(0, limit);
+}
+
+/**
+ * Get materials by treatment level
+ *
+ * @param {string} treatment - H1.2, H3.2, H4, H5, etc.
+ * @param {number} limit - Max results
+ * @param {string} supplier - Supplier filter
+ * @returns {Array} - Materials with given treatment
+ */
+export function getMaterialsByTreatment(treatment, limit = 500, supplier = 'All') {
+  const all = getAllMaterials();
+
+  let filtered = all.filter(m => m.parsed?.treatment === treatment);
+
+  if (supplier !== 'All') {
+    filtered = filtered.filter(m => m.supplier === supplier);
+    return filtered.slice(0, limit);
+  }
+
+  return interleaveBySupplier(filtered).slice(0, limit);
+}
+
+/**
+ * Get framing timber by size
+ *
+ * @param {number} width - Width in mm (90, 140, 190, etc.)
+ * @param {number} depth - Depth in mm (45, 90, etc.)
+ * @param {string} treatment - Optional treatment filter
+ * @returns {Array} - Matching framing timber
+ */
+export function getFramingBySize(width, depth, treatment = null) {
+  const all = getAllMaterials();
+
+  return all.filter(m => {
+    if (m.parsed?.type !== 'framing') return false;
+    if (m.parsed?.width !== width || m.parsed?.depth !== depth) return false;
+    if (treatment && m.parsed?.treatment !== treatment) return false;
+    return true;
+  });
+}
+
 // ============================================================================
 // PAGINATION (for large lists)
 // ============================================================================
@@ -411,7 +547,7 @@ export function getSuggestions(query, limit = 5) {
   for (const material of all) {
     if (suggestions.size >= limit * 3) break;
 
-    const words = material.name.toLowerCase().split(/[\s\-_]+/);
+    const words = (material.displayName || material.name).toLowerCase().split(/[\s\-_]+/);
     for (const word of words) {
       if (word.length < 3) continue;
 
