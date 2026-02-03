@@ -51,6 +51,7 @@ export function getSuppliers() {
 /**
  * Normalize search term for consistent matching
  * - Convert x to × and vice versa
+ * - Collapse dimension patterns (90 x 45 → 90×45)
  * - Lowercase
  * - Trim and collapse whitespace
  */
@@ -61,17 +62,21 @@ function normalizeText(text) {
     .trim()
     // Normalize multiplication sign variations
     .replace(/x/g, '×')
-    .replace(/\*/g, '×');
+    .replace(/\*/g, '×')
+    // Collapse dimension patterns: "90 × 45" → "90×45"
+    .replace(/(\d+)\s*×\s*(\d+)/g, '$1×$2');
 }
 
 /**
  * Create searchable version of text (for indexing)
- * Keeps both x and × versions for matching
+ * Normalizes dimensions and keeps both x and × versions for matching
  */
 function createSearchableText(text) {
   const lower = text.toLowerCase();
+  // Normalize dimension patterns in the text (remove spaces around ×)
+  const normalized = lower.replace(/(\d+)\s*×\s*(\d+)/g, '$1×$2');
   // Include both × and x versions so either matches
-  return lower + ' ' + lower.replace(/×/g, 'x');
+  return normalized + ' ' + normalized.replace(/×/g, 'x');
 }
 
 /**
