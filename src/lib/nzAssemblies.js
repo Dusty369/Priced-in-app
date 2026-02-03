@@ -14,6 +14,69 @@
  */
 
 // ============================================================================
+// 0. PILE TYPES & RULES - CRITICAL FOR AI
+// ============================================================================
+
+export const PILE_TYPES = {
+  // STRUCTURAL PILES - for decks, pergolas, buildings
+  structural: {
+    anchorPile: {
+      name: 'Anchor pile (concrete with steel rod)',
+      use: 'Decks, pergolas, small structures',
+      sizes: ['150mm dia', '200mm dia'],
+      depth: '450-600mm depending on load',
+      supplier: 'Pre-made or site-cast',
+    },
+    concretePile: {
+      name: 'Concrete pile',
+      use: 'Decks, buildings, retaining',
+      sizes: ['200mm dia', '300mm dia'],
+      depth: '450mm minimum in ground',
+    },
+    timberPile: {
+      name: 'H5 timber pile',
+      size: '125×125 H5',
+      use: 'Decks, subfloors, light structures',
+      depth: '600mm minimum in ground',
+      note: 'Must be H5 for in-ground contact',
+    },
+  },
+
+  // FENCE POSTS - for fences ONLY
+  fencing: {
+    fencePost: {
+      name: 'Fence post',
+      sizes: ['100×100 H4', '75×75 H4'],
+      use: 'FENCES ONLY - not structural',
+      depth: '450-600mm',
+      WARNING: 'NOT suitable for decks, pergolas, or any load-bearing structure',
+    },
+  },
+};
+
+export const PILE_RULES = {
+  decks: {
+    allowed: ['anchorPile', 'concretePile', 'H5 timber pile 125×125'],
+    forbidden: ['fencePost', '100×100 H4'],
+    note: 'Fence posts are NOT structural - use anchor piles or 125×125 H5',
+  },
+  pergolas: {
+    allowed: ['anchorPile', 'concretePile', 'H5 timber pile'],
+    forbidden: ['fencePost', '100×100 H4'],
+    note: 'Posts can sit on anchor piles or be embedded if H5 treated',
+  },
+  buildings: {
+    allowed: ['concretePile', 'H5 timber pile'],
+    forbidden: ['fencePost', 'anchorPile', '100×100'],
+    note: 'Requires engineering for pile design',
+  },
+  fences: {
+    allowed: ['100×100 H4 fence post', '75×75 H4 fence post'],
+    note: '100×100 H4 standard, 600mm in ground - ONLY for fences',
+  },
+};
+
+// ============================================================================
 // 1. FOUNDATION ASSEMBLIES
 // ============================================================================
 
@@ -57,8 +120,18 @@ export const PILE_FOUNDATION = {
   name: 'Timber Pile Foundation',
   standard: 'NZS 3604',
   pileTypes: {
-    H5Timber: { minDiameter: '125mm', embedment: '600mm min in ground' },
+    H5Timber: {
+      size: '125×125mm minimum',
+      embedment: '600mm min in ground',
+      note: 'MUST be H5 treatment for in-ground structural use'
+    },
     concretePile: { minDiameter: '200mm', embedment: '450mm min' },
+    anchorPile: { note: 'Steel anchor piles also acceptable' },
+  },
+  CRITICAL_WARNING: {
+    fencePosts: 'NEVER use fence posts (100×100 H4) for structural piles - they are NOT structural and do NOT meet NZS 3604',
+    treatment: 'H4 is for above-ground external use only - structural in-ground piles MUST be H5',
+    size: 'Fence posts are undersized (100×100) vs structural piles (125×125 minimum)',
   },
   connections: {
     pileToBearerFixing: '2 × M12 galv coach bolts per pile',
@@ -854,11 +927,21 @@ export const TILING = {
 export const TIMBER_DECK = {
   name: 'Standard Timber Deck',
   standard: 'NZS 3604',
+  CRITICAL_PILE_WARNING: {
+    NEVER_USE: 'FENCE POSTS (100×100 H4) - these are NOT structural and do NOT meet code',
+    CORRECT_OPTIONS: [
+      '125×125 H5 timber piles (in-ground rated)',
+      'Concrete piles 200mm diameter',
+      'Steel anchor piles (proprietary systems)',
+    ],
+    WHY: 'Fence posts are H4 (above-ground only) and undersized. Deck piles support structural loads and MUST be H5 rated for in-ground use.',
+  },
   substructure: {
     piles: {
-      type: 'H5 timber 125mm dia or concrete',
+      type: '125×125 H5 timber piles or 200mm concrete piles',
+      NOT_ACCEPTABLE: 'Fence posts (100×100 H4) - NOT structural',
       spacing: '1.2-1.8m grid depending on bearer/joist size',
-      embedment: 'H5: 600mm in ground, concrete: 450mm',
+      embedment: 'H5 timber: 600mm in ground, concrete: 450mm',
     },
     bearers: {
       sizes: ['140×45', '190×45'],
@@ -1084,6 +1167,13 @@ export const SKIRTING_ARCHITRAVE = {
 // ============================================================================
 
 export const COMMON_MISTAKES = {
+  piles: [
+    'FENCE POSTS USED FOR DECK/STRUCTURE PILES - 100×100 H4 fence posts are NOT structural',
+    'H4 treatment used in ground (must be H5 for in-ground structural)',
+    '100×100 posts used instead of 125×125 (undersized for structural loads)',
+    'Fence posts used for pergola footings (not structural)',
+    'Wrong pile type: Use anchor piles, concrete piles, or 125×125 H5 timber piles for structures',
+  ],
   foundations: [
     'Mesh placed directly on polythene (needs chairs)',
     'Foundation bolts too far from openings (need within 300mm)',
@@ -1132,7 +1222,9 @@ export const COMMON_MISTAKES = {
     'Nosing too short or too long (20-25mm)',
   ],
   decks: [
+    'FENCE POSTS (100×100 H4) used for piles - WRONG! Use anchor piles or 125×125 H5',
     '90×45 joists used (need 140×45 minimum)',
+    'H4 piles used in ground (must be H5 for in-ground)',
     'Posts not embedded deep enough (600mm for H5)',
     'No fall away from house',
     'Decking gaps too tight or too wide (5-6mm correct)',
@@ -1190,6 +1282,27 @@ export function getAssembliesForPrompt() {
               NZ BUILDING ASSEMBLIES REFERENCE
 ═══════════════════════════════════════════════════════════════
 
+⚠️⚠️⚠️ CRITICAL PILE WARNING - READ THIS FIRST ⚠️⚠️⚠️
+
+FENCE POSTS vs STRUCTURAL PILES:
+• FENCE POSTS (100×100 H4) are for FENCES ONLY - NOT structural
+• NEVER suggest fence posts for decks, pergolas, or any load-bearing structure
+• Fence posts are H4 (above-ground only) and undersized for structural use
+
+FOR DECKS/PERGOLAS/STRUCTURES - USE THESE INSTEAD:
+• Anchor piles (concrete with steel rod) - 150-200mm dia
+• Concrete piles - 200mm dia minimum
+• H5 timber piles - 125×125 minimum (NOT 100×100)
+• H5 treatment is REQUIRED for in-ground structural use
+
+IF YOU SEE "FENCE POST" IN SEARCH RESULTS - DO NOT USE IT FOR:
+✗ Deck piles/footings
+✗ Pergola footings
+✗ Carport supports
+✗ Any structural foundation
+
+═══════════════════════════════════════════════════════════════
+
 CRITICAL ASSEMBLY RULES - AI MUST FOLLOW:
 
 FOUNDATIONS:
@@ -1239,9 +1352,11 @@ WET AREAS (E3/AS1):
 • Floor fall 1:50 to waste
 
 DECKS (NZS 3604):
+• PILES: Use anchor piles, concrete piles, or 125×125 H5 timber
+• NEVER use fence posts (100×100 H4) - they are NOT structural
 • NEVER use 90×45 joists - minimum 140×45
 • Joists at 450mm for 90mm decking, 600mm for 140mm
-• Posts H4, 600mm in ground
+• H5 piles 600mm in ground minimum
 • 22 deck screws per m²
 
 STAIRS (D1):
@@ -1256,7 +1371,9 @@ BALUSTRADES (F4):
 • Non-climbable design
 
 COMMON MISTAKES TO FLAG:
+• ⚠️ FENCE POSTS FOR DECK PILES (100×100 H4 is NOT structural - use anchor piles or 125×125 H5)
 • 90×45 deck joists (wrong - use 140×45)
+• H4 piles in ground (must be H5 for structural in-ground)
 • Standard GIB in shower (use cement board)
 • Single top plate external walls (need double)
 • Studs at 600mm in bracing walls (need 400mm)
@@ -1271,6 +1388,10 @@ COMMON MISTAKES TO FLAG:
 // ============================================================================
 
 export const NZ_ASSEMBLIES = {
+  pileRules: {
+    PILE_TYPES,
+    PILE_RULES,
+  },
   foundations: {
     SLAB_ON_GROUND,
     PILE_FOUNDATION,
