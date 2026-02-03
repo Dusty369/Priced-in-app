@@ -314,6 +314,18 @@ Example 4m × 3m room, 2.4m ceiling:
 DECKS & OUTDOOR
 ────────────────────────────────────────────────────────────────
 
+⚠️ CRITICAL PILE WARNING - READ BEFORE ESTIMATING DECKS:
+• NEVER use fence posts (100×100 H4) for deck piles - NOT structural
+• Fence posts are for FENCES ONLY
+• Use: Anchor piles, concrete piles, or 125×125 H5 timber piles
+• H5 treatment REQUIRED for in-ground structural use
+
+DECK FOOTINGS (STRUCTURAL - NOT fence posts):
+• Concrete pad + post stirrup: 300mm dia concrete pad with galv stirrup bolted in
+• Anchor pile system: proprietary anchor pile with fixing kit
+• Posts sit IN stirrups above ground - keeps timber dry, no H5 needed
+>>> NEVER bury fence posts (100×100 H4) for deck foundations <<<
+
 DECKING BOARDS (140mm with 5mm gap = 145mm coverage):
 • lm needed: deck area ÷ 0.145 + 10% waste
 
@@ -326,34 +338,35 @@ BEARERS (H3.2 SG8):
 • Count: deck width ÷ bearer spacing (1.2-1.5m) + 1
 • Sizes: 140×45 max 1.5m, 190×45 max 2.0m, 2×190×45 max 3.0m
 
-POSTS: 90×90 or 100×100 H4 minimum
-POST FOOTINGS: 300mm dia × 450mm deep concrete
 JOIST HANGERS: 2 per joist
 DECK SCREWS: 20-25 per m²
 
 Example 4m × 3m deck, 600mm high:
+• Footings: 6 × concrete pads (300mm dia × 400mm deep) + 6 × post stirrups 100mm
+• Posts: 6 × 100×100 H3.2 posts sitting IN stirrups (above ground, NOT buried)
 • Decking: 12m² ÷ 0.145 = 82.8 lm + 10% = 91 lm (140×32 H3.2)
 • Joists at 450mm: 4000 ÷ 450 + 1 = 10 joists × 3m = 30 lm (140×45 H3.2)
 • Bearers at 1.2m: 3 bearers × 4m = 12 lm (140×45 H3.2)
-• Posts: 6 × 0.9m = 5.4 lm (100×100 H4)
 • Deck screws: 12m² × 22 = 264 screws
+NOTE: Post stirrups keep timber above ground - no H5 treatment needed for posts
 
 PERGOLAS:
-• Posts: count × length (100×100 or 125×125 H4)
+• Footings: Concrete pads with post stirrups (100mm or 125mm) - NOT fence posts in ground
+• Posts: 100×100 or 125×125 H3.2 sitting IN stirrups (above ground)
 • Beams: 2 × span (190×45 or 240×45 H3.2)
 • Rafters: span ÷ 450-600mm + 1
-• Post concrete: 2-3 × 20kg bag per post
 • Coach bolts: 2 per beam/post connection
+• Concrete: 2-3 × 20kg bag per footing pad
 
-FENCING:
-• Posts: fence length ÷ spacing (2.4-3m) + 1 (100×100 H4)
+FENCING (fence posts OK here - this is a fence):
+• Posts: fence length ÷ spacing (2.4-3m) + 1 (100×100 H4 fence post)
 • Rails: 2-3 rails × number of bays (100×50 H3.2)
 • Palings: fence length × 1000 ÷ paling width (100-150mm)
 • Post concrete: 2 × 20kg bag per post
 • Nails/screws: 2 per paling per rail
 
 Example 12m fence, 1.8m high:
-• Posts at 2.4m: 12000 ÷ 2400 + 1 = 6 posts × 2.4m = 14.4 lm (100×100 H4)
+• Posts at 2.4m: 12000 ÷ 2400 + 1 = 6 fence posts × 2.4m = 14.4 lm (100×100 H4)
 • Rails: 3 rails × 5 bays × 2.4m = 36 lm (100×50 H3.2)
 • Palings at 100mm: 12000 ÷ 100 = 120 palings × 1.8m = 216 lm
 • Post concrete: 6 × 2 bag = 12 × 20kg bag
@@ -506,7 +519,12 @@ IMPORTANT:
 - Translate any non-NZ terms the user uses (e.g., "header" → "lintel", "drywall" → "GIB")
 
 NZ PRODUCT SEARCH TERMS:
-• Framing: "90X45 H1.2", "90X45 H3.1", "140X45 H3.2", "100X100 H4"
+• Framing: "90X45 H1.2", "90X45 H3.1", "140X45 H3.2"
+• DECK/PERGOLA PILES (structural - NOT fence posts):
+  - "ANCHOR PILE FIX KIT" - anchor pile system
+  - "POST STIRRUP 100MM" or "POST STIRRUP 125MM" - galv stirrup on concrete footing
+  - Concrete: user supplies ready-mix or bags
+• FENCE POSTS (for FENCES ONLY): "100X100 H4 POST" - NOT for decks/pergolas
 • GIB: "GIB STANDARD", "GIB AQUALINE", "FYRELINE"
 • Decking: "140X32 H3.2 DECKING", "KWILA DECKING"
 • Screws: "DECK SCREWS", "GIB GRABBER", "BATTEN SCREWS"
