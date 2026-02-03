@@ -25,12 +25,11 @@ export default function MaterialsPage({ onAddToCart }) {
 
     const loadMaterials = () => {
       if (search) {
-        setMaterials(searchMaterials(search, 100));
+        // Pass supplier filter to search
+        setMaterials(searchMaterials(search, 100, supplier));
       } else {
-        setMaterials(getMaterialsByCategory(category, 100).filter(m => {
-          const matchesSupplier = supplier === 'All' || m.supplier === supplier;
-          return matchesSupplier;
-        }));
+        // Pass supplier filter to category browse
+        setMaterials(getMaterialsByCategory(category, 100, supplier));
       }
     };
 

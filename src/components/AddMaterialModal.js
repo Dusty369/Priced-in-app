@@ -29,12 +29,11 @@ export default function AddMaterialModal({ isOpen, onClose, onAddToCart }) {
   useEffect(() => {
     const loadMaterials = () => {
       if (search) {
-        setMaterials(searchMaterials(search, 50));
+        // Pass supplier filter to search
+        setMaterials(searchMaterials(search, 50, supplier));
       } else {
-        setMaterials(getMaterialsByCategory(category, 50).filter(m => {
-          const matchesSupplier = supplier === 'All' || m.supplier === supplier;
-          return matchesSupplier;
-        }));
+        // Pass supplier filter to category browse
+        setMaterials(getMaterialsByCategory(category, 50, supplier));
       }
     };
 
