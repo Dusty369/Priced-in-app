@@ -1,5 +1,6 @@
 // API route for AI calls - keeps API key secure on server
 import { getGlossaryForPrompt } from '../../../lib/nzGlossary';
+import { getAssembliesForPrompt } from '../../../lib/nzAssemblies';
 
 export async function POST(request) {
   const { messages, mode, materials, labourRates, planImage, planMediaType } = await request.json();
@@ -90,8 +91,9 @@ function getProjectBuilderPrompt(materials, labourRates) {
 
   const builderRate = labourRates?.builder || 95;
 
-  // Get the NZ glossary
+  // Get the NZ glossary and assemblies
   const glossary = getGlossaryForPrompt();
+  const assemblies = getAssembliesForPrompt();
 
   return `You are a NZ Licensed Building Practitioner (LBP) estimator. You provide ACCURATE material quantities using REAL CALCULATIONS from dimensions - never guessing.
 
@@ -99,21 +101,25 @@ This app is for BUILDERS. You supply structural materials, substrates, and fixin
 
 ${glossary}
 
+${assemblies}
+
 ═══════════════════════════════════════════════════════════════
                     CRITICAL RULES
 ═══════════════════════════════════════════════════════════════
 
 1. USE NZ TERMINOLOGY ONLY - refer to glossary above
 2. USE APPROVED UNITS ONLY: lm, m², m³, ea, sht, box, etc.
-3. CALCULATE FROM DIMENSIONS - never guess quantities
-4. SHOW YOUR WORKING for every quantity:
+3. FOLLOW ASSEMBLY SPECS - use correct fixing schedules and sequences
+4. CALCULATE FROM DIMENSIONS - never guess quantities
+5. SHOW YOUR WORKING for every quantity:
    "4m wall at 600mm centres = 4000 ÷ 600 + 1 = 7.67 → 8 studs"
-5. If dimensions are missing - ASK, don't assume
-6. Round UP all quantities (can't buy half a sheet)
-7. Apply waste factors: 10% timber, 10% sheets, 15% tiles
-8. Use NZ standard sizes (2.4m studs, 1200×2400 sheets, 90×45 framing)
-9. Specify timber treatment: H1.2 interior, H3.1 wet areas, H3.2 exterior, H4 ground contact, H5 in-ground
-10. If user uses non-NZ terms, translate to NZ terms in your response
+6. If dimensions are missing - ASK, don't assume
+7. Round UP all quantities (can't buy half a sheet)
+8. Apply waste factors: 10% timber, 10% sheets, 15% tiles
+9. Use NZ standard sizes (2.4m studs, 1200×2400 sheets, 90×45 framing)
+10. Specify timber treatment: H1.2 interior, H3.1 wet areas, H3.2 exterior, H4 ground contact, H5 in-ground
+11. If user uses non-NZ terms, translate to NZ terms in your response
+12. FLAG COMMON MISTAKES - check assemblies reference for errors to warn about
 
 BUILDER SUPPLIES ONLY - exclude:
 - Electrical (cables, switches, lights, wiring) → electrician supplies
@@ -542,12 +548,15 @@ function getPlanAnalysisPrompt(materials, labourRates) {
 
   const builderRate = labourRates?.builder || 95;
 
-  // Get the NZ glossary
+  // Get the NZ glossary and assemblies
   const glossary = getGlossaryForPrompt();
+  const assemblies = getAssembliesForPrompt();
 
   return `You are a NZ Licensed Building Practitioner analyzing building plans.
 
 ${glossary}
+
+${assemblies}
 
 CRITICAL: Calculate ALL quantities from the dimensions shown. Show your working.
 
