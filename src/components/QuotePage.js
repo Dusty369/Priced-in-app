@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {
   Save, Plus, Settings, Download, Building2, Package, Users,
   Calculator, DollarSign, Trash2, Minus, Edit3, FileText,
-  TrendingUp, Search
+  TrendingUp, Search, Clock
 } from 'lucide-react';
 
 export default function QuotePage({
@@ -40,6 +40,7 @@ export default function QuotePage({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [contingency, setContingency] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [crewSize, setCrewSize] = useState(1);
 
   // Calculations
   const materialsSubtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
@@ -356,21 +357,65 @@ export default function QuotePage({
 
       {/* Labour Section */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-            <Users size={18} className="text-purple-600" />
-            Labour
-            <span className="text-sm font-normal text-gray-500">({labourItems.length})</span>
-          </h2>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => onAddLabourItem({ role: "builder", hours: 1, description: "Labour" })}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors duration-150 font-medium"
-            >
-              <Plus size={16} /> Add
-            </button>
-            <span className="text-purple-600 font-semibold">${labourSubtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+        <div className="px-5 py-4 border-b border-gray-100">
+          <div className="flex justify-between items-center">
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Users size={18} className="text-purple-600" />
+              Labour
+              <span className="text-sm font-normal text-gray-500">({labourItems.length})</span>
+            </h2>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => onAddLabourItem({ role: "builder", hours: 1, description: "Labour" })}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors duration-150 font-medium"
+              >
+                <Plus size={16} /> Add
+              </button>
+              <span className="text-purple-600 font-semibold">${labourSubtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+            </div>
           </div>
+
+          {/* Crew Size Selector */}
+          {labourItems.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-600 flex items-center gap-1.5">
+                  <Clock size={14} className="text-gray-400" />
+                  Crew size:
+                </span>
+                <div className="flex items-center gap-1 bg-gray-100 rounded-lg">
+                  {[1, 2, 3].map(size => (
+                    <button
+                      key={size}
+                      onClick={() => setCrewSize(size)}
+                      className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors duration-150 ${
+                        crewSize === size
+                          ? 'bg-purple-600 text-white'
+                          : 'text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="text-sm text-gray-600">
+                {(() => {
+                  const totalHours = labourItems.reduce((s, i) => s + i.hours, 0);
+                  const hoursPerPerson = totalHours / crewSize;
+                  const days = hoursPerPerson / 8;
+                  return (
+                    <span className="flex items-center gap-1">
+                      <span className="font-medium text-gray-900">{totalHours}</span> hrs total
+                      <span className="text-gray-400 mx-1">•</span>
+                      <span className="font-medium text-purple-600">{days.toFixed(1)}</span> days
+                      {crewSize > 1 && <span className="text-gray-500 ml-1">(÷{crewSize})</span>}
+                    </span>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
         </div>
 
         {labourItems.length === 0 ? (

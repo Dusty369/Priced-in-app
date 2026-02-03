@@ -589,7 +589,12 @@ export default function PricedInApp() {
             if (json.summary) {
               formattedContent += `**${json.summary}**\n\n`;
             }
-            
+
+            if (json.calculations) {
+              formattedContent += '🧮 **Calculations:**\n';
+              formattedContent += `${json.calculations}\n\n`;
+            }
+
             if (json.materials && json.materials.length > 0) {
               formattedContent += '📦 **Materials needed:**\n';
               json.materials.forEach(m => {
@@ -598,13 +603,14 @@ export default function PricedInApp() {
               formattedContent += '\n';
             }
             
-            if (json.labour && json.labour.length > 0) {
+            if (json.labour && json.labour.totalHours) {
+              const rate = labourRates.builder || 95;
+              const cost = rate * json.labour.totalHours;
               formattedContent += '👷 **Labour estimate:**\n';
-              json.labour.forEach(l => {
-                const rate = labourRates[l.role] || 0;
-                const cost = rate * l.hours;
-                formattedContent += `• ${l.hours}hrs - ${l.description} (${cost.toFixed(0)})\n`;
-              });
+              formattedContent += `• ${json.labour.totalHours} builder hours ($${cost.toFixed(0)})\n`;
+              if (json.labour.description) {
+                formattedContent += `  ${json.labour.description}\n`;
+              }
               formattedContent += '\n';
             }
             
@@ -716,14 +722,12 @@ export default function PricedInApp() {
 
   // Add AI-suggested labour to quote
   const addLabourToQuote = (labour, msgIndex) => {
-    if (!labour || labour.length === 0) return;
-    
-    labour.forEach(l => {
-      addLabourItem({
-        role: l.role,
-        hours: l.hours,
-        description: l.description
-      });
+    if (!labour || !labour.totalHours) return;
+
+    addLabourItem({
+      role: 'builder',
+      hours: labour.totalHours,
+      description: labour.description || 'Builder labour'
     });
   };
 
