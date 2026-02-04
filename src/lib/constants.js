@@ -4,28 +4,46 @@ export const CURRENT_PROJECT_KEY = 'priced-in-current-project';
 export const LABOUR_RATES_KEY = 'priced-in-labour-rates';
 export const COMPANY_INFO_KEY = 'priced-in-company-info';
 
-// Default labour rates (NZD/hour or /sqm) - NZ Auckland rates
+// Default labour rates (NZD/hour or /sqm) - NZ Auckland rates 2026
+// Source: NZ Certified Builders, Master Builders Association, trade avg Feb 2026
+// CPI adjustment: rates updated annually, ~3-4% increase typical
 export const DEFAULT_LABOUR_RATES = {
-  builder: 95,
-  labourer: 45,
-  apprentice: 30,
-  electrician: 105,    // $95-110/hr in Auckland
-  plumber: 105,        // $95-110/hr in Auckland
-  tiler: 120,          // $120/sqm in Auckland
-  painter: 65,         // $60-65/hr in Auckland
-  plasterer: 40        // $40/sqm in Auckland
+  builder: 105,        // Qualified carpenter/builder
+  labourer: 50,        // General labourer
+  apprentice: 35,      // 3rd/4th year apprentice
+  electrician: 115,    // Registered electrician
+  plumber: 115,        // Registered plumber
+  gasfitter: 120,      // Registered gasfitter
+  tiler: 130,          // Per sqm rate for tiling
+  painter: 70,         // Interior/exterior painter
+  plasterer: 45,       // GIB stopper per sqm
+  roofer: 95,          // Metal/tile roofing
+  concreter: 90,       // Concrete work
+  demolition: 75       // Demolition labour
+};
+
+// Labour rates metadata
+export const LABOUR_RATES_META = {
+  lastUpdated: '2026-02-01',
+  region: 'Auckland',
+  source: 'NZ Certified Builders / Master Builders Association',
+  cpiNote: 'Adjust +3-4% annually for inflation'
 };
 
 // Labour role display names and min/max rates
 export const LABOUR_ROLES = {
-  builder: { label: 'Builder/Carpenter', min: 90, max: 110 },
-  labourer: { label: 'Labourer', min: 40, max: 55 },
-  apprentice: { label: 'Apprentice', min: 25, max: 35 },
-  electrician: { label: 'Electrician', min: 95, max: 115 },
-  plumber: { label: 'Plumber', min: 95, max: 115 },
-  tiler: { label: 'Tiler', min: 110, max: 130 },
-  painter: { label: 'Painter', min: 60, max: 70 },
-  plasterer: { label: 'Plasterer', min: 35, max: 45 }
+  builder: { label: 'Builder/Carpenter', min: 95, max: 120, unit: 'hr' },
+  labourer: { label: 'Labourer', min: 45, max: 60, unit: 'hr' },
+  apprentice: { label: 'Apprentice', min: 30, max: 40, unit: 'hr' },
+  electrician: { label: 'Electrician', min: 105, max: 130, unit: 'hr' },
+  plumber: { label: 'Plumber', min: 105, max: 130, unit: 'hr' },
+  gasfitter: { label: 'Gasfitter', min: 110, max: 135, unit: 'hr' },
+  tiler: { label: 'Tiler', min: 120, max: 150, unit: 'm²' },
+  painter: { label: 'Painter', min: 65, max: 80, unit: 'hr' },
+  plasterer: { label: 'Plasterer/GIB Stopper', min: 40, max: 55, unit: 'm²' },
+  roofer: { label: 'Roofer', min: 85, max: 110, unit: 'hr' },
+  concreter: { label: 'Concreter', min: 80, max: 100, unit: 'hr' },
+  demolition: { label: 'Demolition', min: 65, max: 85, unit: 'hr' }
 };
 
 // Default company info

@@ -421,12 +421,24 @@ Example 4m × 3m deck, 600mm high:
 • Footings: 6 × concrete pads (300mm dia × 400mm deep) + 6 × post stirrups 100mm
 • Posts: 6 × 100×100 H3.2 posts sitting IN stirrups (above ground, NOT buried)
 • Decking: 4m × 3m = 12m² ÷ 0.145m coverage = 82.8 lm + 10% waste = 91 lm
-  OUTPUT: {"name": "140×32 H3.2 Decking", "qty": 91, "unit": "lm", "searchTerm": "140X32 H3.2 DECKING"}
+  OUTPUT: {"name": "140×32 H3.2 Decking", "qty": 91, "unit": "lm", "searchTerm": "PINE DECKING H3.2"}
 • Joists at 450mm: 4000 ÷ 450 + 1 = 10 joists × 3m = 30 lm (140×45 H3.2)
 • Bearers at 1.2m: 3 bearers × 4m = 12 lm (140×45 H3.2)
-• Deck screws: 12m² × 22 = 264 screws
+• Deck screws: 12m² × 22 = 264 screws ÷ 200/box = 2 boxes
+• Joist hangers: 10 joists × 2 = 20 ea
+• ANCILLARY (always include for decks):
+  - Joist/bearer tape: 30 + 12 = 42 lm
+  - DPC under bearers: 12 lm
+  - Concrete: 6 pads × 2 bags = 12 × 20kg bags
 NOTE: Post stirrups keep timber above ground - no H5 treatment needed for posts
 >>> DECKING UNIT IS ALWAYS "lm" (lineal meters) - NEVER "ea" or "boards" <<<
+
+ANCILLARY MATERIALS (always include for relevant jobs):
+• DECKS: joist tape, bearer DPC, concrete bags, stirrups/brackets
+• FRAMING: building wrap, flashing tape, sill sealer, fixings
+• ROOFING: underlay, ridge cap, barge flashings, roofing screws
+• BATHROOMS: Aqualine GIB, tile underlay (builder supplies only)
+• CLADDING: building wrap, cavity battens, flashings, sealant
 
 PERGOLAS:
 • Footings: Concrete pads with post stirrups (100mm or 125mm) - NOT fence posts in ground
@@ -572,9 +584,18 @@ Example: 4m × 3m deck
 ════════════════════════════════════════════════════════════════
 
 ALWAYS SHOW YOUR MATH - every quantity needs visible working:
-• "3.6m × 2.4m = 8.64m² ÷ 2.88m²/sheet = 3 sheets + 10% = 4 sht"
+• "3.6m × 2.4m = 8.64m² ÷ 2.88m²/sheet = 3 sheets (no waste on full sheets)"
 • "12m² deck ÷ 0.145m coverage = 83 lm + 10% waste = 91 lm"
-• "4m wall ÷ 0.6m spacing + 1 = 8 studs × 2.4m = 19.2 lm"
+• "4m wall ÷ 0.6m spacing + 1 = 8 studs × 2.4m = 19.2 lm + 10% = 21 lm"
+
+WASTAGE RULES:
+• SHEETS (GIB, ply): Calculate exact sheets from dimensions, NO flat wastage
+  - "3.6m wall ÷ 1.2m width = 3 sheets" (not 3 + 10%)
+  - Only add extra sheet if cuts create unusable offcuts
+• TIMBER FRAMING: Add 10% waste for cuts/offcuts
+• DECKING: Add 10% for end cuts and board selection
+• TILES: Add 15% for cuts and breakage
+• FIXINGS: Round up to next pack size (no percentage waste)
 
 Respond with JSON:
 {
@@ -602,6 +623,40 @@ UNIT RULES FOR OUTPUT:
 • TIMBER FRAMING: Always "lm" for bearers, joists, studs, rafters
 • SHEETS (GIB, ply): Always "sht"
 • SCREWS/NAILS: Always "box" or "pk" with pack size in name
+
+═══════════════════════════════════════════════════════════════
+     ⚠️ CRITICAL: OUTPUT SELLABLE UNITS (NOT individual items)
+═══════════════════════════════════════════════════════════════
+
+SCREWS & NAILS - output BOXES not individual screws:
+• Calculate: screws needed ÷ screws per box = boxes to order
+• Example: "264 screws ÷ 200 per box = 1.32 → 2 boxes"
+• WRONG: qty: 264, unit: "box" ← This orders 264 BOXES!
+• RIGHT: qty: 2, unit: "box"
+• Typical box sizes: 200, 500, 1000 screws
+
+PAINT & STAIN - output TINS not liters:
+• Calculate: m² to cover ÷ coverage per L = liters needed
+• Then: liters ÷ tin size = tins to order
+• Example: "12m² deck × 2 coats = 24m² ÷ 12m²/L = 2L → 1 × 5L tin"
+• WRONG: qty: 91 (the m² area!)
+• RIGHT: qty: 1, unit: "ea" for 5L tin
+
+CONCRETE - output BAGS:
+• Calculate: m³ needed × bags per m³
+• 1m³ ≈ 108 × 20kg bags (pre-mixed)
+• Example: "0.15m³ footing = 0.15 × 108 = 16 bags → 18 bags"
+
+TIMBER - output in PRODUCT UNITS:
+• If product is "per LM" → qty in lineal meters
+• If product is "per LGTH" (length) → qty in lengths
+• Example: "30 lm ÷ 5.4m length = 5.6 → 6 lengths"
+
+WORKING MUST SHOW UNIT CONVERSION:
+✓ "Deck screws: 12m² × 22 screws/m² = 264 screws ÷ 200/box = 2 boxes"
+✓ "Stain: 12m² × 2 coats ÷ 12m²/L coverage = 2L needed → 1 × 5L tin"
+✓ "Concrete: 0.3m × 0.3m × 0.4m × 6 pads = 0.22m³ × 108 = 24 bags"
+✗ "264 screws needed" with qty: 264 ← WRONG, this orders 264 boxes!
 
 IMPORTANT:
 - The "calculations" array must have an entry for EVERY material showing the math

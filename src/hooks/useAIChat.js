@@ -221,6 +221,31 @@ export function useAIChat({
       if (!qty || isNaN(qty) || qty <= 0) qty = 1;
       qty = Math.ceil(qty);
 
+      // Sanity check for common unit confusion errors
+      const itemName = (suggested.name || '').toLowerCase();
+      const unit = (suggested.unit || '').toLowerCase();
+
+      // Screws/nails: if qty > 50 boxes, likely meant individual screws
+      if ((itemName.includes('screw') || itemName.includes('nail')) &&
+          (unit === 'box' || unit === 'pk') && qty > 50) {
+        // Assume AI output individual count, convert to boxes (assume 200/box)
+        qty = Math.ceil(qty / 200);
+        if (qty < 1) qty = 1;
+      }
+
+      // Paint/stain: if qty > 20 tins, likely meant m² coverage
+      if ((itemName.includes('paint') || itemName.includes('stain') || itemName.includes('finish')) &&
+          qty > 20) {
+        // Assume AI output m² coverage, convert to tins (assume 12m²/L, 5L tin)
+        qty = Math.ceil(qty / (12 * 5));
+        if (qty < 1) qty = 1;
+      }
+
+      // Concrete bags: if qty > 200, likely meant kg not bags
+      if (itemName.includes('concrete') && qty > 200) {
+        qty = Math.ceil(qty / 20); // 20kg bags
+      }
+
       if (searchWords.length === 0) {
         unmatched.push({ name: suggested.name || 'Unknown item', qty, reason: 'No search term' });
         return;
