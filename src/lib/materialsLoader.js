@@ -16,15 +16,12 @@ let cachedTreatments = null;
 // ============================================================================
 
 /**
- * Get all materials with backward-compatible format
- * Adds 'name' property from 'displayName' for compatibility
+ * Get all materials
+ * Uses 'name' field directly (displayName was removed in data restructure)
  */
 export function getAllMaterials() {
   if (!cachedMaterials) {
-    cachedMaterials = processedMaterialsData.map(m => ({
-      ...m,
-      name: m.displayName, // Backward compatibility
-    }));
+    cachedMaterials = processedMaterialsData;
   }
   return cachedMaterials;
 }
@@ -210,7 +207,7 @@ function isFuzzyMatch(searchWord, targetWord, maxDistance = 2) {
  * Higher score = better match
  */
 function scoreMatch(material, searchTerms, normalizedQuery) {
-  const searchableName = createSearchableText(material.displayName || material.name);
+  const searchableName = createSearchableText(material.name || '');
   const searchableCategory = createSearchableText(material.category || '');
   const searchableSubcategory = createSearchableText(material.subcategory || '');
   const searchableCode = createSearchableText(material.code || '');
@@ -547,7 +544,7 @@ export function getSuggestions(query, limit = 5) {
   for (const material of all) {
     if (suggestions.size >= limit * 3) break;
 
-    const words = (material.displayName || material.name).toLowerCase().split(/[\s\-_]+/);
+    const words = (material.name || '').toLowerCase().split(/[\s\-_]+/);
     for (const word of words) {
       if (word.length < 3) continue;
 

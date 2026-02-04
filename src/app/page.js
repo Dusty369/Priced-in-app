@@ -10,6 +10,7 @@ import AIAssistant from '../components/AIAssistant';
 import { generateQuotePDF } from '../lib/pdfGenerator';
 import { useAIChat } from '../hooks/useAIChat';
 import { useProjects } from '../hooks/useProjects';
+import { useCart } from '../hooks/useCart';
 
 // Lazy load heavy components
 const MaterialsPage = lazy(() => import('../components/MaterialsPage'));
@@ -50,8 +51,10 @@ export default function PricedInApp() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAI, setShowAI] = useState(true);
 
-  // Cart & materials state
-  const [cart, setCart] = useState([]);
+  // Cart hook
+  const { cart, setCart, addToCart, updateQty, removeFromCart, addItemsToCart, clearCart } = useCart();
+
+  // Materials filter state
   const [search, setSearch] = useState('');
   const [materialSearch, setMaterialSearch] = useState(''); // For AI suggestion -> Materials nav
   const [category, setCategory] = useState('All');
@@ -141,31 +144,6 @@ export default function PricedInApp() {
     if (page !== 'materials') setMaterialSearch('');
   }, [page]);
 
-  // Cart functions (memoized to prevent unnecessary re-renders)
-  const addToCart = useCallback((material) => {
-    setCart(prev => {
-      const existing = prev.find(i => i.id === material.id);
-      if (existing) {
-        return prev.map(i => i.id === material.id ? {...i, qty: i.qty + 1} : i);
-      }
-      return [...prev, { ...material, qty: 1 }];
-    });
-  }, []);
-
-  const updateQty = useCallback((id, delta) => {
-    setCart(prev => prev.map(i => {
-      if (i.id === id) {
-        const newQty = Math.max(0, i.qty + delta);
-        return newQty === 0 ? null : {...i, qty: newQty};
-      }
-      return i;
-    }).filter(Boolean));
-  }, []);
-
-  const removeFromCart = useCallback((id) => {
-    setCart(prev => prev.filter(i => i.id !== id));
-  }, []);
-
   // Labour functions (memoized)
   const addLabourItem = useCallback((item) => {
     const id = Date.now().toString();
@@ -182,22 +160,7 @@ export default function PricedInApp() {
     setLabourItems(prev => prev.filter(i => i.id !== id));
   }, []);
 
-  // AI chat hook (must be after addLabourItem is defined)
-  const addItemsToCart = useCallback((items) => {
-    setCart(prev => {
-      const updated = [...prev];
-      items.forEach(item => {
-        const existing = updated.find(i => i.id === item.id);
-        if (existing) {
-          existing.qty += item.qty;
-        } else {
-          updated.push(item);
-        }
-      });
-      return updated;
-    });
-  }, []);
-
+  // AI chat hook
   const {
     chatInput,
     setChatInput,
