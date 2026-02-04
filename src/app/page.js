@@ -7,8 +7,8 @@ import { Plus, Minus, Trash2, Save, FolderOpen, FileText, Settings, Download, Bu
 import { searchMaterials, getMaterialsByCategory, getCategories, getSuppliers, getAllMaterials } from '../lib/materialsLoader';
 import Header from '../components/Header';
 import AIAssistant from '../components/AIAssistant';
-import { extractSearchSuggestions } from '../utils/searchSuggestions';
 import { generateQuotePDF } from '../lib/pdfGenerator';
+import { useAIChat } from '../hooks/useAIChat';
 
 // Lazy load heavy components
 const MaterialsPage = lazy(() => import('../components/MaterialsPage'));
@@ -87,11 +87,6 @@ export default function PricedInApp() {
   const [planPreview, setPlanPreview] = useState(null);
   const [planAnalyzing, setPlanAnalyzing] = useState(false);
 
-  // AI state
-  const [chatInput, setChatInput] = useState('');
-  const [chatHistory, setChatHistory] = useState([]);
-  const [aiLoading, setAiLoading] = useState(false);
-
   // Load from localStorage on mount
   useEffect(() => {
     setHydrated(true);
@@ -166,6 +161,40 @@ export default function PricedInApp() {
   const removeLabourItem = useCallback((id) => {
     setLabourItems(prev => prev.filter(i => i.id !== id));
   }, []);
+
+  // AI chat hook (must be after addLabourItem is defined)
+  const addItemsToCart = useCallback((items) => {
+    setCart(prev => {
+      const updated = [...prev];
+      items.forEach(item => {
+        const existing = updated.find(i => i.id === item.id);
+        if (existing) {
+          existing.qty += item.qty;
+        } else {
+          updated.push(item);
+        }
+      });
+      return updated;
+    });
+  }, []);
+
+  const {
+    chatInput,
+    setChatInput,
+    chatHistory,
+    setChatHistory,
+    aiLoading,
+    sendAIMessage,
+    addMaterialsToQuote,
+    addLabourToQuote
+  } = useAIChat({
+    labourRates,
+    onAddToCart: addItemsToCart,
+    onAddLabourItem: addLabourItem,
+    onNavigateToQuote: () => setPage('quote'),
+    allMaterials,
+    materialWordIndex
+  });
 
   // Calculations (memoized to prevent recalculation on every render)
   const subtotal = useMemo(() => 
@@ -322,330 +351,6 @@ export default function PricedInApp() {
     }
     setPdfGenerating(false);
   };
-
-  // Extract JSON from AI response text using balanced brace matching
-  const extractJSON = (text) => {
-    // First, try to find JSON in a code block (```json ... ``` or ``` ... ```)
-    const codeBlockMatch = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
-    if (codeBlockMatch) {
-      try {
-        const parsed = JSON.parse(codeBlockMatch[1]);
-        if (parsed.materials) return parsed; // Valid estimate JSON
-      } catch (e) { /* continue to other methods */ }
-    }
-
-    // Find the first { that starts a JSON object with required fields
-    const startIdx = text.indexOf('{');
-    if (startIdx === -1) return null;
-
-    // Use balanced brace counting to find the matching }
-    let braceCount = 0;
-    let inString = false;
-    let escapeNext = false;
-
-    for (let i = startIdx; i < text.length; i++) {
-      const char = text[i];
-
-      if (escapeNext) {
-        escapeNext = false;
-        continue;
-      }
-
-      if (char === '\\' && inString) {
-        escapeNext = true;
-        continue;
-      }
-
-      if (char === '"' && !escapeNext) {
-        inString = !inString;
-        continue;
-      }
-
-      if (!inString) {
-        if (char === '{') braceCount++;
-        if (char === '}') braceCount--;
-
-        if (braceCount === 0) {
-          // Found matching closing brace
-          const jsonStr = text.slice(startIdx, i + 1);
-          try {
-            const parsed = JSON.parse(jsonStr);
-            // Verify it has expected structure (at minimum, materials array)
-            if (parsed.materials && Array.isArray(parsed.materials)) {
-              return parsed;
-            }
-          } catch (e) {
-            // This JSON object wasn't valid, try finding next one
-            const nextStart = text.indexOf('{', i + 1);
-            if (nextStart !== -1) {
-              return extractJSON(text.slice(nextStart));
-            }
-          }
-          break;
-        }
-      }
-    }
-
-    return null;
-  };
-
-  // AI message handler
-  const sendAIMessage = async () => {
-    if (!chatInput.trim() || aiLoading) return;
-
-    const userMessage = chatInput;
-    setChatInput('');
-    setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
-    setAiLoading(true);
-
-    try {
-      const response = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'project',
-          materials: [],
-          labourRates,
-          messages: [{ role: 'user', content: userMessage }]
-        })
-      });
-
-      const data = await response.json();
-      
-      if (data.error) {
-        setChatHistory(prev => [...prev, { 
-          role: 'assistant', 
-          content: `Error: ${data.error}. Make sure your API key is set in .env.local`,
-          type: 'error'
-        }]);
-      } else {
-        let text = data.content?.find(c => c.type === 'text')?.text || 'No response';
-
-        // Try to parse JSON and format it nicely
-        try {
-          // Extract JSON from response using balanced brace matching
-          const json = extractJSON(text);
-          if (json) {
-            
-            // Format the response beautifully
-            let formattedContent = '';
-            
-            if (json.summary) {
-              formattedContent += `**${json.summary}**\n\n`;
-            }
-
-            if (json.calculations) {
-              formattedContent += '🧮 **Calculations:**\n';
-              if (Array.isArray(json.calculations)) {
-                json.calculations.forEach(calc => {
-                  formattedContent += `• **${calc.item}:** ${calc.working}\n`;
-                });
-              } else {
-                formattedContent += `${json.calculations}\n`;
-              }
-              formattedContent += '\n';
-            }
-
-            if (json.materials && json.materials.length > 0) {
-              formattedContent += '📦 **Materials needed:**\n';
-              json.materials.forEach(m => {
-                formattedContent += `• ${m.qty} × ${m.name}\n`;
-              });
-              formattedContent += '\n';
-            }
-            
-            if (json.labour && json.labour.totalHours) {
-              const rate = labourRates.builder || 95;
-              const cost = rate * json.labour.totalHours;
-              formattedContent += '👷 **Labour estimate:**\n';
-              formattedContent += `• ${json.labour.totalHours} builder hours ($${cost.toFixed(0)})\n`;
-              if (json.labour.description) {
-                formattedContent += `  ${json.labour.description}\n`;
-              }
-              formattedContent += '\n';
-            }
-            
-            if (json.notes && json.notes.length > 0) {
-              formattedContent += '📝 **Important notes:**\n';
-              json.notes.forEach(note => {
-                formattedContent += `• ${note}\n`;
-              });
-              formattedContent += '\n';
-            }
-            
-            if (json.warnings && json.warnings.length > 0) {
-              formattedContent += '⚠️ **Warnings:**\n';
-              json.warnings.forEach(warning => {
-                formattedContent += `• ${warning}\n`;
-              });
-            }
-            
-            setChatHistory(prev => [...prev, { 
-              role: 'assistant', 
-              content: formattedContent.trim(),
-              parsed: json
-            }]);
-          } else {
-            // No JSON found, display as-is
-            setChatHistory(prev => [...prev, { role: 'assistant', content: text }]);
-          }
-        } catch (e) {
-          // JSON parse failed, display as plain text
-          setChatHistory(prev => [...prev, { role: 'assistant', content: text }]);
-        }
-      }
-    } catch (error) {
-      setChatHistory(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Failed to connect. Check your internet connection.' 
-      }]);
-    }
-    
-    setAiLoading(false);
-  };
-
-  // Add AI-suggested materials to quote
-  const addMaterialsToQuote = (materials, msgIndex) => {
-    if (!materials || materials.length === 0) return;
-
-    const newItems = [];
-    const unmatched = []; // Track materials we couldn't find
-
-    materials.forEach(suggested => {
-      const searchTerm = (suggested.searchTerm || suggested.name || "").toUpperCase();
-      const searchWords = searchTerm.replace(/[^A-Z0-9.]/g, " ").split(" ").filter(w => w.length > 1);
-
-      // Validate and parse quantity
-      let qty = suggested.qty;
-      if (typeof qty === 'string') qty = parseFloat(qty);
-      if (!qty || isNaN(qty) || qty <= 0) qty = 1;
-      qty = Math.ceil(qty); // Round up - can't buy partial items
-
-      // Skip if no valid search term
-      if (searchWords.length === 0) {
-        unmatched.push({ name: suggested.name || 'Unknown item', qty, reason: 'No search term' });
-        return;
-      }
-
-      // Find best match using word index (O(n) instead of O(13k))
-      let bestMatch = null;
-      let bestScore = 0;
-
-      // Key words that MUST match if present (product identifiers)
-      const keyWords = searchWords.filter(w =>
-        ["AQUALINE", "ULTRALINE", "FYRELINE", "STANDARD", "PINK", "EARTHWOOL", "H3.1", "H3.2", "H4", "H5", "H1.2", "SG8", "KD"].includes(w)
-      );
-
-      // Get candidate indices from word index
-      let candidateIndices = null;
-      const wordsToMatch = keyWords.length > 0 ? keyWords : searchWords.slice(0, 3);
-
-      for (const word of wordsToMatch) {
-        const indices = materialWordIndex.get(word);
-        if (!indices) {
-          candidateIndices = new Set();
-          break;
-        }
-        if (candidateIndices === null) {
-          candidateIndices = new Set(indices);
-        } else {
-          candidateIndices = new Set(indices.filter(i => candidateIndices.has(i)));
-        }
-        if (candidateIndices.size === 0) break;
-      }
-
-      // Score only candidates (not all 13k materials)
-      if (candidateIndices && candidateIndices.size > 0) {
-        for (const idx of candidateIndices) {
-          const m = allMaterials[idx];
-          const matName = m.name.toUpperCase();
-          const score = searchWords.filter(word => matName.includes(word)).length;
-          if (score > bestScore) {
-            bestScore = score;
-            bestMatch = m;
-          }
-        }
-      }
-
-      if (bestMatch) {
-        const existing = newItems.find(i => i.id === bestMatch.id);
-        if (existing) {
-          existing.qty += qty;
-        } else {
-          newItems.push({ ...bestMatch, qty });
-        }
-      } else {
-        // Track unmatched for user feedback with helpful search suggestions
-        const itemName = suggested.name || searchTerm;
-        const suggestedSearches = extractSearchSuggestions(itemName, suggested.searchTerm);
-        unmatched.push({
-          name: itemName,
-          qty,
-          searchTerm: suggested.searchTerm,
-          reason: 'No match in database',
-          suggestions: suggestedSearches
-        });
-      }
-    });
-
-    // Add all matched items to cart
-    if (newItems.length > 0) {
-      setCart(prev => {
-        const updated = [...prev];
-        newItems.forEach(item => {
-          const existing = updated.find(i => i.id === item.id);
-          if (existing) {
-            existing.qty += item.qty;
-          } else {
-            updated.push(item);
-          }
-        });
-        return updated;
-      });
-    }
-
-    // Update chat with match results and add warning message for unmatched items
-    setChatHistory(prev => {
-      const updated = prev.map((msg, idx) =>
-        idx === msgIndex ? {
-          ...msg,
-          added: true,
-          matchResults: {
-            matched: newItems.length,
-            total: materials.length,
-            unmatched: unmatched.length > 0 ? unmatched : null
-          }
-        } : msg
-      );
-
-      // Add system warning message if items couldn't be matched
-      if (unmatched.length > 0) {
-        updated.push({
-          role: 'system',
-          type: 'warning',
-          content: `${unmatched.length} of ${materials.length} items couldn't be matched`,
-          unmatched: unmatched,
-          matched: newItems.length
-        });
-      }
-
-      return updated;
-    });
-
-    setPage('quote');
-  };
-
-  // Add AI-suggested labour to quote
-  const addLabourToQuote = (labour, msgIndex) => {
-    if (!labour || !labour.totalHours) return;
-
-    addLabourItem({
-      role: 'builder',
-      hours: labour.totalHours,
-      description: labour.description || 'Builder labour'
-    });
-  };
-
 
   if (!hydrated) {
     return (
