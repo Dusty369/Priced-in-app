@@ -31,6 +31,17 @@ import {
 
 const allMaterials = getAllMaterials();
 
+// Build word index for O(1) material lookup (instead of O(13k) per search)
+const materialWordIndex = new Map();
+allMaterials.forEach((m, idx) => {
+  if (!m?.name) return;
+  const words = m.name.toUpperCase().replace(/[^A-Z0-9.]/g, ' ').split(/\s+/).filter(w => w.length > 1);
+  words.forEach(word => {
+    if (!materialWordIndex.has(word)) materialWordIndex.set(word, []);
+    materialWordIndex.get(word).push(idx);
+  });
+});
+
 export default function PricedInApp() {
   // Hydration guard
   const [hydrated, setHydrated] = useState(false);
@@ -748,7 +759,7 @@ export default function PricedInApp() {
         return;
       }
 
-      // Find best match - prioritize key product words
+      // Find best match using word index (O(n) instead of O(13k))
       let bestMatch = null;
       let bestScore = 0;
 
@@ -757,23 +768,36 @@ export default function PricedInApp() {
         ["AQUALINE", "ULTRALINE", "FYRELINE", "STANDARD", "PINK", "EARTHWOOL", "H3.1", "H3.2", "H4", "H5", "H1.2", "SG8", "KD"].includes(w)
       );
 
-      allMaterials.forEach(m => {
-        if (!m?.name) return; // Skip invalid entries
-        const matName = m.name.toUpperCase();
+      // Get candidate indices from word index
+      let candidateIndices = null;
+      const wordsToMatch = keyWords.length > 0 ? keyWords : searchWords.slice(0, 3);
 
-        // If we have key words, they must ALL match
-        if (keyWords.length > 0) {
-          const keyMatches = keyWords.every(kw => matName.includes(kw));
-          if (!keyMatches) return;
+      for (const word of wordsToMatch) {
+        const indices = materialWordIndex.get(word);
+        if (!indices) {
+          candidateIndices = new Set();
+          break;
         }
+        if (candidateIndices === null) {
+          candidateIndices = new Set(indices);
+        } else {
+          candidateIndices = new Set(indices.filter(i => candidateIndices.has(i)));
+        }
+        if (candidateIndices.size === 0) break;
+      }
 
-        // Score by total word matches
-        const score = searchWords.filter(word => matName.includes(word)).length;
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = m;
+      // Score only candidates (not all 13k materials)
+      if (candidateIndices && candidateIndices.size > 0) {
+        for (const idx of candidateIndices) {
+          const m = allMaterials[idx];
+          const matName = m.name.toUpperCase();
+          const score = searchWords.filter(word => matName.includes(word)).length;
+          if (score > bestScore) {
+            bestScore = score;
+            bestMatch = m;
+          }
         }
-      });
+      }
 
       if (bestMatch) {
         const existing = newItems.find(i => i.id === bestMatch.id);
