@@ -130,37 +130,65 @@ ${assemblies}
 10. Specify timber treatment: H1.2 interior, H3.1 wet areas, H3.2 exterior, H4 ground contact, H5 in-ground
 11. If user uses non-NZ terms, translate to NZ terms in your response
 12. FLAG COMMON MISTAKES - check assemblies reference for errors to warn about
+13. ALL DIMENSIONS IN MILLIMETERS - timber: "140 X 45" not "14 X 4.5" or "140x45mm"
+    Never convert mm to cm or m. Database expects: "90 X 45", "140 X 45", "190 X 45", "240 X 45"
+    Wrong: 14×4.5, 70×22.5, 140mm×45mm. Correct: 140 X 45, 90 X 45
 
 ═══════════════════════════════════════════════════════════════
-          TIMBER TREATMENT RULES (NZS 3604 Compliance)
+          NZ TIMBER TREATMENT GRADES (NZBC Compliance)
 ═══════════════════════════════════════════════════════════════
 
-STRUCTURAL PILES AND IN-GROUND POSTS:
-• MUST be H5 treated (125×125 H5 minimum)
-• H4 is NOT acceptable for structural foundations
-• H4 is ONLY for fence posts (non-structural)
+TREATMENT GRADES PER NZ BUILDING CODE:
 
-ABOVE GROUND STRUCTURAL:
-• Bearers, joists: H3.2 minimum
-• Decking: H3.2 minimum
-• Posts sitting ON piles (not in ground): H4 acceptable
+H1.2 - INTERNAL DRY USE ONLY
+• Wall framing inside building envelope
+• Ceiling framing, roof framing (above insulation)
+• Internal joists where well ventilated
+• NOT suitable where moisture exposure possible
 
-⚠️ NEVER suggest for structural foundations:
-• 100×100 H4 fence posts
-• Any H4 timber in ground
-• Any H3.2 timber in ground
+H3.2 - EXTERNAL ABOVE GROUND
+• Decking boards (on top of subframe)
+• External joists and bearers ABOVE ground (on piles/posts)
+• Weatherboards, fascia, barge boards
+• External battens, cavity battens
+• Pergola rafters and beams (above posts)
+• NOT suitable for ground contact
 
-✓ CORRECT examples:
-• Deck piles: "125×125 H5 TIMBER PILE 2.4M" or anchor piles
-• Pergola posts in ground: "125×125 H5 POST 3.0M"
-• Pergola posts on stirrups: "100×100 H4 POST 3.0M" (above ground only)
+H4 - GROUND CONTACT, NON-STRUCTURAL
+• Landscaping timber, garden edging, sleepers
+• Fence rails (if touching ground)
+• NOT for structural posts or foundations
+• NOT in concrete
 
-✗ WRONG:
-• "100×100 H4 POST" for deck piles
-• "H4 pile" for any structural foundation
+H5 - IN-GROUND STRUCTURAL
+• Foundation piles (timber piles in concrete)
+• Fence posts set in concrete
+• Posts buried in ground for structural support
+• Retaining wall posts
+• Any timber embedded in concrete/ground AND load-bearing
 
->>> If the user asks for "H4 posts" for a deck or pergola foundation, CORRECT them:
-"H4 is not suitable for in-ground structural use. Using H5 treated 125×125 piles instead."
+⚠️ COMMON MISTAKES TO AVOID:
+
+✗ WRONG: Deck bearers resting on ground → Use H5 (or raise on piles)
+✗ WRONG: Posts in concrete = H4 → Must be H5
+✗ WRONG: External wall framing = H3.2 → H1.2 if above DPC
+✗ WRONG: "H4 deck piles" → No such thing, must be H5
+✗ WRONG: 100×100 H4 fence post for pergola → Use H5 if in ground
+
+✓ CORRECT EXAMPLES:
+• Deck piles in concrete: "125×125 H5 POST 3.0M"
+• Deck bearers on piles: "140×45 H3.2 BEARER"
+• Deck joists: "140×45 H3.2 JOIST"
+• Decking boards: "140×32 H3.2 DECKING"
+• Pergola posts in ground: "125×125 H5 POST"
+• Pergola posts on stirrups: "100×100 H3.2 POST" (H4 also OK)
+• Fence posts in concrete: "100×100 H5 POST" (NOT H4)
+• Garden sleeper on ground: "200×50 H4"
+
+>>> CORRECT THE USER if they request:
+- "H4 posts in concrete" → "H4 is not rated for concrete embedment. Using H5 instead."
+- "H3.2 posts in ground" → "H3.2 not for ground contact. Using H5 for in-ground."
+- "H4 deck piles" → "H4 not structural. Using H5 treated piles for deck foundations."
 
 BUILDER SUPPLIES ONLY - exclude:
 - Electrical (cables, switches, lights, wiring) → electrician supplies
@@ -582,18 +610,25 @@ IMPORTANT:
 - "searchTerm" should match NZ product names in the database
 - Translate any non-NZ terms the user uses (e.g., "header" → "lintel", "drywall" → "GIB")
 
-NZ PRODUCT SEARCH TERMS:
-• Framing: "90X45 H1.2", "90X45 H3.1", "140X45 H3.2"
-• DECK/PERGOLA PILES (structural - NOT fence posts):
-  - "ANCHOR PILE FIX KIT" - anchor pile system
-  - "POST STIRRUP 100MM" or "POST STIRRUP 125MM" - galv stirrup on concrete footing
-  - Concrete: user supplies ready-mix or bags
-• FENCE POSTS (for FENCES ONLY): "100X100 H4 POST" - NOT for decks/pergolas
+DIMENSION FORMAT (CRITICAL - NZ merchants use mm only):
+• Timber sizes: "140 X 45" not "140x45mm" or "14 X 4.5" - always mm, spaces around X
+• Sheet sizes: "2400 X 1200" not "2.4m x 1.2m"
+• In searchTerm: Use exact format "140 X 45 RAD SG8 H3.2"
+• NEVER divide dimensions by 10 or convert to other units
+• Examples: 90, 140, 190, 240 (mm) - not 9, 14, 19, 24 (cm)
+
+NZ PRODUCT SEARCH TERMS (use EXACT patterns below):
+• Framing timber: "140 X 45 RAD SG8 H3.2", "90 X 45 RAD SG8 H1.2", "190 X 45 RAD"
+  (note: spaces around X, RAD prefix, SG8 grade)
+• Posts: "100 X 100 RAD POST H4", "125 X 125 POST H5"
+• Post stirrups/brackets: "R6 STIRRUP 150X150", "BOWMAC POST BRACKET"
+  (R6 stirrups start at 150mm, use BOWMAC brackets for 100mm posts)
+• Joist hangers: "L/LOK JOIST HANGER", "LVL JOIST HANGER 300 X 90"
+• Decking boards: "PINE WET PREMIUM DECKING", "RAD PREM DECKING H3.2", "KWILA DECKING"
 • GIB: "GIB STANDARD", "GIB AQUALINE", "FYRELINE"
-• Decking: "140X32 H3.2 DECKING", "KWILA DECKING"
-• Screws: "DECK SCREWS", "GIB GRABBER", "BATTEN SCREWS"
-• Insulation: "R2.2 WALL BATTS", "R3.2 CEILING"
-• Underlay: "TILE & SLATE UNDERLAY 6MM"
+• Screws: "DECKING SCREW", "GIB GRABBER", "BATTEN SCREW"
+• Insulation: "PINK BATTS", "EARTHWOOL"
+• Underlay: "TILE UNDERLAY", "BUILDING PAPER"
 
 AVAILABLE MATERIALS (sample):
 ${materialSummary}
@@ -691,6 +726,9 @@ CRITICAL RULES:
 • Always use correct timber sizes from NZS 3604 span tables
 • Specify treatment levels (H1.2, H3.1, H3.2, H4, H5)
 • Note if building consent is likely required
+• ALL DIMENSIONS IN MM: timber "140 X 45" not "14x4.5" - spaces around X, no unit suffix
+• searchTerm format: "140 X 45 RAD SG8 H3.2" - exactly as database stores it
+• NEVER convert mm to cm: 90, 140, 190, 240 mm NOT 9, 14, 19, 24 cm
 
 TIMBER TREATMENT RULES (NZS 3604):
 • STRUCTURAL PILES/IN-GROUND: MUST be H5 (125×125 H5 minimum) - H4 NOT acceptable

@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Plus, Package, ChevronDown } from 'lucide-react';
+import { Search, Plus, Package, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { searchMaterials, getMaterialsByCategory, getCategories, getSuppliers } from '../lib/materialsLoader';
+
+const ITEMS_PER_PAGE = 100;
 
 export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
   const [materials, setMaterials] = useState([]);
@@ -13,6 +15,8 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
   const [categories, setCategories] = useState(['All']);
   const [suppliers, setSuppliers] = useState(['All']);
   const [expandedCategories, setExpandedCategories] = useState({});
+  const [page, setPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
 
   useEffect(() => {
     setCategories(getCategories());
@@ -25,22 +29,35 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
     if (initialSearch) setSearch(initialSearch);
   }, [initialSearch]);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, category, supplier]);
+
   useEffect(() => {
     if (loading) return;
 
     const loadMaterials = () => {
+      // Get all matching results (up to 2000 for performance)
+      const maxResults = 2000;
+      let results;
       if (search) {
-        // Pass supplier filter to search
-        setMaterials(searchMaterials(search, 100, supplier));
+        results = searchMaterials(search, maxResults, supplier);
       } else {
-        // Pass supplier filter to category browse
-        setMaterials(getMaterialsByCategory(category, 100, supplier));
+        results = getMaterialsByCategory(category, maxResults, supplier);
       }
+
+      setTotalResults(results.length);
+
+      // Paginate results
+      const start = (page - 1) * ITEMS_PER_PAGE;
+      const end = start + ITEMS_PER_PAGE;
+      setMaterials(results.slice(start, end));
     };
 
     const timer = setTimeout(loadMaterials, 300);
     return () => clearTimeout(timer);
-  }, [search, category, supplier, loading]);
+  }, [search, category, supplier, loading, page]);
 
   if (loading) {
     return (
@@ -92,11 +109,34 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
         </div>
       </div>
 
-      {/* Results count */}
-      {materials.length > 0 && (
-        <p className="text-sm text-gray-500 px-1">
-          {materials.length} materials found {search && `for "${search}"`}
-        </p>
+      {/* Results count & pagination */}
+      {totalResults > 0 && (
+        <div className="flex items-center justify-between px-1">
+          <p className="text-sm text-gray-500">
+            Showing {(page - 1) * ITEMS_PER_PAGE + 1}-{Math.min(page * ITEMS_PER_PAGE, totalResults)} of {totalResults} {search && `for "${search}"`}
+          </p>
+          {totalResults > ITEMS_PER_PAGE && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <span className="text-sm text-gray-600">
+                {page} / {Math.ceil(totalResults / ITEMS_PER_PAGE)}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(Math.ceil(totalResults / ITEMS_PER_PAGE), p + 1))}
+                disabled={page >= Math.ceil(totalResults / ITEMS_PER_PAGE)}
+                className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Materials List */}
@@ -160,6 +200,29 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
           );
         })}
       </div>
+
+      {/* Bottom pagination */}
+      {totalResults > ITEMS_PER_PAGE && materials.length > 0 && (
+        <div className="flex items-center justify-center gap-4 py-4">
+          <button
+            onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo(0, 0); }}
+            disabled={page === 1}
+            className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100 flex items-center gap-1"
+          >
+            <ChevronLeft size={18} /> Previous
+          </button>
+          <span className="text-sm text-gray-600">
+            Page {page} of {Math.ceil(totalResults / ITEMS_PER_PAGE)}
+          </span>
+          <button
+            onClick={() => { setPage(p => Math.min(Math.ceil(totalResults / ITEMS_PER_PAGE), p + 1)); window.scrollTo(0, 0); }}
+            disabled={page >= Math.ceil(totalResults / ITEMS_PER_PAGE)}
+            className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:hover:bg-gray-100 flex items-center gap-1"
+          >
+            Next <ChevronRight size={18} />
+          </button>
+        </div>
+      )}
 
       {/* Empty state */}
       {materials.length === 0 && !loading && (

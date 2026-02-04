@@ -353,7 +353,7 @@ function interleaveBySupplier(results) {
  * @param {string} supplier - Filter by supplier ('All', 'Carters', 'ITM')
  * @returns {Array} - Matched materials sorted by relevance
  */
-export function searchMaterials(query, limit = 100, supplier = 'All') {
+export function searchMaterials(query, limit = 2000, supplier = 'All') {
   if (!query || query.trim().length === 0) {
     return getMaterialsByCategory('All', limit, supplier);
   }
@@ -420,7 +420,7 @@ export function searchMaterials(query, limit = 100, supplier = 'All') {
  * @param {string} supplier - Supplier filter
  * @returns {Array} - Materials in category
  */
-export function getMaterialsByCategory(category, limit = 500, supplier = 'All') {
+export function getMaterialsByCategory(category, limit = 2000, supplier = 'All') {
   const all = getAllMaterials();
 
   let filtered = all;
