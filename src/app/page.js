@@ -8,6 +8,7 @@ import { searchMaterials, getMaterialsByCategory, getCategories, getSuppliers, g
 import Header from '../components/Header';
 import AIAssistant from '../components/AIAssistant';
 import { generateQuotePDF } from '../lib/pdfGenerator';
+import { validateQuote, getValidationSummary } from '../lib/quoteValidation';
 import { useAIChat } from '../hooks/useAIChat';
 import { useProjects } from '../hooks/useProjects';
 import { useCart } from '../hooks/useCart';
@@ -242,8 +243,46 @@ export default function PricedInApp() {
     window.URL.revokeObjectURL(url);
   }, [cart, labourItems, labourRates, currentProjectName, wastage, margin, gst]);
 
-  // Generate PDF
+  // Calculate totals for validation
+  const calculateTotals = useCallback(() => {
+    const materialsSubtotal = cart.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 0), 0);
+    const labourSubtotal = labourItems.reduce((sum, item) => {
+      const rate = labourRates[item.role] || 0;
+      return sum + rate * (item.hours || 0);
+    }, 0);
+    const withWastage = materialsSubtotal * (1 + wastage / 100);
+    const withMargin = (withWastage + labourSubtotal) * (1 + margin / 100);
+    const grandTotal = withMargin * (1 + (gst ? 0.15 : 0));
+    return { materialsSubtotal, labourSubtotal, grandTotal };
+  }, [cart, labourItems, labourRates, wastage, margin, gst]);
+
+  // Generate PDF with validation
   const generatePDF = async () => {
+    const totals = calculateTotals();
+
+    // Validate quote before generating PDF
+    const validation = validateQuote({
+      cart,
+      labourItems,
+      materialsTotal: totals.materialsSubtotal,
+      labourTotal: totals.labourSubtotal,
+      grandTotal: totals.grandTotal
+    });
+
+    // Block if errors
+    if (!validation.valid) {
+      const errorMsg = validation.errors.map(e => e.message).join('\n');
+      alert(`Cannot generate PDF:\n\n${errorMsg}`);
+      return;
+    }
+
+    // Warn if issues but allow proceed
+    if (validation.warnings.length > 0) {
+      const warningMsg = validation.warnings.map(w => `• ${w.message}`).join('\n');
+      const proceed = confirm(`Warnings found:\n\n${warningMsg}\n\nGenerate PDF anyway?`);
+      if (!proceed) return;
+    }
+
     setPdfGenerating(true);
     try {
       await generateQuotePDF({
