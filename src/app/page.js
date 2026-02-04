@@ -21,6 +21,7 @@ const LabourSettingsDialog = lazy(() => import('../components/LabourSettingsDial
 const PriceComparisonModal = lazy(() => import('../components/PriceComparisonModal'));
 const CompanySettingsDialog = lazy(() => import('../components/CompanySettingsDialog'));
 const AddMaterialModal = lazy(() => import('../components/AddMaterialModal'));
+const ReviewEstimate = lazy(() => import('../components/ReviewEstimate'));
 import {
   DEFAULT_LABOUR_RATES,
   DEFAULT_COMPANY_INFO,
@@ -114,6 +115,9 @@ export default function PricedInApp() {
   const [showPriceComparison, setShowPriceComparison] = useState(null);
   const [showAddMaterial, setShowAddMaterial] = useState(false);
 
+  // Review estimate state (materials pending review before adding to cart)
+  const [reviewMaterials, setReviewMaterials] = useState(null);
+
   // Plan upload state
   const [planFile, setPlanFile] = useState(null);
   const [planPreview, setPlanPreview] = useState(null);
@@ -161,6 +165,34 @@ export default function PricedInApp() {
     setLabourItems(prev => prev.filter(i => i.id !== id));
   }, []);
 
+  // Review estimate handlers
+  const handleMaterialsForReview = useCallback((materials) => {
+    // Show materials in review modal instead of directly adding to cart
+    setReviewMaterials(materials);
+  }, []);
+
+  const handleConfirmReview = useCallback(() => {
+    if (reviewMaterials && reviewMaterials.length > 0) {
+      addItemsToCart(reviewMaterials);
+      setPage('quote');
+    }
+    setReviewMaterials(null);
+  }, [reviewMaterials, addItemsToCart]);
+
+  const handleCancelReview = useCallback(() => {
+    setReviewMaterials(null);
+  }, []);
+
+  const handleUpdateReviewQty = useCallback((id, newQty) => {
+    setReviewMaterials(prev =>
+      prev.map(item => item.id === id ? { ...item, qty: newQty } : item)
+    );
+  }, []);
+
+  const handleRemoveReviewItem = useCallback((id) => {
+    setReviewMaterials(prev => prev.filter(item => item.id !== id));
+  }, []);
+
   // AI chat hook
   const {
     chatInput,
@@ -173,9 +205,9 @@ export default function PricedInApp() {
     addLabourToQuote
   } = useAIChat({
     labourRates,
-    onAddToCart: addItemsToCart,
+    onAddToCart: handleMaterialsForReview,  // Show review modal instead of direct add
     onAddLabourItem: addLabourItem,
-    onNavigateToQuote: () => setPage('quote'),
+    onNavigateToQuote: () => {},  // Don't auto-navigate - we navigate after review confirmation
     allMaterials,
     materialWordIndex
   });
@@ -406,6 +438,18 @@ export default function PricedInApp() {
               isOpen={showAddMaterial}
               onClose={() => setShowAddMaterial(false)}
               onAddToCart={addToCart}
+            />
+          </Suspense>
+        )}
+
+        {reviewMaterials && reviewMaterials.length > 0 && (
+          <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
+            <ReviewEstimate
+              materials={reviewMaterials}
+              onConfirm={handleConfirmReview}
+              onCancel={handleCancelReview}
+              onUpdateQty={handleUpdateReviewQty}
+              onRemoveItem={handleRemoveReviewItem}
             />
           </Suspense>
         )}
