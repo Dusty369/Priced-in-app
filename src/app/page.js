@@ -7,6 +7,7 @@ import { Plus, Minus, Trash2, Save, FolderOpen, FileText, Settings, Download, Bu
 import { searchMaterials, getMaterialsByCategory, getCategories, getSuppliers, getAllMaterials } from '../lib/materialsLoader';
 import Header from '../components/Header';
 import AIAssistant from '../components/AIAssistant';
+import { extractSearchSuggestions } from '../utils/searchSuggestions';
 
 // Lazy load heavy components
 const MaterialsPage = lazy(() => import('../components/MaterialsPage'));
@@ -544,10 +545,76 @@ export default function PricedInApp() {
     setPdfGenerating(false);
   };
 
+  // Extract JSON from AI response text using balanced brace matching
+  const extractJSON = (text) => {
+    // First, try to find JSON in a code block (```json ... ``` or ``` ... ```)
+    const codeBlockMatch = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    if (codeBlockMatch) {
+      try {
+        const parsed = JSON.parse(codeBlockMatch[1]);
+        if (parsed.materials) return parsed; // Valid estimate JSON
+      } catch (e) { /* continue to other methods */ }
+    }
+
+    // Find the first { that starts a JSON object with required fields
+    const startIdx = text.indexOf('{');
+    if (startIdx === -1) return null;
+
+    // Use balanced brace counting to find the matching }
+    let braceCount = 0;
+    let inString = false;
+    let escapeNext = false;
+
+    for (let i = startIdx; i < text.length; i++) {
+      const char = text[i];
+
+      if (escapeNext) {
+        escapeNext = false;
+        continue;
+      }
+
+      if (char === '\\' && inString) {
+        escapeNext = true;
+        continue;
+      }
+
+      if (char === '"' && !escapeNext) {
+        inString = !inString;
+        continue;
+      }
+
+      if (!inString) {
+        if (char === '{') braceCount++;
+        if (char === '}') braceCount--;
+
+        if (braceCount === 0) {
+          // Found matching closing brace
+          const jsonStr = text.slice(startIdx, i + 1);
+          try {
+            const parsed = JSON.parse(jsonStr);
+            // Verify it has expected structure (at minimum, materials array)
+            if (parsed.materials && Array.isArray(parsed.materials)) {
+              return parsed;
+            }
+          } catch (e) {
+            // This JSON object wasn't valid, try finding next one
+            const nextStart = text.indexOf('{', i + 1);
+            if (nextStart !== -1) {
+              return extractJSON(text.slice(nextStart));
+            }
+          }
+          break;
+        }
+      }
+    }
+
+    return null;
+  };
+
   // AI message handler
   const sendAIMessage = async () => {
     if (!chatInput.trim() || aiLoading) return;
-    
+
     const userMessage = chatInput;
     setChatInput('');
     setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
@@ -575,13 +642,12 @@ export default function PricedInApp() {
         }]);
       } else {
         let text = data.content?.find(c => c.type === 'text')?.text || 'No response';
-        
+
         // Try to parse JSON and format it nicely
         try {
-          // Extract JSON from response
-          const jsonMatch = text.match(/\{[\s\S]*"summary"[\s\S]*"materials"[\s\S]*\}/);
-          if (jsonMatch) {
-            const json = JSON.parse(jsonMatch[0]);
+          // Extract JSON from response using balanced brace matching
+          const json = extractJSON(text);
+          if (json) {
             
             // Format the response beautifully
             let formattedContent = '';
@@ -656,30 +722,45 @@ export default function PricedInApp() {
   // Add AI-suggested materials to quote
   const addMaterialsToQuote = (materials, msgIndex) => {
     if (!materials || materials.length === 0) return;
-    
+
     const newItems = [];
+    const unmatched = []; // Track materials we couldn't find
+
     materials.forEach(suggested => {
       const searchTerm = (suggested.searchTerm || suggested.name || "").toUpperCase();
       const searchWords = searchTerm.replace(/[^A-Z0-9.]/g, " ").split(" ").filter(w => w.length > 1);
-      
+
+      // Validate and parse quantity
+      let qty = suggested.qty;
+      if (typeof qty === 'string') qty = parseFloat(qty);
+      if (!qty || isNaN(qty) || qty <= 0) qty = 1;
+      qty = Math.ceil(qty); // Round up - can't buy partial items
+
+      // Skip if no valid search term
+      if (searchWords.length === 0) {
+        unmatched.push({ name: suggested.name || 'Unknown item', qty, reason: 'No search term' });
+        return;
+      }
+
       // Find best match - prioritize key product words
       let bestMatch = null;
       let bestScore = 0;
-      
+
       // Key words that MUST match if present (product identifiers)
-      const keyWords = searchWords.filter(w => 
-        ["AQUALINE", "ULTRALINE", "FYRELINE", "STANDARD", "PINK", "EARTHWOOL", "H3.1", "H3.2", "H4", "H1.2"].includes(w)
+      const keyWords = searchWords.filter(w =>
+        ["AQUALINE", "ULTRALINE", "FYRELINE", "STANDARD", "PINK", "EARTHWOOL", "H3.1", "H3.2", "H4", "H5", "H1.2", "SG8", "KD"].includes(w)
       );
-      
+
       allMaterials.forEach(m => {
+        if (!m?.name) return; // Skip invalid entries
         const matName = m.name.toUpperCase();
-        
+
         // If we have key words, they must ALL match
         if (keyWords.length > 0) {
           const keyMatches = keyWords.every(kw => matName.includes(kw));
           if (!keyMatches) return;
         }
-        
+
         // Score by total word matches
         const score = searchWords.filter(word => matName.includes(word)).length;
         if (score > bestScore) {
@@ -687,17 +768,28 @@ export default function PricedInApp() {
           bestMatch = m;
         }
       });
-      
+
       if (bestMatch) {
         const existing = newItems.find(i => i.id === bestMatch.id);
         if (existing) {
-          existing.qty += (suggested.qty || 1);
+          existing.qty += qty;
         } else {
-          newItems.push({ ...bestMatch, qty: suggested.qty || 1 });
+          newItems.push({ ...bestMatch, qty });
         }
+      } else {
+        // Track unmatched for user feedback with helpful search suggestions
+        const itemName = suggested.name || searchTerm;
+        const suggestedSearches = extractSearchSuggestions(itemName, suggested.searchTerm);
+        unmatched.push({
+          name: itemName,
+          qty,
+          searchTerm: suggested.searchTerm,
+          reason: 'No match in database',
+          suggestions: suggestedSearches
+        });
       }
     });
-    
+
     // Add all matched items to cart
     if (newItems.length > 0) {
       setCart(prev => {
@@ -713,10 +805,35 @@ export default function PricedInApp() {
         return updated;
       });
     }
-    
-    setChatHistory(prev => prev.map((msg, idx) => 
-      idx === msgIndex ? {...msg, added: true} : msg
-    ));
+
+    // Update chat with match results and add warning message for unmatched items
+    setChatHistory(prev => {
+      const updated = prev.map((msg, idx) =>
+        idx === msgIndex ? {
+          ...msg,
+          added: true,
+          matchResults: {
+            matched: newItems.length,
+            total: materials.length,
+            unmatched: unmatched.length > 0 ? unmatched : null
+          }
+        } : msg
+      );
+
+      // Add system warning message if items couldn't be matched
+      if (unmatched.length > 0) {
+        updated.push({
+          role: 'system',
+          type: 'warning',
+          content: `${unmatched.length} of ${materials.length} items couldn't be matched`,
+          unmatched: unmatched,
+          matched: newItems.length
+        });
+      }
+
+      return updated;
+    });
+
     setPage('quote');
   };
 
