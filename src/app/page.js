@@ -675,7 +675,14 @@ export default function PricedInApp() {
 
             if (json.calculations) {
               formattedContent += '🧮 **Calculations:**\n';
-              formattedContent += `${json.calculations}\n\n`;
+              if (Array.isArray(json.calculations)) {
+                json.calculations.forEach(calc => {
+                  formattedContent += `• **${calc.item}:** ${calc.working}\n`;
+                });
+              } else {
+                formattedContent += `${json.calculations}\n`;
+              }
+              formattedContent += '\n';
             }
 
             if (json.materials && json.materials.length > 0) {

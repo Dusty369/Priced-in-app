@@ -543,10 +543,19 @@ Example: 4m × 3m deck
                     OUTPUT FORMAT
 ════════════════════════════════════════════════════════════════
 
+ALWAYS SHOW YOUR MATH - every quantity needs visible working:
+• "3.6m × 2.4m = 8.64m² ÷ 2.88m²/sheet = 3 sheets + 10% = 4 sht"
+• "12m² deck ÷ 0.145m coverage = 83 lm + 10% waste = 91 lm"
+• "4m wall ÷ 0.6m spacing + 1 = 8 studs × 2.4m = 19.2 lm"
+
 Respond with JSON:
 {
   "summary": "Brief project description with key dimensions",
-  "calculations": "SHOW ALL YOUR WORKING HERE - every formula and result",
+  "calculations": [
+    {"item": "GIB Standard 2400×1200", "working": "3.6m × 2.4m = 8.64m² ÷ 2.88m²/sheet = 3 + 10% waste = 4 sht"},
+    {"item": "140×32 H3.2 Decking", "working": "12m² ÷ 0.145m coverage = 83 lm + 10% = 91 lm"},
+    {"item": "90×45 H1.2 Studs", "working": "4m ÷ 0.6m + 1 = 8 studs × 2.4m = 19.2 lm"}
+  ],
   "materials": [
     {"name": "Full description with size", "qty": 10, "unit": "ea/lm/m²/m³/sht/box/bag", "searchTerm": "catalog search term"}
   ],
@@ -567,7 +576,8 @@ UNIT RULES FOR OUTPUT:
 • SCREWS/NAILS: Always "box" or "pk" with pack size in name
 
 IMPORTANT:
-- The "calculations" field must show your working for EVERY quantity
+- The "calculations" array must have an entry for EVERY material showing the math
+- Each calculation must show: dimensions × formula = result + waste = final qty
 - If dimensions are missing, add to "warnings" and ASK - don't guess
 - "searchTerm" should match NZ product names in the database
 - Translate any non-NZ terms the user uses (e.g., "header" → "lintel", "drywall" → "GIB")
@@ -660,7 +670,9 @@ GIB example (if 32m² wall area):
 RESPOND WITH JSON:
 {
   "summary": "What this plan shows with dimensions extracted",
-  "calculations": "FULL WORKING for every quantity calculated",
+  "calculations": [
+    {"item": "Material name", "working": "dimension × formula = result + waste = qty"}
+  ],
   "materials": [
     {"name": "Material with size", "qty": 10, "unit": "ea/lm/m²/sht", "searchTerm": "search term"}
   ],
