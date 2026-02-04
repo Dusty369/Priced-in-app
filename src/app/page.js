@@ -9,6 +9,7 @@ import Header from '../components/Header';
 import AIAssistant from '../components/AIAssistant';
 import { generateQuotePDF } from '../lib/pdfGenerator';
 import { useAIChat } from '../hooks/useAIChat';
+import { useProjects } from '../hooks/useProjects';
 
 // Lazy load heavy components
 const MaterialsPage = lazy(() => import('../components/MaterialsPage'));
@@ -22,8 +23,6 @@ import {
   DEFAULT_LABOUR_RATES,
   DEFAULT_COMPANY_INFO,
   LABOUR_PRESETS,
-  PROJECTS_KEY,
-  CURRENT_PROJECT_KEY,
   LABOUR_RATES_KEY,
   COMPANY_INFO_KEY
 } from '../lib/constants';
@@ -67,13 +66,42 @@ export default function PricedInApp() {
   const [labourItems, setLabourItems] = useState([]);
   const [showLabourSettings, setShowLabourSettings] = useState(false);
 
-  // Project state
-  const [projects, setProjects] = useState([]);
-  const [currentProjectId, setCurrentProjectId] = useState(null);
-  const [currentProjectName, setCurrentProjectName] = useState('');
-  const [projectNotes, setProjectNotes] = useState('');
-  const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [saveProjectName, setSaveProjectName] = useState('');
+  // Project management hook
+  const {
+    projects,
+    currentProjectId,
+    currentProjectName,
+    projectNotes,
+    setProjectNotes,
+    showSaveDialog,
+    saveProjectName,
+    setSaveProjectName,
+    saveProject,
+    loadProject,
+    deleteProject,
+    newProject,
+    openSaveDialog,
+    closeSaveDialog
+  } = useProjects({
+    getProjectData: () => ({ cart, labourItems, wastage, margin, gst, chatHistory }),
+    onLoadProject: (project) => {
+      setCart(project.cart || []);
+      setLabourItems(project.labourItems || []);
+      setWastage(project.wastage ?? 10);
+      setMargin(project.margin ?? 20);
+      setGst(project.gst ?? true);
+      setChatHistory(project.chatHistory || []);
+    },
+    onNewProject: () => {
+      setCart([]);
+      setLabourItems([]);
+      setWastage(10);
+      setMargin(20);
+      setGst(true);
+      setChatHistory([]);
+    },
+    onNavigate: setPage
+  });
 
   // UI state
   const [showCompanySettings, setShowCompanySettings] = useState(false);
@@ -87,23 +115,15 @@ export default function PricedInApp() {
   const [planPreview, setPlanPreview] = useState(null);
   const [planAnalyzing, setPlanAnalyzing] = useState(false);
 
-  // Load from localStorage on mount
+  // Load settings from localStorage on mount
   useEffect(() => {
     setHydrated(true);
-    const savedProjects = localStorage.getItem(PROJECTS_KEY);
-    if (savedProjects) setProjects(JSON.parse(savedProjects));
-    
+
     const savedRates = localStorage.getItem(LABOUR_RATES_KEY);
     if (savedRates) setLabourRates(JSON.parse(savedRates));
-    
+
     const savedCompany = localStorage.getItem(COMPANY_INFO_KEY);
     if (savedCompany) setCompanyInfo(JSON.parse(savedCompany));
-    
-    const currentId = localStorage.getItem(CURRENT_PROJECT_KEY);
-    if (currentId && savedProjects) {
-      const current = JSON.parse(savedProjects).find(p => p.id === currentId);
-      if (current) loadProject(current);
-    }
   }, []);
 
   // Persist labour rates
@@ -226,35 +246,7 @@ export default function PricedInApp() {
 
   const { withWastage, withMargin, labourWithMargin, materialsTotal, labourTotal, grandTotal } = totals;
 
-  // Project functions (memoized)
-  const saveProject = useCallback((name, overwrite = false) => {
-    setProjects(prev => {
-      const projectData = {
-        id: overwrite && currentProjectId ? currentProjectId : Date.now().toString(),
-        name: name || currentProjectName || 'Untitled Project',
-        cart,
-        labourItems,
-        wastage,
-        margin,
-        gst,
-        notes: projectNotes,
-        chatHistory,
-        createdAt: overwrite && currentProjectId ? prev.find(p => p.id === currentProjectId)?.createdAt : new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      const updatedProjects = overwrite && currentProjectId 
-        ? prev.map(p => p.id === currentProjectId ? projectData : p)
-        : [...prev, projectData];
-      localStorage.setItem(PROJECTS_KEY, JSON.stringify(updatedProjects));
-      setCurrentProjectId(projectData.id);
-      setCurrentProjectName(projectData.name);
-      localStorage.setItem(CURRENT_PROJECT_KEY, projectData.id);
-      setShowSaveDialog(false);
-      return updatedProjects;
-    });
-  }, [currentProjectId, currentProjectName, cart, labourItems, wastage, margin, gst, projectNotes, chatHistory]);
-
+  // Export functions
   const exportXero = useCallback(() => {
     const materialsSubtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
     const materialsWithWastage = materialsSubtotal * (1 + wastage / 100);
@@ -286,49 +278,6 @@ export default function PricedInApp() {
     a.click();
     window.URL.revokeObjectURL(url);
   }, [cart, labourItems, labourRates, currentProjectName, wastage, margin, gst]);
-
-  const loadProject = useCallback((project) => {
-    setCart(project.cart || []);
-    setLabourItems(project.labourItems || []);
-    setWastage(project.wastage ?? 10);
-    setMargin(project.margin ?? 20);
-    setGst(project.gst ?? true);
-    setProjectNotes(project.notes || '');
-    setChatHistory(project.chatHistory || []);
-    setCurrentProjectId(project.id);
-    setCurrentProjectName(project.name);
-    localStorage.setItem(CURRENT_PROJECT_KEY, project.id);
-    setPage('quote');
-  }, []);
-
-  const deleteProject = useCallback((projectId) => {
-    if (!confirm('Delete this project?')) return;
-    setProjects(prev => {
-      const updatedProjects = prev.filter(p => p.id !== projectId);
-      localStorage.setItem(PROJECTS_KEY, JSON.stringify(updatedProjects));
-      if (currentProjectId === projectId) {
-        setCurrentProjectId(null);
-        setCurrentProjectName('');
-        localStorage.removeItem(CURRENT_PROJECT_KEY);
-      }
-      return updatedProjects;
-    });
-  }, [currentProjectId]);
-
-  const newProject = useCallback(() => {
-    setCart([]);
-    setLabourItems([]);
-    setWastage(10);
-    setMargin(20);
-    setGst(true);
-    setProjectNotes('');
-    setChatHistory([]);
-    setCurrentProjectId(null);
-    setCurrentProjectName('');
-    localStorage.removeItem(CURRENT_PROJECT_KEY);
-    setPage('quote');
-    setPage('materials');
-  }, []);
 
   // Generate PDF
   const generatePDF = async () => {
@@ -401,7 +350,7 @@ export default function PricedInApp() {
               projectNotes={projectNotes}
               setProjectNotes={setProjectNotes}
               onSave={() => saveProject(saveProjectName)}
-              onCancel={() => setShowSaveDialog(false)}
+              onCancel={closeSaveDialog}
             />
           </Suspense>
         )}
@@ -480,7 +429,7 @@ export default function PricedInApp() {
             projectNotes={projectNotes}
             setProjectNotes={setProjectNotes}
             onSave={() => saveProject(currentProjectName, true)}
-            onSaveAs={() => { setSaveProjectName(''); setShowSaveDialog(true); }}
+            onSaveAs={openSaveDialog}
             onNew={newProject}
             onLabourSettings={() => setShowLabourSettings(true)}
             onCompanySettings={() => setShowCompanySettings(true)}
