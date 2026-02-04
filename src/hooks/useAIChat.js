@@ -288,11 +288,34 @@ export function useAIChat({
       }
 
       if (bestMatch) {
+        // Use AI's pre-calculated qty if available, otherwise use raw qty
+        let finalQty = qty;
+
+        // If AI provided packaging calculation, validate it
+        if (suggested.totalNeeded && suggested.packageSize && bestMatch.packaging) {
+          const expectedQty = Math.ceil(suggested.totalNeeded / (bestMatch.packaging.unitsPerPackage || 1));
+          // Use AI's qty if reasonable, otherwise recalculate
+          if (qty > 0 && qty <= expectedQty * 2) {
+            finalQty = qty;
+          } else {
+            finalQty = expectedQty;
+          }
+        }
+
+        // Final sanity check - warn if qty seems unreasonable
+        const lineTotal = finalQty * (bestMatch.price || 0);
+        const warning = lineTotal > 5000 ? `High value: $${lineTotal.toFixed(0)}` : null;
+
         const existing = newItems.find(i => i.id === bestMatch.id);
         if (existing) {
-          existing.qty += qty;
+          existing.qty += finalQty;
         } else {
-          newItems.push({ ...bestMatch, qty });
+          newItems.push({
+            ...bestMatch,
+            qty: finalQty,
+            calculation: suggested.calculation,
+            warning
+          });
         }
       } else {
         const itemName = suggested.name || searchTerm;

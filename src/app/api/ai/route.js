@@ -601,12 +601,21 @@ Respond with JSON:
 {
   "summary": "Brief project description with key dimensions",
   "calculations": [
-    {"item": "GIB Standard 2400×1200", "working": "3.6m × 2.4m = 8.64m² ÷ 2.88m²/sheet = 3 + 10% waste = 4 sht"},
+    {"item": "GIB Standard 2400×1200", "working": "3.6m × 2.4m = 8.64m² ÷ 2.88m²/sheet = 3 sheets"},
     {"item": "140×32 H3.2 Decking", "working": "12m² ÷ 0.145m coverage = 83 lm + 10% = 91 lm"},
-    {"item": "90×45 H1.2 Studs", "working": "4m ÷ 0.6m + 1 = 8 studs × 2.4m = 19.2 lm"}
+    {"item": "Deck screws", "working": "12m² × 22/m² = 264 screws ÷ 200/box = 2 boxes"}
   ],
   "materials": [
-    {"name": "Full description with size", "qty": 10, "unit": "ea/lm/m²/m³/sht/box/bag", "searchTerm": "catalog search term"}
+    {
+      "name": "Product description",
+      "searchTerm": "search term for database",
+      "calculation": "12m² × 22 screws/m² = 264 screws",
+      "totalNeeded": 264,
+      "packageSize": 200,
+      "packageUnit": "per box",
+      "qty": 2,
+      "unit": "box"
+    }
   ],
   "labour": {
     "totalHours": 16,
@@ -615,6 +624,20 @@ Respond with JSON:
   "notes": ["Code compliance notes", "Installation tips"],
   "warnings": ["Missing dimensions needed", "Consent requirements", "Engineering needed"]
 }
+
+MATERIAL OUTPUT RULES:
+• totalNeeded = raw calculated quantity (264 screws, 91 lineal meters)
+• packageSize = how many per sellable unit (200 screws/box, 1 per sheet)
+• qty = totalNeeded ÷ packageSize, rounded UP (264÷200 = 2 boxes)
+• unit = sellable unit (box, sht, lm, ea, bag, tin, roll)
+
+PACKAGING REFERENCE:
+• Screws/nails: 200-500 per box → qty = screws ÷ 200
+• Paint/stain: 5L or 10L tins → qty = liters ÷ 5 (round up)
+• Concrete: 20kg bags → qty = kg ÷ 20 (round up)
+• Timber: per lineal meter → qty = total lm needed
+• Sheets: per sheet → qty = sheets needed
+• Brackets/hangers: per each → qty = count needed
 
 UNIT RULES FOR OUTPUT:
 • Use ONLY: lm, m², m³, ea, sht, box, bag, roll, tube, pk, set, pr, kg, L
