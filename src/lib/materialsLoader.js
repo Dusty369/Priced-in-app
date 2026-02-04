@@ -1,7 +1,7 @@
 // Optimized materials loader with fuzzy search and supplier balancing
-// Uses processed/structured materials for better search and filtering
+// Uses normalized materials with dimensions, treatment, length, and packaging data
 
-import processedMaterialsData from '../data/materials-processed.json';
+import normalizedMaterialsData from '../data/materials-normalized.json';
 
 // Cache for better performance
 let cachedMaterials = null;
@@ -17,20 +17,27 @@ let cachedTreatments = null;
 
 /**
  * Get all materials
- * Uses 'name' field directly (displayName was removed in data restructure)
+ * Uses normalized data with dimensions, treatment, productLength, packaging fields
  */
 export function getAllMaterials() {
   if (!cachedMaterials) {
-    cachedMaterials = processedMaterialsData;
+    cachedMaterials = normalizedMaterialsData;
   }
   return cachedMaterials;
 }
 
 /**
- * Get raw processed materials (with full parsed structure)
+ * Get raw normalized materials (with full structure)
  */
 export function getProcessedMaterials() {
-  return processedMaterialsData;
+  return normalizedMaterialsData;
+}
+
+/**
+ * Get normalized materials (alias)
+ */
+export function getNormalizedMaterials() {
+  return normalizedMaterialsData;
 }
 
 export function getMaterialsBySupplierCache() {
@@ -60,24 +67,25 @@ export function getSuppliers() {
 }
 
 /**
- * Get material types from parsed data
+ * Get packaging unit types from normalized data
  */
 export function getTypes() {
   if (!cachedTypes) {
     const all = getAllMaterials();
-    cachedTypes = ['All', ...new Set(all.map(m => m.parsed?.type).filter(Boolean))].sort();
+    cachedTypes = ['All', ...new Set(all.map(m => m.packaging?.unitType).filter(Boolean))].sort();
   }
   return cachedTypes;
 }
 
 /**
- * Get treatments from parsed data
+ * Get NZ timber treatment codes from normalized data
+ * Valid codes: H1.2 (interior), H3.1/H3.2 (exterior), H4 (ground), H5 (in-ground), H6 (marine)
  */
 export function getTreatments() {
   if (!cachedTreatments) {
     const all = getAllMaterials();
-    const treatments = [...new Set(all.map(m => m.parsed?.treatment).filter(Boolean))];
-    // Sort treatments in logical order
+    const treatments = [...new Set(all.map(m => m.treatment).filter(Boolean))];
+    // Sort treatments in logical order (H1.2, H3.1, H3.2, H4, H5, H6)
     cachedTreatments = ['All', ...treatments.sort((a, b) => {
       const aNum = parseFloat(a.replace('H', ''));
       const bNum = parseFloat(b.replace('H', ''));
@@ -274,17 +282,17 @@ function scoreMatch(material, searchTerms, normalizedQuery) {
     }
   }
 
-  // Bonus for exact dimension match
-  if (material.parsed?.width && material.parsed?.depth) {
-    const dimStr = `${material.parsed.width}×${material.parsed.depth}`;
-    if (normalizedQuery.includes(dimStr)) {
+  // Bonus for exact dimension match (normalized format: "90 X 45")
+  if (material.dimensions) {
+    const dimNormalized = material.dimensions.toLowerCase().replace(/\s*x\s*/g, '×');
+    if (normalizedQuery.includes(dimNormalized)) {
       score += 40;
     }
   }
 
-  // Bonus for exact treatment match
-  if (material.parsed?.treatment) {
-    if (normalizedQuery.includes(material.parsed.treatment.toLowerCase())) {
+  // Bonus for exact treatment match (H1.2, H3.2, H4, H5, H6)
+  if (material.treatment) {
+    if (normalizedQuery.includes(material.treatment.toLowerCase())) {
       score += 30;
     }
   }
@@ -441,17 +449,17 @@ export function getMaterialsByCategory(category, limit = 2000, supplier = 'All')
 }
 
 /**
- * Get materials by type (from parsed data)
+ * Get materials by packaging type (from normalized data)
  *
- * @param {string} type - Material type (framing, decking, etc.)
+ * @param {string} type - Packaging type (box, length, meter, sheet, tin, bag, etc.)
  * @param {number} limit - Max results
  * @param {string} supplier - Supplier filter
- * @returns {Array} - Materials of given type
+ * @returns {Array} - Materials of given packaging type
  */
 export function getMaterialsByType(type, limit = 500, supplier = 'All') {
   const all = getAllMaterials();
 
-  let filtered = all.filter(m => m.parsed?.type === type);
+  let filtered = all.filter(m => m.packaging?.unitType === type);
 
   if (supplier !== 'All') {
     filtered = filtered.filter(m => m.supplier === supplier);
@@ -462,9 +470,9 @@ export function getMaterialsByType(type, limit = 500, supplier = 'All') {
 }
 
 /**
- * Get materials by treatment level
+ * Get materials by NZ timber treatment level
  *
- * @param {string} treatment - H1.2, H3.2, H4, H5, etc.
+ * @param {string} treatment - H1.2, H3.1, H3.2, H4, H5, H6
  * @param {number} limit - Max results
  * @param {string} supplier - Supplier filter
  * @returns {Array} - Materials with given treatment
@@ -472,7 +480,7 @@ export function getMaterialsByType(type, limit = 500, supplier = 'All') {
 export function getMaterialsByTreatment(treatment, limit = 500, supplier = 'All') {
   const all = getAllMaterials();
 
-  let filtered = all.filter(m => m.parsed?.treatment === treatment);
+  let filtered = all.filter(m => m.treatment === treatment);
 
   if (supplier !== 'All') {
     filtered = filtered.filter(m => m.supplier === supplier);
@@ -487,16 +495,20 @@ export function getMaterialsByTreatment(treatment, limit = 500, supplier = 'All'
  *
  * @param {number} width - Width in mm (90, 140, 190, etc.)
  * @param {number} depth - Depth in mm (45, 90, etc.)
- * @param {string} treatment - Optional treatment filter
+ * @param {string} treatment - Optional treatment filter (H1.2, H3.2, H4, H5, H6)
  * @returns {Array} - Matching framing timber
  */
 export function getFramingBySize(width, depth, treatment = null) {
   const all = getAllMaterials();
+  const targetDim = `${width} X ${depth}`;
 
   return all.filter(m => {
-    if (m.parsed?.type !== 'framing') return false;
-    if (m.parsed?.width !== width || m.parsed?.depth !== depth) return false;
-    if (treatment && m.parsed?.treatment !== treatment) return false;
+    // Must have dimensions matching the target
+    if (m.dimensions !== targetDim) return false;
+    // Must be timber (check category or name)
+    if (!/timber|framing|pine|radiata/i.test(m.category + ' ' + m.name)) return false;
+    // Optional treatment filter
+    if (treatment && m.treatment !== treatment) return false;
     return true;
   });
 }
