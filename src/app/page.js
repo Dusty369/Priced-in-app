@@ -43,6 +43,7 @@ export default function PricedInApp() {
   // Cart & materials state
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
+  const [materialSearch, setMaterialSearch] = useState(''); // For AI suggestion -> Materials nav
   const [category, setCategory] = useState('All');
   const [supplier, setSupplier] = useState('All');
   const [wastage, setWastage] = useState(10);
@@ -108,6 +109,11 @@ export default function PricedInApp() {
   useEffect(() => {
     localStorage.setItem(COMPANY_INFO_KEY, JSON.stringify(companyInfo));
   }, [companyInfo]);
+
+  // Clear materialSearch when leaving materials page
+  useEffect(() => {
+    if (page !== 'materials') setMaterialSearch('');
+  }, [page]);
 
   // Cart functions (memoized to prevent unnecessary re-renders)
   const addToCart = useCallback((material) => {
@@ -882,6 +888,10 @@ export default function PricedInApp() {
             aiLoading={aiLoading}
             onAddMaterialsToQuote={addMaterialsToQuote}
             onAddLabourToQuote={addLabourToQuote}
+            onSearchMaterial={(term) => {
+              setMaterialSearch(term);
+              setPage('materials');
+            }}
           />
         )}
 
@@ -954,7 +964,7 @@ export default function PricedInApp() {
 
         {page === 'materials' && (
           <Suspense fallback={<div className="p-4 text-center text-gray-500">Loading materials...</div>}>
-            <MaterialsPage onAddToCart={addToCart} />
+            <MaterialsPage onAddToCart={addToCart} initialSearch={materialSearch} />
           </Suspense>
         )}
 

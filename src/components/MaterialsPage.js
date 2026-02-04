@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { Search, Plus, Package, ChevronDown } from 'lucide-react';
 import { searchMaterials, getMaterialsByCategory, getCategories, getSuppliers } from '../lib/materialsLoader';
 
-export default function MaterialsPage({ onAddToCart }) {
+export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
   const [materials, setMaterials] = useState([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState('All');
   const [supplier, setSupplier] = useState('All');
   const [loading, setLoading] = useState(true);
@@ -19,6 +19,11 @@ export default function MaterialsPage({ onAddToCart }) {
     setSuppliers(getSuppliers());
     setLoading(false);
   }, []);
+
+  // Sync search when initialSearch changes (from AI suggestion click)
+  useEffect(() => {
+    if (initialSearch) setSearch(initialSearch);
+  }, [initialSearch]);
 
   useEffect(() => {
     if (loading) return;

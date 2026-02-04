@@ -1,6 +1,6 @@
 'use client';
 
-import { MessageSquare, Send, Plus, CheckCircle } from 'lucide-react';
+import { MessageSquare, Send, Plus, CheckCircle, AlertTriangle, Search } from 'lucide-react';
 
 export default function AIAssistant({
   showAI,
@@ -10,7 +10,8 @@ export default function AIAssistant({
   aiLoading,
   onSendMessage,
   onAddMaterialsToQuote,
-  onAddLabourToQuote
+  onAddLabourToQuote,
+  onSearchMaterial
 }) {
   if (!showAI) return null;
 
@@ -61,23 +62,79 @@ export default function AIAssistant({
         )}
         {chatHistory.map((msg, idx) => (
           <div key={idx}>
-            <div className={`p-3 rounded-lg animate-fadeIn ${
-              msg.role === 'user' 
-                ? 'bg-emerald-100 ml-8' 
-                : msg.type === 'error'
-                ? 'bg-red-100 mr-8'
-                : 'bg-gray-100 mr-8'
-            }`}>
-              <div className="text-sm whitespace-pre-wrap">
-                {msg.content.split(/(\*\*[^*]+\*\*)/).map((part, i) => {
-                  if (part.startsWith('**') && part.endsWith('**')) {
-                    return <strong key={i}>{part.slice(2, -2)}</strong>;
-                  }
-                  return part;
-                })}
+            {/* Warning message for unmatched materials */}
+            {msg.type === 'warning' && msg.unmatched ? (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mr-8 animate-fadeIn">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={20} />
+                  <div className="flex-1">
+                    <p className="font-medium text-amber-800 mb-2">
+                      {msg.unmatched.length} item{msg.unmatched.length > 1 ? 's' : ''} couldn&apos;t be matched
+                      <span className="font-normal text-amber-600 ml-1">
+                        ({msg.matched} of {msg.matched + msg.unmatched.length} added)
+                      </span>
+                    </p>
+                    <div className="space-y-2 mb-3">
+                      {msg.unmatched.map((item, i) => (
+                        <div key={i} className="bg-white rounded border border-amber-100 p-2">
+                          <div className="flex justify-between items-start gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-amber-900 font-medium truncate" title={item.name}>
+                                {item.name}
+                              </p>
+                              {item.suggestions && item.suggestions.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  <span className="text-xs text-amber-600">Try:</span>
+                                  {item.suggestions.map((term, j) => (
+                                    <button
+                                      key={j}
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(term);
+                                        if (onSearchMaterial) onSearchMaterial(term);
+                                      }}
+                                      className="text-xs px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded hover:bg-amber-200 transition cursor-pointer"
+                                      title={`Search for "${term}"`}
+                                    >
+                                      {term}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-sm text-amber-700 font-medium whitespace-nowrap">
+                              ×{item.qty}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-sm text-amber-700 flex items-center gap-1">
+                      <Search size={14} />
+                      Click a term to search Materials
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-            
+            ) : (
+              /* Regular message (user/assistant/error) */
+              <div className={`p-3 rounded-lg animate-fadeIn ${
+                msg.role === 'user'
+                  ? 'bg-emerald-100 ml-8'
+                  : msg.type === 'error'
+                  ? 'bg-red-100 mr-8'
+                  : 'bg-gray-100 mr-8'
+              }`}>
+                <div className="text-sm whitespace-pre-wrap">
+                  {msg.content.split(/(\*\*[^*]+\*\*)/).map((part, i) => {
+                    if (part.startsWith('**') && part.endsWith('**')) {
+                      return <strong key={i}>{part.slice(2, -2)}</strong>;
+                    }
+                    return part;
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Add to Quote buttons if AI response has parsed data */}
             {msg.role === 'assistant' && msg.parsed && !msg.added && (
               <div className="mt-2 mr-8 flex gap-2 justify-end">
@@ -92,7 +149,7 @@ export default function AIAssistant({
                 </button>
               </div>
             )}
-            
+
             {/* Show confirmation if added */}
             {msg.role === 'assistant' && msg.added && (
               <div className="mt-2 mr-8 flex justify-end">

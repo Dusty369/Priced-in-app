@@ -3,7 +3,10 @@ import { getGlossaryForPrompt } from '../../../lib/nzGlossary';
 import { getAssembliesForPrompt } from '../../../lib/nzAssemblies';
 
 export async function POST(request) {
-  const { messages, mode, materials, labourRates, planImage, planMediaType } = await request.json();
+  const body = await request.json();
+  // Support both 'messages' array and 'message' string for flexibility
+  const messages = body.messages || (body.message ? [{ role: 'user', content: body.message }] : null);
+  const { mode, materials, labourRates, planImage, planMediaType } = body;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
@@ -11,6 +14,13 @@ export async function POST(request) {
     return Response.json(
       { error: 'API key not configured' },
       { status: 500 }
+    );
+  }
+
+  if (!messages || messages.length === 0) {
+    return Response.json(
+      { error: 'No message provided' },
+      { status: 400 }
     );
   }
 
@@ -120,6 +130,37 @@ ${assemblies}
 10. Specify timber treatment: H1.2 interior, H3.1 wet areas, H3.2 exterior, H4 ground contact, H5 in-ground
 11. If user uses non-NZ terms, translate to NZ terms in your response
 12. FLAG COMMON MISTAKES - check assemblies reference for errors to warn about
+
+═══════════════════════════════════════════════════════════════
+          TIMBER TREATMENT RULES (NZS 3604 Compliance)
+═══════════════════════════════════════════════════════════════
+
+STRUCTURAL PILES AND IN-GROUND POSTS:
+• MUST be H5 treated (125×125 H5 minimum)
+• H4 is NOT acceptable for structural foundations
+• H4 is ONLY for fence posts (non-structural)
+
+ABOVE GROUND STRUCTURAL:
+• Bearers, joists: H3.2 minimum
+• Decking: H3.2 minimum
+• Posts sitting ON piles (not in ground): H4 acceptable
+
+⚠️ NEVER suggest for structural foundations:
+• 100×100 H4 fence posts
+• Any H4 timber in ground
+• Any H3.2 timber in ground
+
+✓ CORRECT examples:
+• Deck piles: "125×125 H5 TIMBER PILE 2.4M" or anchor piles
+• Pergola posts in ground: "125×125 H5 POST 3.0M"
+• Pergola posts on stirrups: "100×100 H4 POST 3.0M" (above ground only)
+
+✗ WRONG:
+• "100×100 H4 POST" for deck piles
+• "H4 pile" for any structural foundation
+
+>>> If the user asks for "H4 posts" for a deck or pergola foundation, CORRECT them:
+"H4 is not suitable for in-ground structural use. Using H5 treated 125×125 piles instead."
 
 BUILDER SUPPLIES ONLY - exclude:
 - Electrical (cables, switches, lights, wiring) → electrician supplies
@@ -326,8 +367,15 @@ DECK FOOTINGS (STRUCTURAL - NOT fence posts):
 • Posts sit IN stirrups above ground - keeps timber dry, no H5 needed
 >>> NEVER bury fence posts (100×100 H4) for deck foundations <<<
 
-DECKING BOARDS (140mm with 5mm gap = 145mm coverage):
-• lm needed: deck area ÷ 0.145 + 10% waste
+═══════════════════════════════════════════════════════════════
+     DECKING = LINEAL METERS (NEVER boards/ea)
+═══════════════════════════════════════════════════════════════
+SHOW YOUR WORKING: deck area ÷ 0.145m coverage = X LM
+• 45m² deck: 45 ÷ 0.145 = 310 LM + 10% waste = 341 LM of 140×32 H3.2 decking
+• 12m² deck: 12 ÷ 0.145 = 83 LM + 10% waste = 91 LM
+• Output unit MUST be "lm" - NEVER "ea", "boards", or board count
+• WRONG: "86 boards" or "qty: 86, unit: ea"
+• RIGHT: "310 lm" or "qty: 310, unit: lm"
 
 JOISTS (H3.2 SG8):
 • Count: deck length ÷ joist spacing (450mm) + 1
@@ -344,11 +392,13 @@ DECK SCREWS: 20-25 per m²
 Example 4m × 3m deck, 600mm high:
 • Footings: 6 × concrete pads (300mm dia × 400mm deep) + 6 × post stirrups 100mm
 • Posts: 6 × 100×100 H3.2 posts sitting IN stirrups (above ground, NOT buried)
-• Decking: 12m² ÷ 0.145 = 82.8 lm + 10% = 91 lm (140×32 H3.2)
+• Decking: 4m × 3m = 12m² ÷ 0.145m coverage = 82.8 lm + 10% waste = 91 lm
+  OUTPUT: {"name": "140×32 H3.2 Decking", "qty": 91, "unit": "lm", "searchTerm": "140X32 H3.2 DECKING"}
 • Joists at 450mm: 4000 ÷ 450 + 1 = 10 joists × 3m = 30 lm (140×45 H3.2)
 • Bearers at 1.2m: 3 bearers × 4m = 12 lm (140×45 H3.2)
 • Deck screws: 12m² × 22 = 264 screws
 NOTE: Post stirrups keep timber above ground - no H5 treatment needed for posts
+>>> DECKING UNIT IS ALWAYS "lm" (lineal meters) - NEVER "ea" or "boards" <<<
 
 PERGOLAS:
 • Footings: Concrete pads with post stirrups (100mm or 125mm) - NOT fence posts in ground
@@ -510,7 +560,11 @@ Respond with JSON:
 
 UNIT RULES FOR OUTPUT:
 • Use ONLY: lm, m², m³, ea, sht, box, bag, roll, tube, pk, set, pr, kg, L
-• NEVER use: m (alone), sqm, cbm, piece, unit, linear
+• NEVER use: m (alone), sqm, cbm, piece, unit, linear, boards
+• DECKING: Always "lm" (lineal meters) - NZ decking is sold per lineal meter
+• TIMBER FRAMING: Always "lm" for bearers, joists, studs, rafters
+• SHEETS (GIB, ply): Always "sht"
+• SCREWS/NAILS: Always "box" or "pk" with pack size in name
 
 IMPORTANT:
 - The "calculations" field must show your working for EVERY quantity
@@ -623,8 +677,16 @@ CRITICAL RULES:
 • Use approved units only: lm, m², m³, ea, sht, box, bag, etc.
 • If a dimension is unclear - add to warnings, estimate conservatively
 • Always use correct timber sizes from NZS 3604 span tables
-• Specify treatment levels (H1.2, H3.1, H3.2, H4)
+• Specify treatment levels (H1.2, H3.1, H3.2, H4, H5)
 • Note if building consent is likely required
+
+TIMBER TREATMENT RULES (NZS 3604):
+• STRUCTURAL PILES/IN-GROUND: MUST be H5 (125×125 H5 minimum) - H4 NOT acceptable
+• H4 is ONLY for fence posts (non-structural)
+• Bearers, joists, decking: H3.2 minimum
+• Posts ON stirrups (above ground): H4 acceptable
+• NEVER use 100×100 H4 fence posts for deck/pergola foundations
+• If user asks for H4 for foundations, CORRECT: "H4 not suitable for in-ground structural use. Using H5 125×125 piles."
 
 AVAILABLE MATERIALS:
 ${materialSummary}
