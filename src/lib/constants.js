@@ -51,7 +51,14 @@ export const DEFAULT_COMPANY_INFO = {
   name: 'Your Company Name',
   phone: '',
   email: '',
-  address: ''
+  address: '',
+  // Branding
+  logo: null,              // Base64 data URI
+  primaryColor: '#10b981', // Emerald-600 default
+  // Quote terms
+  termsAndConditions: '',
+  paymentTerms: '',
+  quoteValidity: 30        // Days
 };
 
 // Labour Item Presets

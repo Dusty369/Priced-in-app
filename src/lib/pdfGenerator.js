@@ -1,6 +1,16 @@
 import { DEFAULT_LABOUR_RATES, LABOUR_ROLES } from './constants';
 
 /**
+ * Convert hex color to RGB array
+ */
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
+    : [16, 185, 129]; // Default emerald-600
+}
+
+/**
  * Generate a PDF quote document
  * @param {Object} options
  * @param {Array} options.cart - Cart items
@@ -35,12 +45,26 @@ export async function generateQuotePDF({
   const contentWidth = pageWidth - leftMargin - rightMargin;
   let yPos = 20;
 
+  // Get brand color from company info or use default
+  const brandColor = hexToRgb(companyInfo.primaryColor || '#10b981');
+  const quoteValidity = companyInfo.quoteValidity || 30;
+
   // Helper to format currency
   const formatCurrency = (amount) => `$${amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+  // Logo (if exists)
+  if (companyInfo.logo) {
+    try {
+      doc.addImage(companyInfo.logo, 'AUTO', leftMargin, yPos - 5, 40, 20, undefined, 'FAST');
+      yPos += 18;
+    } catch (e) {
+      console.warn('Could not add logo to PDF:', e);
+    }
+  }
+
   // Company header (left side)
   doc.setFontSize(18);
-  doc.setTextColor(16, 185, 129);
+  doc.setTextColor(...brandColor);
   doc.setFont(undefined, 'bold');
   doc.text(companyInfo.name || 'Quote', leftMargin, yPos);
 
@@ -78,19 +102,22 @@ export async function generateQuotePDF({
   // Materials table
   if (cart.length > 0) {
     doc.setFontSize(11);
-    doc.setTextColor(16, 185, 129);
+    doc.setTextColor(...brandColor);
     doc.setFont(undefined, 'bold');
     doc.text('MATERIALS', leftMargin, yPos);
     doc.setFont(undefined, 'normal');
     yPos += 2;
 
-    const materialsData = cart.map(item => [
-      item.name.length > 55 ? item.name.substring(0, 52) + '...' : item.name,
-      item.qty.toString(),
-      item.unit || 'EA',
-      formatCurrency(item.price),
-      formatCurrency(item.price * item.qty)
-    ]);
+    const materialsData = cart.map(item => {
+      const row = [
+        item.name.length > 55 ? item.name.substring(0, 52) + '...' : item.name,
+        item.qty.toString(),
+        item.unit || 'EA',
+        formatCurrency(item.price),
+        formatCurrency(item.price * item.qty)
+      ];
+      return row;
+    });
 
     autoTable(doc, {
       startY: yPos,
@@ -113,7 +140,20 @@ export async function generateQuotePDF({
       },
       margin: { left: leftMargin, right: rightMargin },
       tableLineColor: [200, 200, 200],
-      tableLineWidth: 0.1
+      tableLineWidth: 0.1,
+      didDrawCell: (data) => {
+        // Add item notes as sub-row if exists
+        if (data.section === 'body' && data.column.index === 0) {
+          const item = cart[data.row.index];
+          if (item?.itemNote) {
+            doc.setFontSize(7);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont(undefined, 'italic');
+            doc.text(`Note: ${item.itemNote}`, data.cell.x + 2, data.cell.y + data.cell.height - 1);
+            doc.setFont(undefined, 'normal');
+          }
+        }
+      }
     });
 
     yPos = doc.lastAutoTable.finalY + 8;
@@ -128,7 +168,7 @@ export async function generateQuotePDF({
     }
 
     doc.setFontSize(11);
-    doc.setTextColor(16, 185, 129);
+    doc.setTextColor(...brandColor);
     doc.setFont(undefined, 'bold');
     doc.text('LABOUR', leftMargin, yPos);
     doc.setFont(undefined, 'normal');
@@ -224,19 +264,39 @@ export async function generateQuotePDF({
   yPos = doc.lastAutoTable.finalY + 2;
 
   // Grand total with emphasis
-  doc.setDrawColor(16, 185, 129);
+  doc.setDrawColor(...brandColor);
   doc.setLineWidth(0.5);
   doc.line(totalsX, yPos, totalsX + totalsWidth, yPos);
   yPos += 6;
 
   doc.setFontSize(12);
-  doc.setTextColor(16, 185, 129);
+  doc.setTextColor(...brandColor);
   doc.setFont(undefined, 'bold');
   doc.text('TOTAL:', totalsX, yPos);
   doc.text(formatCurrency(total), totalsX + totalsWidth, yPos, { align: 'right' });
   doc.setFont(undefined, 'normal');
 
   yPos += 15;
+
+  // Payment terms (if exists)
+  if (companyInfo.paymentTerms) {
+    if (yPos > pageHeight - 50) {
+      doc.addPage();
+      yPos = 20;
+    }
+
+    doc.setFontSize(10);
+    doc.setTextColor(...brandColor);
+    doc.setFont(undefined, 'bold');
+    doc.text('Payment Terms:', leftMargin, yPos);
+    doc.setFont(undefined, 'normal');
+    yPos += 5;
+    doc.setFontSize(9);
+    doc.setTextColor(60, 60, 60);
+    const splitPayment = doc.splitTextToSize(companyInfo.paymentTerms, contentWidth);
+    doc.text(splitPayment, leftMargin, yPos);
+    yPos += splitPayment.length * 4 + 8;
+  }
 
   // Notes section
   if (projectNotes) {
@@ -254,6 +314,26 @@ export async function generateQuotePDF({
     doc.setFontSize(9);
     const splitNotes = doc.splitTextToSize(projectNotes, contentWidth);
     doc.text(splitNotes, leftMargin, yPos);
+    yPos += splitNotes.length * 4 + 8;
+  }
+
+  // Terms & Conditions (if exists)
+  if (companyInfo.termsAndConditions) {
+    if (yPos > pageHeight - 50) {
+      doc.addPage();
+      yPos = 20;
+    }
+
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    doc.setFont(undefined, 'bold');
+    doc.text('Terms & Conditions:', leftMargin, yPos);
+    doc.setFont(undefined, 'normal');
+    yPos += 5;
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    const splitTerms = doc.splitTextToSize(companyInfo.termsAndConditions, contentWidth);
+    doc.text(splitTerms, leftMargin, yPos);
   }
 
   // Footer on each page
@@ -263,7 +343,7 @@ export async function generateQuotePDF({
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
     doc.text('Generated by Priced In - Building Estimator', pageWidth / 2, pageHeight - 12, { align: 'center' });
-    doc.text(`Quote valid for 30 days from ${new Date().toLocaleDateString('en-NZ')}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+    doc.text(`Quote valid for ${quoteValidity} days from ${new Date().toLocaleDateString('en-NZ')}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
     if (pageCount > 1) {
       doc.text(`Page ${i} of ${pageCount}`, pageWidth - rightMargin, pageHeight - 8, { align: 'right' });
     }

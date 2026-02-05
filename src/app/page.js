@@ -464,9 +464,11 @@ export default function PricedInApp() {
             onCompanySettings={() => setShowCompanySettings(true)}
             onGeneratePDF={generatePDF}
             onExportXero={exportXero}
-            onUpdateCartQty={(id, delta) => {
-              setCart(cart.map(item => 
-                item.id === id ? {...item, qty: Math.max(1, item.qty + delta)} : item
+            onUpdateCartQty={(id, value, isAbsolute) => {
+              setCart(cart.map(item =>
+                item.id === id
+                  ? {...item, qty: Math.max(1, isAbsolute ? value : item.qty + value)}
+                  : item
               ));
             }}
             onRemoveFromCart={(id) => setCart(cart.filter(i => i.id !== id))}
@@ -483,6 +485,11 @@ export default function PricedInApp() {
             onUpdateLabourRate={(role, rate) => setLabourRates(prev => ({ ...prev, [role]: rate }))}
             onOpenAddMaterial={() => setShowAddMaterial(true)}
             aiCalculations={aiCalculations}
+            onUpdateItemNote={(id, note) => {
+              setCart(cart.map(item =>
+                item.id === id ? {...item, itemNote: note} : item
+              ));
+            }}
           />
         )}
 

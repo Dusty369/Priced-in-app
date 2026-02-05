@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {
   Save, Plus, Settings, Download, Building2, Package, Users,
   Calculator, DollarSign, Trash2, Minus, Edit3, FileText,
-  TrendingUp, Search, Clock
+  TrendingUp, Search, Clock, StickyNote
 } from 'lucide-react';
 
 export default function QuotePage({
@@ -37,7 +37,8 @@ export default function QuotePage({
   labourRates,
   onUpdateLabourRate,
   onOpenAddMaterial,
-  aiCalculations
+  aiCalculations,
+  onUpdateItemNote
 }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showCalcs, setShowCalcs] = useState(false);
@@ -47,6 +48,7 @@ export default function QuotePage({
   const [discount, setDiscount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [targetPrice, setTargetPrice] = useState('');
+  const [editingNoteId, setEditingNoteId] = useState(null);
 
   // Copy materials list to clipboard
   const copyMaterialsList = () => {
@@ -350,45 +352,84 @@ export default function QuotePage({
         ) : (
           <div className="divide-y divide-gray-100">
             {cart.map(item => (
-              <div key={item.id} className="px-5 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors duration-150">
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{item.name}</p>
-                  <p className="text-sm text-gray-500">
-                    ${item.price.toFixed(2)} / {item.unit}
-                    <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
-                      'bg-orange-50 text-orange-700'
-                    }`}>
-                      Carters
-                    </span>
-                  </p>
-                </div>
+              <div key={item.id} className="hover:bg-gray-50 transition-colors duration-150">
+                <div className="px-5 py-4 flex items-center gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{item.name}</p>
+                    <p className="text-sm text-gray-500">
+                      ${item.price.toFixed(2)} / {item.unit}
+                      <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
+                        'bg-orange-50 text-orange-700'
+                      }`}>
+                        Carters
+                      </span>
+                      {item.itemNote && (
+                        <span className="ml-2 text-xs text-amber-600">
+                          Has note
+                        </span>
+                      )}
+                    </p>
+                  </div>
 
-                <div className="flex items-center gap-1 bg-gray-100 rounded-lg">
+                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg">
+                    <button
+                      onClick={() => onUpdateCartQty(item.id, -1)}
+                      className="p-2 hover:bg-gray-200 rounded-l-lg transition-colors duration-150"
+                    >
+                      <Minus size={16} className="text-gray-600" />
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      value={item.qty}
+                      onChange={(e) => onUpdateCartQty(item.id, parseInt(e.target.value) || 1, true)}
+                      className="w-14 text-center font-semibold text-gray-900 bg-transparent border-0 focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <button
+                      onClick={() => onUpdateCartQty(item.id, 1)}
+                      className="p-2 hover:bg-gray-200 rounded-r-lg transition-colors duration-150"
+                    >
+                      <Plus size={16} className="text-gray-600" />
+                    </button>
+                  </div>
+
+                  <div className="text-right w-24">
+                    <p className="font-semibold text-gray-900">${(item.price * item.qty).toFixed(2)}</p>
+                  </div>
+
                   <button
-                    onClick={() => onUpdateCartQty(item.id, -1)}
-                    className="p-2 hover:bg-gray-200 rounded-l-lg transition-colors duration-150"
+                    onClick={() => setEditingNoteId(editingNoteId === item.id ? null : item.id)}
+                    className={`p-2 rounded-lg transition-colors duration-150 ${
+                      item.itemNote
+                        ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50'
+                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                    }`}
+                    title="Add note"
                   >
-                    <Minus size={16} className="text-gray-600" />
+                    <StickyNote size={18} />
                   </button>
-                  <span className="w-10 text-center font-semibold text-gray-900">{item.qty}</span>
+
                   <button
-                    onClick={() => onUpdateCartQty(item.id, 1)}
-                    className="p-2 hover:bg-gray-200 rounded-r-lg transition-colors duration-150"
+                    onClick={() => onRemoveFromCart(item.id)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   >
-                    <Plus size={16} className="text-gray-600" />
+                    <Trash2 size={18} />
                   </button>
                 </div>
 
-                <div className="text-right w-24">
-                  <p className="font-semibold text-gray-900">${(item.price * item.qty).toFixed(2)}</p>
-                </div>
-
-                <button
-                  onClick={() => onRemoveFromCart(item.id)}
-                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-150"
-                >
-                  <Trash2 size={18} />
-                </button>
+                {/* Expandable note input */}
+                {editingNoteId === item.id && (
+                  <div className="px-5 pb-4">
+                    <input
+                      type="text"
+                      value={item.itemNote || ''}
+                      onChange={(e) => onUpdateItemNote(item.id, e.target.value)}
+                      placeholder="Add note (e.g., Client wants stainless fixings)"
+                      className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-amber-50/50"
+                      autoFocus
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>
