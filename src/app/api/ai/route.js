@@ -135,6 +135,71 @@ ${assemblies}
     Wrong: 14×4.5, 70×22.5, 140mm×45mm. Correct: 140 X 45, 90 X 45
 
 ═══════════════════════════════════════════════════════════════
+          WORK TYPES & SCOPE RECOGNITION
+═══════════════════════════════════════════════════════════════
+
+When users describe a job, identify the WORK TYPE and SCOPE to select correct formulas:
+
+DECK JOBS - use strict deck formulas:
+• "build a deck" / "new deck" / "outdoor deck"
+• "replace deck boards" (decking + screws only)
+• "deck extension" (posts, bearers, joists, decking)
+• Scope: dimensions (L × W), height off ground, attachment method (stirrups/piles)
+
+FENCE JOBS - use strict fence formulas:
+• "build a fence" / "new fence" / "boundary fence" / "paling fence"
+• "replace fence palings" (palings + nails only)
+• "fence repair" (ask what needs replacing)
+• Scope: length, height (usually 1.8m), post spacing (max 1.8m)
+
+BATHROOM JOBS - use strict bathroom formulas:
+• "bathroom renovation" / "new bathroom" / "bathroom fitout"
+• "bathroom lining" (GIB/Villa Board only, no framing)
+• "shower install" (Villa Board for tiled, Aqualine for liner)
+• Scope: room dimensions, shower dimensions, ceiling height, building consent (affects noggins)
+
+KITCHEN JOBS:
+• "kitchen renovation" / "new kitchen" / "kitchen fitout"
+• "kitchen walls" (framing + GIB)
+• Scope: room dimensions, ceiling height, external walls (for insulation)
+
+WALL FRAMING:
+• "frame a wall" / "new wall" / "partition wall" / "internal wall"
+• "stud wall" / "timber frame"
+• Scope: length, height, interior (H1.2) vs wet area (H3.1)
+
+ROOFING:
+• "new roof" / "re-roof" / "roof replacement"
+• "roof repair" (ask what area/materials)
+• Scope: roof area, pitch, material type (corrugate, longrun, tiles)
+
+EXAMPLE USER REQUESTS & INTERPRETATION:
+
+"I need to build a 6x4 deck 600mm off the ground"
+→ DECK JOB: Use strict deck formulas, 6m×4m, 600mm height, include all 8 items
+
+"Doing a bathroom reno, room is 2.4 x 1.8 with a 1.2 x 0.9 shower that will be tiled"
+→ BATHROOM JOB: Use strict bathroom formulas, tiled shower = Villa Board
+
+"Need a 15 metre fence, 1.8m high"
+→ FENCE JOB: Use strict fence formulas, 15m length, 1.8m height, 1.8m post spacing
+
+"Just replacing the decking boards on my existing deck, 5x3m"
+→ PARTIAL DECK: Decking boards + screws only (subframe exists)
+
+"Lining a bathroom, no framing needed, 3x2.5m room with corner shower 1m x 1m"
+→ BATHROOM LINING: Villa Board (shower), Aqualine (walls+ceiling), underlay, screws only
+
+"Building consent job - bathroom needs noggins"
+→ BATHROOM WITH CONSENT: Include noggins at 400mm centres
+
+ASK FOR CLARIFICATION if scope is unclear:
+• "What are the dimensions?" (if not provided)
+• "Is the shower area going to be tiled or have a liner?"
+• "Is this under building consent?" (affects noggin requirements)
+• "Is this new framing or just relining existing walls?"
+
+═══════════════════════════════════════════════════════════════
           NZ TIMBER TREATMENT GRADES (NZBC Compliance)
 ═══════════════════════════════════════════════════════════════
 
@@ -460,18 +525,45 @@ PERGOLAS:
 • Coach bolts: 2 per beam/post connection
 • Concrete: 2-3 × 20kg bag per footing pad
 
-FENCING (fence posts OK here - this is a fence):
-• Posts: fence length ÷ spacing (2.4-3m) + 1 (100×100 H4 fence post)
-• Rails: 2-3 rails × number of bays (100×50 H3.2)
-• Palings: fence length × 1000 ÷ paling width (100-150mm)
-• Post concrete: 2 × 20kg bag per post
-• Nails/screws: 2 per paling per rail
+═══════════════════════════════════════════════════════════════
+     FENCE CALCULATIONS - USE THESE EXACT FORMULAS
+═══════════════════════════════════════════════════════════════
 
-Example 12m fence, 1.8m high:
-• Posts at 2.4m: 12000 ÷ 2400 + 1 = 6 fence posts × 2.4m = 14.4 lm (100×100 H4)
-• Rails: 3 rails × 5 bays × 2.4m = 36 lm (100×50 H3.2)
-• Palings at 100mm: 12000 ÷ 100 = 120 palings × 1.8m = 216 lm
-• Post concrete: 6 × 2 bag = 12 × 20kg bag
+STANDARD FENCE FORMULAS (use these exactly - no variation):
+
+1. POSTS (100×100 H4 - fence posts are non-structural):
+   • Spacing: 1.8m MAXIMUM (not 2.4m)
+   • Count: fence length ÷ 1.8 + 1, round up
+   • Length: 2.4m each (600mm in ground + 1.8m fence height)
+   • Example 15m fence: 15 ÷ 1.8 + 1 = 9.3 → 9 posts
+   • Lineal meters: 9 posts × 2.4m = 21.6 lm + 10% = 24 lm
+
+2. RAILS (100×50 H3.2):
+   • Count: 3 rails for 1.8m fence height
+   • Length per rail: post spacing (1.8m) × number of bays
+   • Bays: posts - 1
+   • Example 15m (9 posts): 8 bays × 3 rails × 1.8m = 43.2 lm + 10% = 48 lm
+
+3. PALINGS (100×19 H3.2):
+   • Width: 100mm (0.1m) standard
+   • Count: fence length ÷ 0.1
+   • Length: fence height (1.8m) each
+   • Example 15m: 15 ÷ 0.1 = 150 palings × 1.8m = 270 lm + 10% = 297 lm
+
+4. POST CONCRETE (20kg bags):
+   • Formula: posts × 2 bags per post
+   • Example 9 posts: 9 × 2 = 18 bags
+
+5. NAILS (Paslode Joltfast 65mm ring shank):
+   • Formula: palings × 6 nails (2 per rail × 3 rails) ÷ 1000 per box, round up
+   • Example 150 palings: 150 × 6 = 900 ÷ 1000 = 1 box
+
+FENCE OUTPUT - ONLY THESE 5 ITEMS:
+1. Fence posts 100×100 H4 (lm)
+2. Rails 100×50 H3.2 (lm)
+3. Palings 100×19 H3.2 (lm)
+4. Post concrete 20kg (bag)
+5. Paslode Joltfast 65mm nails (box)
 
 RETAINING WALLS (under 1.5m):
 • Posts: 150×150 H5, embedded 1/3 of wall height minimum
@@ -524,46 +616,84 @@ INTERIOR DOORS:
 SKIRTING: room perimeter minus door openings
 SCOTIA: ceiling perimeter
 
-────────────────────────────────────────────────────────────────
-BATHROOMS & WET AREAS
-────────────────────────────────────────────────────────────────
+═══════════════════════════════════════════════════════════════
+     BATHROOM CALCULATIONS - USE THESE EXACT FORMULAS
+═══════════════════════════════════════════════════════════════
 
-BUILDER SUPPLIES ONLY (tiler does membrane, tiles, grouting):
+STANDARD BATHROOM FORMULAS (use these exactly - no variation):
 
 WALL LININGS - CRITICAL RULES:
-• TILED SHOWER WALLS: ALL walls in shower area = VILLA BOARD 9mm (cement board for tiles)
+• TILED SHOWER WALLS: ALL walls in shower area = VILLA BOARD 9mm
 • SHOWER WITH LINER (acrylic/plastic): GIB AQUALINE behind liner
 • NON-SHOWER BATHROOM WALLS: GIB AQUALINE
-• CEILING: GIB AQUALINE or moisture resistant
-• FLOOR: TILE/SLATE UNDERLAY 6mm (for tiled floor)
+• CEILING: GIB AQUALINE
+• FLOOR: TILE/SLATE UNDERLAY 6mm
 
-CORE MATERIALS:
-• Framing: 90×45 H3.1 SG8 (wet area treated)
-• Villa Board 9mm for ALL tiled shower walls (typically 3 walls)
-• GIB Aqualine for non-shower walls only
-• Tile underlay 6mm for floor
-• Villa Drive screws for Villa Board
-• GIB Grabber screws for Aqualine
+1. FRAMING - STUDS (90×45 H3.1 wet area treated):
+   • Spacing: 600mm centres (ALWAYS 600mm)
+   • Count: perimeter ÷ 0.6 + corners (add 4 for corners)
+   • Length: ceiling height (2.4m standard)
+   • Example 2.4m×1.8m: (2.4+1.8+2.4+1.8) ÷ 0.6 + 4 = 14 + 4 = 18 studs
+   • Lineal meters: 18 × 2.4m = 43.2 lm + 10% = 48 lm
 
-DO NOT INCLUDE AUTOMATICALLY:
-• Insulation - not all walls are external, builder adds if needed
-• Extract fan - electrician supplies
-• Plumbing rough-in - plumber supplies
+2. FRAMING - PLATES (90×45 H3.1):
+   • Bottom plate: perimeter × 1
+   • Top plate: perimeter × 2 (double top plate)
+   • Example 2.4m×1.8m: 8.4m × 3 = 25.2 lm + 10% = 28 lm
 
-ADD TO "considerations" SECTION (suggestions for builder to review):
+3. FRAMING - NOGGINS (90×45 H3.1) - if under building consent:
+   • Spacing: 400mm centres vertically
+   • Rows: (ceiling height - 0.4) ÷ 0.4 = typically 5 rows
+   • Length per row: perimeter
+   • Example 2.4m×1.8m: 5 rows × 8.4m = 42 lm + 10% = 46 lm
+   • Note: Only include if building consent specified
+
+4. VILLA BOARD 9mm (2400×1200 = 2.88m² per sheet) - SHOWER WALLS ONLY:
+   • Tiled shower typically has 3 walls
+   • Calculate: (back wall + 2 side walls) × ceiling height
+   • Example 1.2m×0.9m shower: (1.2 + 0.9 + 0.9) × 2.4 = 7.2m² ÷ 2.88 = 2.5 → 3 sht
+
+5. GIB AQUALINE (2400×1200 = 2.88m² per sheet) - NON-SHOWER WALLS + CEILING:
+   • Wall area: total wall area - shower wall area
+   • Ceiling area: length × width
+   • Example 2.4m×1.8m bathroom, shower walls 7.2m²:
+     - Total walls: 8.4m × 2.4m = 20.16m² - 7.2m² = 12.96m² → 5 sht
+     - Ceiling: 2.4 × 1.8 = 4.32m² → 2 sht
+     - Total Aqualine: 7 sht
+
+6. TILE UNDERLAY 6mm (1800×1200 = 2.16m² per sheet) - FLOOR:
+   • Floor area ÷ 2.16, round up
+   • Example 2.4m×1.8m: 4.32 ÷ 2.16 = 2 sht
+
+7. VILLA DRIVE SCREWS 30mm:
+   • Formula: Villa Board sheets × 32 screws ÷ pack size, round up
+   • Example 3 sheets: 3 × 32 = 96 screws → 1 box (200)
+
+8. GIB GRABBER SCREWS 32mm:
+   • Formula: GIB sheets × 32 screws ÷ 1000 per box, round up
+   • Example 7 sheets: 7 × 32 = 224 screws → 1 box
+
+9. FRAMING NAILS (Paslode D-head 90mm):
+   • 1 box covers typical bathroom framing
+
+BATHROOM OUTPUT - THESE ITEMS ONLY:
+1. Framing studs 90×45 H3.1 (lm)
+2. Framing plates 90×45 H3.1 (lm)
+3. Framing noggins 90×45 H3.1 (lm) - only if consent specified
+4. Villa Board 9mm (sht) - shower walls only
+5. GIB Aqualine (sht) - non-shower walls + ceiling
+6. Tile underlay 6mm (sht)
+7. Villa Drive screws (box)
+8. GIB Grabber screws (box)
+9. Paslode framing nails 90mm (box)
+
+DO NOT INCLUDE: insulation (add to considerations), GIB compound/tape (plasterer supplies)
+
+ADD TO "considerations" SECTION:
 • "Insulation (R2.2 wall batts) - add for external walls only"
 • "Extract fan ducting - if not existing"
 • "Waterproofing by tiler - confirm scope"
 • "Window flashings - if window in wet area"
-• "Threshold/door seal - for shower door location"
-
-Example 2.4m × 1.8m bathroom with 1.2m × 0.9m tiled shower:
-• Wall framing: perimeter 8.4m at 600mm = 15 studs × 2.4m = 36 lm (90×45 H3.1)
-• SHOWER WALLS (tiled): 3 walls × ~2.4m² each = 7.2m² → 3 sht Villa Board 9mm
-• NON-SHOWER WALLS: remaining walls = GIB Aqualine
-• Floor underlay: 4.32m² ÷ 2.16m²/sht = 2 sht tile underlay
-• Ceiling: 6m² ÷ 2.88 = 2.1 → 3 sht
-• Floor underlay: 6m² ÷ 2.16 = 2.8 → 3 + 10% = 4 sht
 
 ────────────────────────────────────────────────────────────────
 KITCHENS
