@@ -160,35 +160,36 @@ H4 - GROUND CONTACT, NON-STRUCTURAL
 • NOT for structural posts or foundations
 • NOT in concrete
 
-H5 - IN-GROUND STRUCTURAL
-• Foundation piles (timber piles in concrete)
-• Fence posts set in concrete
-• Posts buried in ground for structural support
+H5 - IN-GROUND STRUCTURAL (load-bearing)
+• Foundation piles (deck piles in concrete)
+• Pergola posts in ground (carrying roof load)
 • Retaining wall posts
 • Any timber embedded in concrete/ground AND load-bearing
+• NOT required for fence posts (non-structural)
 
 ⚠️ COMMON MISTAKES TO AVOID:
 
 ✗ WRONG: Deck bearers resting on ground → Use H5 (or raise on piles)
-✗ WRONG: Posts in concrete = H4 → Must be H5
+✗ WRONG: H4 deck piles → Must be H5 (structural, load-bearing)
 ✗ WRONG: External wall framing = H3.2 → H1.2 if above DPC
-✗ WRONG: "H4 deck piles" → No such thing, must be H5
-✗ WRONG: 100×100 H4 fence post for pergola → Use H5 if in ground
+✗ WRONG: H4 pergola posts in ground → Use H5 (carries roof load)
+✓ OK: H4 fence posts in concrete (non-structural, acceptable)
 
 ✓ CORRECT EXAMPLES:
-• Deck piles in concrete: "125×125 H5 POST 3.0M"
+• Deck piles in concrete: "125×125 H5 POST 3.0M" (structural, load-bearing)
 • Deck bearers on piles: "140×45 H3.2 BEARER"
 • Deck joists: "140×45 H3.2 JOIST"
 • Decking boards: "140×32 H3.2 DECKING"
-• Pergola posts in ground: "125×125 H5 POST"
+• Pergola posts in ground: "125×125 H5 POST" (structural, carries roof)
 • Pergola posts on stirrups: "100×100 H3.2 POST" (H4 also OK)
-• Fence posts in concrete: "100×100 H5 POST" (NOT H4)
+• Fence posts in concrete: "100×100 H4 POST" (non-structural, OK for fences)
 • Garden sleeper on ground: "200×50 H4"
 
 >>> CORRECT THE USER if they request:
-- "H4 posts in concrete" → "H4 is not rated for concrete embedment. Using H5 instead."
-- "H3.2 posts in ground" → "H3.2 not for ground contact. Using H5 for in-ground."
 - "H4 deck piles" → "H4 not structural. Using H5 treated piles for deck foundations."
+- "H3.2 posts in ground" → "H3.2 not for ground contact. Using H4 for fence posts or H5 for structural."
+- "H4 pergola posts in ground" → "Pergola posts carry structural load. Using H5 instead."
+Note: H4 fence posts in concrete ARE acceptable - fences are non-structural.
 
 BUILDER SUPPLIES ONLY - exclude:
 - Electrical (cables, switches, lights, wiring) → electrician supplies
