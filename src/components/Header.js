@@ -1,6 +1,6 @@
 'use client';
 
-import { Package, MessageSquare, Menu, X } from 'lucide-react';
+import { Package, MessageSquare, Menu, X, FileText } from 'lucide-react';
 
 export default function Header({ page, setPage, currentProjectName, cart, showAI, setShowAI, mobileMenuOpen, setMobileMenuOpen }) {
   return (
@@ -29,6 +29,12 @@ export default function Header({ page, setPage, currentProjectName, cart, showAI
             className={`px-4 py-2 rounded-lg font-medium transition-colors duration-150 ${page === 'quote' ? 'bg-white/20' : 'hover:bg-white/10'}`}
           >
             Quote {cart.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-xs">{cart.length}</span>}
+          </button>
+          <button
+            onClick={() => setPage('plans')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors duration-150 flex items-center gap-2 ${page === 'plans' ? 'bg-white/20' : 'hover:bg-white/10'}`}
+          >
+            <FileText size={18} /> Plans
           </button>
           <button
             onClick={() => setShowAI(!showAI)}
@@ -62,6 +68,12 @@ export default function Header({ page, setPage, currentProjectName, cart, showAI
           >
             Quote
             {cart.length > 0 && <span className="px-2 py-0.5 bg-white/20 rounded text-sm">{cart.length}</span>}
+          </button>
+          <button
+            onClick={() => { setPage('plans'); setMobileMenuOpen(false); }}
+            className={`px-4 py-3 rounded-lg text-left font-medium transition-colors duration-150 flex items-center gap-2 ${page === 'plans' ? 'bg-white/20' : 'hover:bg-white/10'}`}
+          >
+            <FileText size={20} /> Plan Reader
           </button>
           <button
             onClick={() => { setShowAI(!showAI); setMobileMenuOpen(false); }}

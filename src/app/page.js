@@ -27,7 +27,10 @@ import {
   LABOUR_PRESETS,
   LABOUR_RATES_KEY,
   COMPANY_INFO_KEY,
-  MATERIAL_PRESETS_KEY
+  MATERIAL_PRESETS_KEY,
+  PLAN_USAGE_KEY,
+  USER_TIER_KEY,
+  PLAN_LIMITS
 } from '../lib/constants';
 
 
@@ -115,6 +118,8 @@ export default function PricedInApp() {
   const [showCompanySettings, setShowCompanySettings] = useState(false);
   const [companyInfo, setCompanyInfo] = useState(DEFAULT_COMPANY_INFO);
   const [materialPresets, setMaterialPresets] = useState([]);
+  const [userTier, setUserTier] = useState('basic');
+  const [planUsage, setPlanUsage] = useState({ month: new Date().toISOString().slice(0, 7), pages: 0 });
   const [pdfGenerating, setPdfGenerating] = useState(false);
   const [showPriceComparison, setShowPriceComparison] = useState(null);
   const [showAddMaterial, setShowAddMaterial] = useState(false);
@@ -139,6 +144,21 @@ export default function PricedInApp() {
 
     const savedPresets = localStorage.getItem(MATERIAL_PRESETS_KEY);
     if (savedPresets) setMaterialPresets(JSON.parse(savedPresets));
+
+    const savedTier = localStorage.getItem(USER_TIER_KEY);
+    if (savedTier) setUserTier(savedTier);
+
+    const savedUsage = localStorage.getItem(PLAN_USAGE_KEY);
+    if (savedUsage) {
+      const usage = JSON.parse(savedUsage);
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      // Reset if new month
+      if (usage.month !== currentMonth) {
+        setPlanUsage({ month: currentMonth, pages: 0 });
+      } else {
+        setPlanUsage(usage);
+      }
+    }
   }, []);
 
   // Persist labour rates
@@ -155,6 +175,16 @@ export default function PricedInApp() {
   useEffect(() => {
     localStorage.setItem(MATERIAL_PRESETS_KEY, JSON.stringify(materialPresets));
   }, [materialPresets]);
+
+  // Persist plan usage
+  useEffect(() => {
+    localStorage.setItem(PLAN_USAGE_KEY, JSON.stringify(planUsage));
+  }, [planUsage]);
+
+  // Persist user tier
+  useEffect(() => {
+    localStorage.setItem(USER_TIER_KEY, userTier);
+  }, [userTier]);
 
   // Clear materialSearch when leaving materials page
   useEffect(() => {
@@ -555,26 +585,52 @@ export default function PricedInApp() {
         {page === 'plans' && (
           <Suspense fallback={<div className="p-4 text-center text-gray-500">Loading plans...</div>}>
             <PlansUpload
-            planFile={planFile}
-            planPreview={planPreview}
-            planAnalyzing={planAnalyzing}
-            chatHistory={chatHistory}
-            cart={cart}
-            labourItems={labourItems}
-            onHandlePlanUpload={(e) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              setPlanFile(file);
-              if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (evt) => setPlanPreview(evt.target?.result);
-                reader.readAsDataURL(file);
-              } else if (file.type === 'application/pdf') {
-                setPlanPreview('PDF: ' + file.name);
-              }
-            }}
-            onAnalyzePlan={() => {}}
-            onNavigateToQuote={() => setPage('quote')}
+              planFile={planFile}
+              planPreview={planPreview}
+              planAnalyzing={planAnalyzing}
+              chatHistory={chatHistory}
+              cart={cart}
+              labourItems={labourItems}
+              planUsage={planUsage}
+              userTier={userTier}
+              planLimit={PLAN_LIMITS[userTier]?.pages || 10}
+              pagesRemaining={Math.max(0, (PLAN_LIMITS[userTier]?.pages || 10) - (planUsage?.pages || 0))}
+              onHandlePlanUpload={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setPlanFile(file);
+                if (file.type.startsWith('image/')) {
+                  const reader = new FileReader();
+                  reader.onload = (evt) => setPlanPreview(evt.target?.result);
+                  reader.readAsDataURL(file);
+                } else if (file.type === 'application/pdf') {
+                  setPlanPreview('PDF: ' + file.name);
+                }
+              }}
+              onAnalyzePlan={async () => {
+                if (!planFile || !planPreview) return;
+                const limit = PLAN_LIMITS[userTier]?.pages || 10;
+                const used = planUsage?.pages || 0;
+                if (used >= limit) {
+                  alert('Monthly page limit reached. Upgrade to Pro for more pages.');
+                  return;
+                }
+                setPlanAnalyzing(true);
+                // Count as 1 page for images, estimate for PDFs
+                const pagesToAdd = planFile.type === 'application/pdf' ? 1 : 1;
+                setPlanUsage(prev => ({
+                  ...prev,
+                  pages: (prev?.pages || 0) + pagesToAdd
+                }));
+                // Use sendAIMessage with plan mode
+                await sendAIMessage('Analyze this building plan and estimate materials needed', 'plan');
+                setPlanAnalyzing(false);
+              }}
+              onNavigateToQuote={() => setPage('quote')}
+              onClearPlan={() => {
+                setPlanFile(null);
+                setPlanPreview(null);
+              }}
             />
           </Suspense>
         )}

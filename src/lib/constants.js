@@ -4,6 +4,14 @@ export const CURRENT_PROJECT_KEY = 'priced-in-current-project';
 export const LABOUR_RATES_KEY = 'priced-in-labour-rates';
 export const COMPANY_INFO_KEY = 'priced-in-company-info';
 export const MATERIAL_PRESETS_KEY = 'priced-in-material-presets';
+export const PLAN_USAGE_KEY = 'priced-in-plan-usage';
+export const USER_TIER_KEY = 'priced-in-user-tier';
+
+// Plan analysis limits by tier
+export const PLAN_LIMITS = {
+  basic: { pages: 10, name: 'Basic' },
+  pro: { pages: 30, name: 'Pro' }
+};
 
 // Default labour rates (NZD/hour or /sqm) - NZ Auckland rates 2026
 // Source: NZ Certified Builders, Master Builders Association, trade avg Feb 2026
