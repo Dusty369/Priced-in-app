@@ -656,12 +656,15 @@ MATERIAL OUTPUT RULES:
 • unit = sellable unit (box, sht, lm, ea, bag, tin, roll)
 
 PACKAGING REFERENCE:
-• Screws/nails: 200-500 per box → qty = screws ÷ 200
-• Paint/stain: 5L or 10L tins → qty = liters ÷ 5 (round up)
+• Screws/nails: 200-500 per box → qty = screws ÷ box size (round up)
+• Paint/stain: 5L or 10L tins → qty = liters ÷ tin size (round up)
 • Concrete: 20kg bags → qty = kg ÷ 20 (round up)
 • Timber: per lineal meter → qty = total lm needed
 • Sheets: per sheet → qty = sheets needed
 • Brackets/hangers: per each → qty = count needed
+• DPC/membrane ROLLS: 20m per roll → qty = lm ÷ 20 (round up)
+• Protection tape ROLLS: 30m per roll → qty = lm ÷ 30 (round up)
+• Building wrap ROLLS: 50m per roll → qty = lm ÷ 50 (round up)
 
 UNIT RULES FOR OUTPUT:
 • Use ONLY: lm, m², m³, ea, sht, box, bag, roll, tube, pk, set, pr, kg, L
@@ -734,8 +737,10 @@ NZ PRODUCT SEARCH TERMS (use EXACT Carters patterns below):
 • Decking screws: "10G X 65MM SS304 DECKING SCREWS" or "DECKING SCREWS SS304"
 • Concrete bags: "CEMIX NO STEEL CONCRETE 20KG" or "MULTICRETE CONCRETE 40KG"
 • Deck stain/oil: "WATTYL FORESTWOOD DECK" or "DECKING STAIN"
-• DPC/flashing tape: "FLASHING TAPE 75MM" or "MALTHOID DPC"
-• Joist/bearer tape: "FRAME PROTECTION TAPE EUROBAND" (not "joist tape")
+• DPC/flashing tape: "MALTHOID DPC 90MM" - sold per ROLL (20m/roll)
+  - Calculate: lm needed ÷ 20m = rolls, e.g. 27 lm ÷ 20 = 2 rolls
+• Joist/bearer tape: "FRAME PROTECTION TAPE EUROBAND" - sold per ROLL (30m/roll)
+  - Calculate: lm needed ÷ 30m = rolls, e.g. 93 lm ÷ 30 = 4 rolls
 • GIB: "GIB STANDARD", "GIB AQUALINE", "FYRELINE"
 • GIB screws: "GIB GRABBER", "BATTEN SCREW"
 • Insulation: "PINK BATTS", "EARTHWOOL"
