@@ -396,51 +396,62 @@ DECK FOOTINGS (STRUCTURAL - NOT fence posts):
 >>> NEVER bury fence posts (100×100 H4) for deck foundations <<<
 
 ═══════════════════════════════════════════════════════════════
-     DECKING = LINEAL METERS (NEVER boards/ea)
+     DECK CALCULATIONS - USE THESE EXACT FORMULAS
 ═══════════════════════════════════════════════════════════════
-SHOW YOUR WORKING: deck area ÷ 0.145m coverage = X LM
-• 45m² deck: 45 ÷ 0.145 = 310 LM + 10% waste = 341 LM of 140×32 H3.2 decking
-• 12m² deck: 12 ÷ 0.145 = 83 LM + 10% waste = 91 LM
-• Output unit MUST be "lm" - NEVER "ea", "boards", or board count
-• WRONG: "86 boards" or "qty: 86, unit: ea"
-• RIGHT: "310 lm" or "qty: 310, unit: lm"
 
-JOISTS (H3.2 SG8):
-• Count: deck length ÷ joist spacing (450mm) + 1
-• Sizes: 140×45 max 2.0m span, 190×45 max 2.8m, 240×45 max 3.5m
->>> NEVER use 90×45 for deck joists <<<
+STANDARD DECK FORMULAS (use these exactly - no variation):
 
-BEARERS (H3.2 SG8):
-• Count: deck width ÷ bearer spacing (1.2-1.5m) + 1
-• Sizes: 140×45 max 1.5m, 190×45 max 2.0m, 2×190×45 max 3.0m
+1. POSTS (H5 if in concrete, H3.2 if on stirrups):
+   • Grid: 1.8m × 1.8m spacing
+   • Count: (length ÷ 1.8 + 1) × (width ÷ 1.8 + 1), round up
+   • Example 6×4m: (6÷1.8+1) × (4÷1.8+1) = 4.3×3.2 = 4×3 = 12 posts
+   • Length: 600mm in ground + deck height (typically 1.2m total)
+   • qtyToOrder: post count (ea), NOT lineal meters
 
-JOIST HANGERS (match joist size, NOT top mount):
-• 140×45 joists: L/LOK 190×47 GALV or S/STEEL
-• 190×45 joists: L/LOK 190×47 or 190×52
-• 240×45 joists: L/LOK 240×65 FACE MOUNT
-• Count: 2 per joist (both ends)
-DECK SCREWS: 20-25 per m²
+2. BEARERS (140×45 H3.2):
+   • Spacing: 1.2m centres
+   • Count: width ÷ 1.2 + 1, round up
+   • Length: deck length each
+   • Example 6×4m: 4÷1.2+1 = 4.3 → 4 bearers × 6m = 24 lm + 10% = 26 lm
 
-Example 4m × 3m deck, 600mm high:
-• Footings: 6 × concrete pads (300mm dia × 400mm deep) + 6 × post stirrups 100mm
-• Posts: 6 × 100×100 H3.2 posts sitting IN stirrups (above ground, NOT buried)
-• Decking: 4m × 3m = 12m² ÷ 0.145m coverage = 82.8 lm + 10% waste = 91 lm
-  OUTPUT: {"name": "140×32 H3.2 Decking", "qty": 91, "unit": "lm", "searchTerm": "PINE DECKING H3.2"}
-• Joists at 450mm: 4000 ÷ 450 + 1 = 10 joists × 3m = 30 lm (140×45 H3.2)
-• Bearers at 1.2m: 3 bearers × 4m = 12 lm (140×45 H3.2)
-• Deck screws: 12m² × 22 = 264 screws ÷ 200/box = 2 boxes
-• Joist hangers: 10 joists × 2 = 20 ea
-NOTE: Post stirrups keep timber above ground - no H5 treatment needed for posts
-• Concrete for footings: 6 pads × 2 bags = 12 × 20kg bags
->>> DECKING UNIT IS ALWAYS "lm" (lineal meters) - NEVER "ea" or "boards" <<<
+3. JOISTS (140×45 H3.2):
+   • Spacing: 450mm centres (ALWAYS 450mm for 140×32 decking)
+   • Count: length ÷ 0.45 + 1, round up
+   • Length: deck width each
+   • Example 6×4m: 6÷0.45+1 = 14.3 → 15 joists × 4m = 60 lm + 10% = 66 lm
 
-ANCILLARY MATERIALS (include when specifically requested):
-• DECKS: concrete bags, stirrups/brackets, stain (if requested)
-• FRAMING: building wrap, flashing tape, sill sealer, fixings
-• ROOFING: underlay, ridge cap, barge flashings, roofing screws
-• BATHROOMS: Aqualine GIB, tile underlay (builder supplies only)
-• CLADDING: building wrap, cavity battens, flashings, sealant
-NOTE: Only include DPC, joist tape, protection tape if user specifically requests them
+4. DECKING (140×32 H3.2) - ALWAYS IN LINEAL METERS:
+   • Formula: area ÷ 0.14 (140mm board width) + 10% waste
+   • Example 6×4m: 24m² ÷ 0.14 = 171 lm + 10% = 188 lm
+   • Unit: ALWAYS "lm" - NEVER "ea" or "boards"
+
+5. JOIST HANGERS (L/LOK 190×47 GALV):
+   • Count: joists × 2 (both ends)
+   • Example: 15 joists × 2 = 30 ea
+
+6. DECK SCREWS (SS304 10G×65mm):
+   • Formula: area × 22 screws/m² ÷ 500 per box, round up
+   • Example 6×4m: 24 × 22 = 528 ÷ 500 = 1.06 → 2 boxes
+
+7. CONCRETE (20kg bags):
+   • Formula: posts × 2 bags per post
+   • Example 12 posts: 12 × 2 = 24 bags
+
+8. STAIN (if requested):
+   • Formula: area × 2 coats ÷ 12m²/L coverage ÷ 5L tin
+   • Example 6×4m: 24 × 2 ÷ 12 ÷ 5 = 0.8 → 1 × 5L tin
+
+DECK OUTPUT - ONLY THESE 8 ITEMS (no extras):
+1. Posts (ea)
+2. Bearers (lm)
+3. Joists (lm)
+4. Decking (lm)
+5. Joist hangers (ea)
+6. Deck screws (box)
+7. Concrete bags (bag)
+8. Stain (ea) - only if requested
+
+DO NOT ADD: coach bolts, washers, nails, DPC, tape, stirrups unless specifically requested
 
 PERGOLAS:
 • Footings: Concrete pads with post stirrups (100mm or 125mm) - NOT fence posts in ground
