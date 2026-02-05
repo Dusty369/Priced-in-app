@@ -144,6 +144,7 @@ function formatAIResponse(json, labourRates) {
  * @param {Function} options.onNavigateToQuote - Callback to navigate to quote page
  * @param {Array} options.allMaterials - All materials array
  * @param {Map} options.materialWordIndex - Word index for material lookup
+ * @param {Function} options.onSetAiCalculations - Callback to store AI calculations for quote display
  */
 export function useAIChat({
   labourRates,
@@ -151,7 +152,8 @@ export function useAIChat({
   onAddLabourItem,
   onNavigateToQuote,
   allMaterials,
-  materialWordIndex
+  materialWordIndex,
+  onSetAiCalculations
 }) {
   const [chatInput, setChatInput] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
@@ -198,6 +200,11 @@ export function useAIChat({
               content: formattedContent,
               parsed: json
             }]);
+
+            // Store calculations for quote display
+            if (json.calculations && Array.isArray(json.calculations) && onSetAiCalculations) {
+              onSetAiCalculations(json.calculations);
+            }
           } else {
             setChatHistory(prev => [...prev, { role: 'assistant', content: text }]);
           }

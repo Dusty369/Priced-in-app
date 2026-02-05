@@ -35,9 +35,11 @@ export default function QuotePage({
   onUpdateLabourRole,
   pdfGenerating,
   labourRates,
-  onOpenAddMaterial
+  onOpenAddMaterial,
+  aiCalculations
 }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showCalcs, setShowCalcs] = useState(false);
   const [contingency, setContingency] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [crewSize, setCrewSize] = useState(1);
@@ -354,6 +356,41 @@ export default function QuotePage({
           </div>
         )}
       </div>
+
+      {/* AI Calculations Section - Collapsible */}
+      {aiCalculations && aiCalculations.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <button
+            onClick={() => setShowCalcs(!showCalcs)}
+            className="w-full px-5 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors duration-150"
+          >
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Calculator size={18} className="text-amber-600" />
+              AI Calculations
+              <span className="text-sm font-normal text-gray-500">({aiCalculations.length})</span>
+            </h2>
+            <span className="text-gray-400 text-sm">
+              {showCalcs ? '▲ Hide' : '▼ Show'}
+            </span>
+          </button>
+
+          {showCalcs && (
+            <div className="px-5 pb-5 border-t border-gray-100">
+              <div className="mt-4 bg-gray-50 rounded-lg p-4 space-y-3">
+                {aiCalculations.map((calc, i) => (
+                  <div key={i} className="border-l-3 border-amber-500 pl-3 py-1" style={{ borderLeftWidth: '3px' }}>
+                    <p className="font-medium text-gray-900 text-sm">{calc.item}</p>
+                    <p className="text-gray-600 text-sm font-mono">{calc.working}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-gray-500">
+                These calculations show how AI estimated the quantities. Verify before quoting.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Labour Section */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">

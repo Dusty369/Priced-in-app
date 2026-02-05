@@ -70,6 +70,9 @@ export default function PricedInApp() {
   const [labourItems, setLabourItems] = useState([]);
   const [showLabourSettings, setShowLabourSettings] = useState(false);
 
+  // AI calculations state (for showing working in quote)
+  const [aiCalculations, setAiCalculations] = useState([]);
+
   // Project management hook
   const {
     projects,
@@ -208,7 +211,8 @@ export default function PricedInApp() {
     onAddLabourItem: addLabourItem,
     onNavigateToQuote: () => {},  // Don't auto-navigate - we navigate after review confirmation
     allMaterials,
-    materialWordIndex
+    materialWordIndex,
+    onSetAiCalculations: setAiCalculations
   });
 
   // Calculations (memoized to prevent recalculation on every render)
@@ -477,6 +481,7 @@ export default function PricedInApp() {
             pdfGenerating={pdfGenerating}
             labourRates={labourRates}
             onOpenAddMaterial={() => setShowAddMaterial(true)}
+            aiCalculations={aiCalculations}
           />
         )}
 
