@@ -9,8 +9,8 @@ export const USER_TIER_KEY = 'priced-in-user-tier';
 
 // Plan analysis limits by tier
 export const PLAN_LIMITS = {
-  basic: { pages: 10, name: 'Basic' },
-  pro: { pages: 30, name: 'Pro' }
+  basic: { plansPerMonth: 4, pagesPerPlan: 10, name: 'Basic' },
+  pro: { plansPerMonth: 6, pagesPerPlan: 20, name: 'Pro' }
 };
 
 // Default labour rates (NZD/hour or /sqm) - NZ Auckland rates 2026

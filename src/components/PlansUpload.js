@@ -16,11 +16,12 @@ export default function PlansUpload({
   // Usage tracking props
   planUsage,
   userTier,
-  planLimit,
-  pagesRemaining
+  plansPerMonth,
+  pagesPerPlan,
+  plansRemaining
 }) {
-  const usagePercent = planLimit > 0 ? (planUsage?.pages || 0) / planLimit * 100 : 0;
-  const isAtLimit = pagesRemaining <= 0;
+  const usagePercent = plansPerMonth > 0 ? (planUsage?.plans || 0) / plansPerMonth * 100 : 0;
+  const isAtLimit = plansRemaining <= 0;
 
   return (
     <div className="space-y-4">
@@ -45,7 +46,7 @@ export default function PlansUpload({
               )}
             </span>
             <span className="text-sm text-gray-500">
-              {planUsage?.pages || 0} / {planLimit} pages
+              {planUsage?.plans || 0} / {plansPerMonth} plans
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
@@ -57,11 +58,11 @@ export default function PlansUpload({
             />
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            {pagesRemaining} pages remaining this month
+            {plansRemaining} plans remaining ({pagesPerPlan} pages max each)
           </p>
           {userTier === 'basic' && (
             <button className="mt-2 text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1">
-              <Zap size={12} /> Upgrade to Pro (30 pages)
+              <Zap size={12} /> Upgrade to Pro (6 plans, 20 pages)
             </button>
           )}
         </div>
@@ -76,7 +77,7 @@ export default function PlansUpload({
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Upload your building plan</h3>
               <p className="text-gray-600 mb-2">PNG, JPG, or PDF format</p>
               <p className="text-sm text-amber-600 mb-4">
-                PDF limit: {userTier === 'pro' ? '30' : '10'} pages max
+                Max {pagesPerPlan} pages per PDF • {plansRemaining} plans remaining
               </p>
               {isAtLimit ? (
                 <div className="text-red-600 font-medium">

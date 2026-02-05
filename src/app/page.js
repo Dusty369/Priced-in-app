@@ -119,7 +119,7 @@ export default function PricedInApp() {
   const [companyInfo, setCompanyInfo] = useState(DEFAULT_COMPANY_INFO);
   const [materialPresets, setMaterialPresets] = useState([]);
   const [userTier, setUserTier] = useState('basic');
-  const [planUsage, setPlanUsage] = useState({ month: new Date().toISOString().slice(0, 7), pages: 0 });
+  const [planUsage, setPlanUsage] = useState({ month: new Date().toISOString().slice(0, 7), plans: 0 });
   const [pdfGenerating, setPdfGenerating] = useState(false);
   const [showPriceComparison, setShowPriceComparison] = useState(null);
   const [showAddMaterial, setShowAddMaterial] = useState(false);
@@ -593,8 +593,9 @@ export default function PricedInApp() {
               labourItems={labourItems}
               planUsage={planUsage}
               userTier={userTier}
-              planLimit={PLAN_LIMITS[userTier]?.pages || 10}
-              pagesRemaining={Math.max(0, (PLAN_LIMITS[userTier]?.pages || 10) - (planUsage?.pages || 0))}
+              plansPerMonth={PLAN_LIMITS[userTier]?.plansPerMonth || 4}
+              pagesPerPlan={PLAN_LIMITS[userTier]?.pagesPerPlan || 10}
+              plansRemaining={Math.max(0, (PLAN_LIMITS[userTier]?.plansPerMonth || 4) - (planUsage?.plans || 0))}
               onHandlePlanUpload={(e) => {
                 const file = e.target.files?.[0];
                 if (!file) return;
@@ -609,18 +610,16 @@ export default function PricedInApp() {
               }}
               onAnalyzePlan={async () => {
                 if (!planFile || !planPreview) return;
-                const limit = PLAN_LIMITS[userTier]?.pages || 10;
-                const used = planUsage?.pages || 0;
-                if (used >= limit) {
-                  alert('Monthly page limit reached. Upgrade to Pro for more pages.');
+                const plansLimit = PLAN_LIMITS[userTier]?.plansPerMonth || 4;
+                const used = planUsage?.plans || 0;
+                if (used >= plansLimit) {
+                  alert(`Monthly plan limit reached (${plansLimit} plans). ${userTier === 'basic' ? 'Upgrade to Pro for more.' : 'Resets next month.'}`);
                   return;
                 }
                 setPlanAnalyzing(true);
-                // Count as 1 page for images, estimate for PDFs
-                const pagesToAdd = planFile.type === 'application/pdf' ? 1 : 1;
                 setPlanUsage(prev => ({
                   ...prev,
-                  pages: (prev?.pages || 0) + pagesToAdd
+                  plans: (prev?.plans || 0) + 1
                 }));
                 // Use sendAIMessage with plan mode
                 await sendAIMessage('Analyze this building plan and estimate materials needed', 'plan');
