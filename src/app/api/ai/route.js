@@ -715,16 +715,20 @@ DIMENSION FORMAT (CRITICAL - NZ merchants use mm only):
 • NEVER divide dimensions by 10 or convert to other units
 • Examples: 90, 140, 190, 240 (mm) - not 9, 14, 19, 24 (cm)
 
-NZ PRODUCT SEARCH TERMS (use EXACT patterns below):
+NZ PRODUCT SEARCH TERMS (use EXACT Carters patterns below):
 • Framing timber: "140 X 45 RAD SG8 H3.2", "90 X 45 RAD SG8 H1.2", "190 X 45 RAD"
   (note: spaces around X, RAD prefix, SG8 grade)
-• Posts: "100 X 100 RAD POST H4", "125 X 125 POST H5"
+• Posts: "125 X 125 RAD SG8 POST H5", "100 X 100 RAD POST H4"
 • Post stirrups/brackets: "R6 STIRRUP 150X150", "BOWMAC POST BRACKET"
   (R6 stirrups start at 150mm, use BOWMAC brackets for 100mm posts)
-• Joist hangers: "L/LOK JOIST HANGER", "LVL JOIST HANGER 300 X 90"
-• Decking boards: "PINE WET PREMIUM DECKING", "RAD PREM DECKING H3.2", "KWILA DECKING"
+• Joist hangers: "L/LOK JOIST HANGER 140", "JOIST HANGER 240 X 65"
+• Decking boards: "RAD PREMIUM H3.2 DECKING", "KWILA DECKING"
+• Decking screws: "10G X 65MM SS304 DECKING SCREWS" or "DECKING SCREWS SS304"
+• Concrete bags: "CEMIX NO STEEL CONCRETE 20KG" or "MULTICRETE CONCRETE 40KG"
+• Deck stain/oil: "WATTYL FORESTWOOD DECK" or "DECKING STAIN"
+• DPC/flashing tape: "FLASHING TAPE 75MM" or "MALTHOID DPC"
 • GIB: "GIB STANDARD", "GIB AQUALINE", "FYRELINE"
-• Screws: "DECKING SCREW", "GIB GRABBER", "BATTEN SCREW"
+• GIB screws: "GIB GRABBER", "BATTEN SCREW"
 • Insulation: "PINK BATTS", "EARTHWOOL"
 • Underlay: "TILE UNDERLAY", "BUILDING PAPER"
 
