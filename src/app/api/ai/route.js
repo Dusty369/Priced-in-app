@@ -762,8 +762,11 @@ NZ PRODUCT SEARCH TERMS (use EXACT Carters patterns below):
   - Calculate: lm needed ÷ 20m = rolls, e.g. 27 lm ÷ 20 = 2 rolls
 • Joist/bearer tape: "FRAME PROTECTION TAPE EUROBAND" - sold per ROLL (30m/roll)
   - Calculate: lm needed ÷ 30m = rolls, e.g. 93 lm ÷ 30 = 4 rolls
-• GIB: "GIB STANDARD", "GIB AQUALINE", "FYRELINE"
-• GIB screws: "GIB GRABBER", "BATTEN SCREW"
+• GIB: "GIB STANDARD", "GIB AQUALINE", "GIB FYRELINE"
+• GIB screws: "GIB 6GX32MM GRABBER SCREWS" (1000 box $39) or "GIB 6GX25MM GRABBER" (for ceilings)
+• Villa Board (shower walls): "9.0MM VILLABOARD 2 EDGE 2400 X1200" ($84/sht) or "6.0MM VILLABOARD"
+• Tile underlay (floors): "6.0MM TILE/SLATE UNDERLAY 1800X1200" ($31/sht)
+• Villa Board screws: "VILLADRIVE SCREW 30MM" (collated or jar)
 
 NAILS - USE PASLODE (NZS 3604 compliant):
 • Framing nails 90mm (structural): "PASLODE IMPULSE 90X3.15MM HD GALV D-HEAD NAIL"
