@@ -26,7 +26,8 @@ import {
   DEFAULT_COMPANY_INFO,
   LABOUR_PRESETS,
   LABOUR_RATES_KEY,
-  COMPANY_INFO_KEY
+  COMPANY_INFO_KEY,
+  MATERIAL_PRESETS_KEY
 } from '../lib/constants';
 
 
@@ -113,6 +114,7 @@ export default function PricedInApp() {
   // UI state
   const [showCompanySettings, setShowCompanySettings] = useState(false);
   const [companyInfo, setCompanyInfo] = useState(DEFAULT_COMPANY_INFO);
+  const [materialPresets, setMaterialPresets] = useState([]);
   const [pdfGenerating, setPdfGenerating] = useState(false);
   const [showPriceComparison, setShowPriceComparison] = useState(null);
   const [showAddMaterial, setShowAddMaterial] = useState(false);
@@ -134,6 +136,9 @@ export default function PricedInApp() {
 
     const savedCompany = localStorage.getItem(COMPANY_INFO_KEY);
     if (savedCompany) setCompanyInfo(JSON.parse(savedCompany));
+
+    const savedPresets = localStorage.getItem(MATERIAL_PRESETS_KEY);
+    if (savedPresets) setMaterialPresets(JSON.parse(savedPresets));
   }, []);
 
   // Persist labour rates
@@ -145,6 +150,11 @@ export default function PricedInApp() {
   useEffect(() => {
     localStorage.setItem(COMPANY_INFO_KEY, JSON.stringify(companyInfo));
   }, [companyInfo]);
+
+  // Persist material presets
+  useEffect(() => {
+    localStorage.setItem(MATERIAL_PRESETS_KEY, JSON.stringify(materialPresets));
+  }, [materialPresets]);
 
   // Clear materialSearch when leaving materials page
   useEffect(() => {
@@ -165,6 +175,41 @@ export default function PricedInApp() {
 
   const removeLabourItem = useCallback((id) => {
     setLabourItems(prev => prev.filter(i => i.id !== id));
+  }, []);
+
+  // Material preset functions
+  const savePreset = useCallback((name) => {
+    if (!name || cart.length === 0) return;
+    const preset = {
+      id: Date.now().toString(),
+      name,
+      materials: cart.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        unit: item.unit,
+        qty: item.qty,
+        category: item.category,
+        supplier: item.supplier
+      })),
+      createdAt: new Date().toISOString()
+    };
+    setMaterialPresets(prev => [...prev, preset]);
+  }, [cart]);
+
+  const loadPreset = useCallback((presetId) => {
+    const preset = materialPresets.find(p => p.id === presetId);
+    if (!preset) return;
+    // Add preset materials to cart with new IDs
+    const newItems = preset.materials.map(item => ({
+      ...item,
+      id: `${item.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    }));
+    setCart(prev => [...prev, ...newItems]);
+  }, [materialPresets]);
+
+  const deletePreset = useCallback((presetId) => {
+    setMaterialPresets(prev => prev.filter(p => p.id !== presetId));
   }, []);
 
   // Review estimate handlers
@@ -490,6 +535,10 @@ export default function PricedInApp() {
                 item.id === id ? {...item, itemNote: note} : item
               ));
             }}
+            materialPresets={materialPresets}
+            onSavePreset={savePreset}
+            onLoadPreset={loadPreset}
+            onDeletePreset={deletePreset}
           />
         )}
 

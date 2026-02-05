@@ -3,6 +3,7 @@ export const PROJECTS_KEY = 'priced-in-projects';
 export const CURRENT_PROJECT_KEY = 'priced-in-current-project';
 export const LABOUR_RATES_KEY = 'priced-in-labour-rates';
 export const COMPANY_INFO_KEY = 'priced-in-company-info';
+export const MATERIAL_PRESETS_KEY = 'priced-in-material-presets';
 
 // Default labour rates (NZD/hour or /sqm) - NZ Auckland rates 2026
 // Source: NZ Certified Builders, Master Builders Association, trade avg Feb 2026

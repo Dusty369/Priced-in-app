@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {
   Save, Plus, Settings, Download, Building2, Package, Users,
   Calculator, DollarSign, Trash2, Minus, Edit3, FileText,
-  TrendingUp, Search, Clock, StickyNote
+  TrendingUp, Search, Clock, StickyNote, FolderPlus, ChevronDown
 } from 'lucide-react';
 
 export default function QuotePage({
@@ -38,7 +38,11 @@ export default function QuotePage({
   onUpdateLabourRate,
   onOpenAddMaterial,
   aiCalculations,
-  onUpdateItemNote
+  onUpdateItemNote,
+  materialPresets,
+  onSavePreset,
+  onLoadPreset,
+  onDeletePreset
 }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showCalcs, setShowCalcs] = useState(false);
@@ -49,6 +53,8 @@ export default function QuotePage({
   const [copied, setCopied] = useState(false);
   const [targetPrice, setTargetPrice] = useState('');
   const [editingNoteId, setEditingNoteId] = useState(null);
+  const [showPresets, setShowPresets] = useState(false);
+  const [newPresetName, setNewPresetName] = useState('');
 
   // Copy materials list to clipboard
   const copyMaterialsList = () => {
@@ -137,10 +143,10 @@ export default function QuotePage({
           </button>
           <button
             onClick={onCompanySettings}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-150"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg transition-colors duration-150 font-medium border border-blue-200"
           >
             <Building2 size={18} />
-            <span className="hidden sm:inline">Company</span>
+            <span className="hidden sm:inline">Branding & PDF</span>
           </button>
           {(cart.length > 0 || labourItems.length > 0) && (
             <>
@@ -316,6 +322,73 @@ export default function QuotePage({
             <span className="text-sm font-normal text-gray-500">({cart.length})</span>
           </h2>
           <div className="flex items-center gap-2">
+            {/* Presets Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowPresets(!showPresets)}
+                className="flex items-center gap-1 px-2 py-1.5 text-xs bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors duration-150 font-medium"
+              >
+                <FolderPlus size={14} />
+                Presets
+                <ChevronDown size={14} className={`transition-transform ${showPresets ? 'rotate-180' : ''}`} />
+              </button>
+              {showPresets && (
+                <div className="absolute right-0 top-full mt-1 w-64 bg-white rounded-lg shadow-lg border z-20">
+                  <div className="p-2 border-b">
+                    <p className="text-xs text-gray-500 mb-1.5">Load Preset</p>
+                    {materialPresets && materialPresets.length > 0 ? (
+                      <div className="space-y-1 max-h-32 overflow-y-auto">
+                        {materialPresets.map(preset => (
+                          <div key={preset.id} className="flex items-center justify-between gap-2 p-1.5 rounded hover:bg-gray-50">
+                            <button
+                              onClick={() => { onLoadPreset(preset.id); setShowPresets(false); }}
+                              className="flex-1 text-left text-sm text-gray-700 hover:text-blue-600"
+                            >
+                              {preset.name}
+                              <span className="text-xs text-gray-400 ml-1">({preset.materials.length})</span>
+                            </button>
+                            <button
+                              onClick={() => onDeletePreset(preset.id)}
+                              className="p-1 text-gray-400 hover:text-red-500"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-400 italic">No saved presets</p>
+                    )}
+                  </div>
+                  {cart.length > 0 && (
+                    <div className="p-2">
+                      <p className="text-xs text-gray-500 mb-1.5">Save Current as Preset</p>
+                      <div className="flex gap-1">
+                        <input
+                          type="text"
+                          value={newPresetName}
+                          onChange={(e) => setNewPresetName(e.target.value)}
+                          placeholder="e.g., Standard deck"
+                          className="flex-1 px-2 py-1 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                        <button
+                          onClick={() => {
+                            if (newPresetName.trim()) {
+                              onSavePreset(newPresetName.trim());
+                              setNewPresetName('');
+                            }
+                          }}
+                          disabled={!newPresetName.trim()}
+                          className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             {cart.length > 0 && (
               <button
                 onClick={copyMaterialsList}
@@ -342,12 +415,22 @@ export default function QuotePage({
             </div>
             <p className="text-gray-600 font-medium mb-1">No materials yet</p>
             <p className="text-sm text-gray-500 mb-4">Use AI Assistant or browse materials to add items</p>
-            <button
-              onClick={onOpenAddMaterial}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-150 font-medium"
-            >
-              <Search size={18} /> Browse Materials
-            </button>
+            <div className="flex gap-2 justify-center flex-wrap">
+              <button
+                onClick={onOpenAddMaterial}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-150 font-medium"
+              >
+                <Search size={18} /> Browse Materials
+              </button>
+              {materialPresets && materialPresets.length > 0 && (
+                <button
+                  onClick={() => setShowPresets(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors duration-150 font-medium border border-purple-200"
+                >
+                  <FolderPlus size={18} /> Load Preset
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
