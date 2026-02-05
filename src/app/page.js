@@ -18,7 +18,6 @@ const MaterialsPage = lazy(() => import('../components/MaterialsPage'));
 const PlansUpload = lazy(() => import('../components/PlansUpload'));
 const SaveProjectDialog = lazy(() => import('../components/SaveProjectDialog'));
 const LabourSettingsDialog = lazy(() => import('../components/LabourSettingsDialog'));
-const PriceComparisonModal = lazy(() => import('../components/PriceComparisonModal'));
 const CompanySettingsDialog = lazy(() => import('../components/CompanySettingsDialog'));
 const AddMaterialModal = lazy(() => import('../components/AddMaterialModal'));
 const ReviewEstimate = lazy(() => import('../components/ReviewEstimate'));
@@ -400,26 +399,6 @@ export default function PricedInApp() {
           </Suspense>
         )}
 
-        {showPriceComparison && (
-          <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
-            <PriceComparisonModal
-              showPriceComparison={showPriceComparison}
-              cart={cart}
-              materials={materials}
-              setShowPriceComparison={setShowPriceComparison}
-              onSwitchSupplier={(oldId, newId) => {
-                const oldItem = cart.find(i => i.id === oldId);
-                const newItem = materials.find(m => m.id === newId);
-                if (oldItem && newItem) {
-                  setCart(prev => prev.map(i => 
-                    i.id === oldId ? { ...newItem, qty: oldItem.qty } : i
-                  ));
-                  setShowPriceComparison(null);
-                }
-              }}
-            />
-          </Suspense>
-        )}
 
         {showCompanySettings && (
           <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>

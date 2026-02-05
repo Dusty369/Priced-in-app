@@ -2,22 +2,19 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { X, Search, Plus, Package, ChevronDown, Check } from 'lucide-react';
-import { searchMaterials, getMaterialsByCategory, getCategories, getSuppliers } from '../lib/materialsLoader';
+import { searchMaterials, getMaterialsByCategory, getCategories } from '../lib/materialsLoader';
 
 export default function AddMaterialModal({ isOpen, onClose, onAddToCart }) {
   const [materials, setMaterials] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
-  const [supplier, setSupplier] = useState('All');
   const [categories, setCategories] = useState(['All']);
-  const [suppliers, setSuppliers] = useState(['All']);
   const [expandedCategories, setExpandedCategories] = useState({});
   const [recentlyAdded, setRecentlyAdded] = useState(null);
   const searchRef = useRef(null);
 
   useEffect(() => {
     setCategories(getCategories());
-    setSuppliers(getSuppliers());
   }, []);
 
   useEffect(() => {
@@ -29,17 +26,15 @@ export default function AddMaterialModal({ isOpen, onClose, onAddToCart }) {
   useEffect(() => {
     const loadMaterials = () => {
       if (search) {
-        // Pass supplier filter to search
-        setMaterials(searchMaterials(search, 50, supplier));
+        setMaterials(searchMaterials(search, 50));
       } else {
-        // Pass supplier filter to category browse
-        setMaterials(getMaterialsByCategory(category, 50, supplier));
+        setMaterials(getMaterialsByCategory(category, 50));
       }
     };
 
     const timer = setTimeout(loadMaterials, 200);
     return () => clearTimeout(timer);
-  }, [search, category, supplier]);
+  }, [search, category]);
 
   const handleAdd = (material) => {
     onAddToCart(material);
@@ -50,7 +45,6 @@ export default function AddMaterialModal({ isOpen, onClose, onAddToCart }) {
   const handleClose = () => {
     setSearch('');
     setCategory('All');
-    setSupplier('All');
     onClose();
   };
 
@@ -90,22 +84,13 @@ export default function AddMaterialModal({ isOpen, onClose, onAddToCart }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <select
-              value={supplier}
-              onChange={(e) => setSupplier(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-            >
-              {suppliers.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-            >
-              {categories.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+          >
+            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
         </div>
 
         {/* Results */}
@@ -145,10 +130,8 @@ export default function AddMaterialModal({ isOpen, onClose, onAddToCart }) {
                               <div className="flex-1 min-w-0 mr-3">
                                 <p className="font-medium text-gray-900 truncate text-sm">{material.name}</p>
                                 <p className="text-xs text-gray-500 mt-0.5">
-                                  <span className={`inline-block px-1.5 py-0.5 rounded mr-2 ${
-                                    'bg-orange-50 text-orange-700'
-                                  }`}>
-                                    {material.supplier || 'Carters'}
+                                  <span className="inline-block px-1.5 py-0.5 rounded mr-2 bg-orange-50 text-orange-700">
+                                    Carters
                                   </span>
                                   {material.code}
                                 </p>

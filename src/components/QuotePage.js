@@ -318,7 +318,7 @@ export default function QuotePage({
                     <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
                       'bg-orange-50 text-orange-700'
                     }`}>
-                      {item.supplier || 'Carters'}
+                      Carters
                     </span>
                   </p>
                 </div>

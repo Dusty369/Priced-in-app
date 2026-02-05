@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Plus, Package, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { searchMaterials, getMaterialsByCategory, getCategories, getSuppliers } from '../lib/materialsLoader';
+import { searchMaterials, getMaterialsByCategory, getCategories } from '../lib/materialsLoader';
 
 const ITEMS_PER_PAGE = 100;
 
@@ -10,17 +10,14 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
   const [materials, setMaterials] = useState([]);
   const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState('All');
-  const [supplier, setSupplier] = useState('All');
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState(['All']);
-  const [suppliers, setSuppliers] = useState(['All']);
   const [expandedCategories, setExpandedCategories] = useState({});
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
 
   useEffect(() => {
     setCategories(getCategories());
-    setSuppliers(getSuppliers());
     setLoading(false);
   }, []);
 
@@ -32,19 +29,18 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [search, category, supplier]);
+  }, [search, category]);
 
   useEffect(() => {
     if (loading) return;
 
     const loadMaterials = () => {
-      // Get all matching results (up to 2000 for performance)
       const maxResults = 2000;
       let results;
       if (search) {
-        results = searchMaterials(search, maxResults, supplier);
+        results = searchMaterials(search, maxResults);
       } else {
-        results = getMaterialsByCategory(category, maxResults, supplier);
+        results = getMaterialsByCategory(category, maxResults);
       }
 
       setTotalResults(results.length);
@@ -57,7 +53,7 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
 
     const timer = setTimeout(loadMaterials, 300);
     return () => clearTimeout(timer);
-  }, [search, category, supplier, loading, page]);
+  }, [search, category, loading, page]);
 
   if (loading) {
     return (
@@ -86,27 +82,18 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search 13,500+ materials..."
+            placeholder="Search 17,000+ Carters materials..."
             className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow duration-150"
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <select
-            value={supplier}
-            onChange={(e) => setSupplier(e.target.value)}
-            className="px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-          >
-            {suppliers.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-          >
-            {categories.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+        >
+          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
       </div>
 
       {/* Results count & pagination */}
@@ -172,10 +159,8 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
                       <div className="flex-1 min-w-0 mr-3">
                         <p className="font-medium text-gray-900 truncate">{material.name}</p>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          <span className={`inline-block px-1.5 py-0.5 rounded mr-2 ${
-                            'bg-orange-50 text-orange-700'
-                          }`}>
-                            {material.supplier || 'Carters'}
+                          <span className="inline-block px-1.5 py-0.5 rounded mr-2 bg-orange-50 text-orange-700">
+                            Carters
                           </span>
                           {material.code}
                         </p>
