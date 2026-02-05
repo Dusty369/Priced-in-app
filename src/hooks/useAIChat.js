@@ -91,7 +91,9 @@ function formatAIResponse(json, labourRates) {
   if (json.materials && json.materials.length > 0) {
     formattedContent += '📦 **Materials needed:**\n';
     json.materials.forEach(m => {
-      formattedContent += `• ${m.qty} × ${m.name}\n`;
+      const qty = m.qtyToOrder ?? m.qty;
+      const unit = m.unit || 'ea';
+      formattedContent += `• ${qty} ${unit} × ${m.name}\n`;
     });
     formattedContent += '\n';
   }
@@ -216,35 +218,11 @@ export function useAIChat({
       const searchTerm = (suggested.searchTerm || suggested.name || "").toUpperCase();
       const searchWords = searchTerm.replace(/[^A-Z0-9.]/g, " ").split(" ").filter(w => w.length > 1);
 
-      let qty = suggested.qty;
+      // Use AI's pre-calculated qtyToOrder (sellable units), fall back to qty
+      let qty = suggested.qtyToOrder ?? suggested.qty;
       if (typeof qty === 'string') qty = parseFloat(qty);
       if (!qty || isNaN(qty) || qty <= 0) qty = 1;
       qty = Math.ceil(qty);
-
-      // Sanity check for common unit confusion errors
-      const itemName = (suggested.name || '').toLowerCase();
-      const unit = (suggested.unit || '').toLowerCase();
-
-      // Screws/nails: if qty > 50 boxes, likely meant individual screws
-      if ((itemName.includes('screw') || itemName.includes('nail')) &&
-          (unit === 'box' || unit === 'pk') && qty > 50) {
-        // Assume AI output individual count, convert to boxes (assume 200/box)
-        qty = Math.ceil(qty / 200);
-        if (qty < 1) qty = 1;
-      }
-
-      // Paint/stain: if qty > 20 tins, likely meant m² coverage
-      if ((itemName.includes('paint') || itemName.includes('stain') || itemName.includes('finish')) &&
-          qty > 20) {
-        // Assume AI output m² coverage, convert to tins (assume 12m²/L, 5L tin)
-        qty = Math.ceil(qty / (12 * 5));
-        if (qty < 1) qty = 1;
-      }
-
-      // Concrete bags: if qty > 200, likely meant kg not bags
-      if (itemName.includes('concrete') && qty > 200) {
-        qty = Math.ceil(qty / 20); // 20kg bags
-      }
 
       if (searchWords.length === 0) {
         unmatched.push({ name: suggested.name || 'Unknown item', qty, reason: 'No search term' });
@@ -288,23 +266,35 @@ export function useAIChat({
       }
 
       if (bestMatch) {
-        // Use AI's pre-calculated qty if available, otherwise use raw qty
-        let finalQty = qty;
+        // Use AI's qtyToOrder directly - it's already in sellable units
+        const finalQty = qty;
 
-        // If AI provided packaging calculation, validate it
-        if (suggested.totalNeeded && suggested.packageSize && bestMatch.packaging) {
-          const expectedQty = Math.ceil(suggested.totalNeeded / (bestMatch.packaging.unitsPerPackage || 1));
-          // Use AI's qty if reasonable, otherwise recalculate
-          if (qty > 0 && qty <= expectedQty * 2) {
-            finalQty = qty;
-          } else {
-            finalQty = expectedQty;
-          }
+        // Log unit mismatch warnings (but don't block)
+        const aiUnit = (suggested.unit || '').toLowerCase();
+        const productUnit = (bestMatch.packaging?.sellUnit || bestMatch.unit || '').toLowerCase();
+        if (aiUnit && productUnit && aiUnit !== productUnit &&
+            !['ea', 'each', 'lm', 'lgth', 'length'].some(u =>
+              (aiUnit.includes(u) && productUnit.includes(u)))) {
+          console.warn(`Unit mismatch: AI says ${aiUnit}, product is ${productUnit} for ${bestMatch.name}`);
         }
 
-        // Final sanity check - warn if qty seems unreasonable
+        // Sanity checks - warn on suspicious quantities
+        const warnings = [];
         const lineTotal = finalQty * (bestMatch.price || 0);
-        const warning = lineTotal > 5000 ? `High value: $${lineTotal.toFixed(0)}` : null;
+        const itemName = (bestMatch.name || '').toLowerCase();
+
+        if (lineTotal > 5000) {
+          warnings.push(`High value: $${lineTotal.toFixed(0)}`);
+        }
+        if ((itemName.includes('screw') || itemName.includes('nail')) && finalQty > 50) {
+          warnings.push(`${finalQty} boxes seems high - verify calculation`);
+        }
+        if ((itemName.includes('stain') || itemName.includes('paint')) && finalQty > 20) {
+          warnings.push(`${finalQty} tins seems high - check coverage`);
+        }
+        if (itemName.includes('concrete') && finalQty > 100) {
+          warnings.push(`${finalQty} bags seems high - verify volume`);
+        }
 
         const existing = newItems.find(i => i.id === bestMatch.id);
         if (existing) {
@@ -314,7 +304,9 @@ export function useAIChat({
             ...bestMatch,
             qty: finalQty,
             calculation: suggested.calculation,
-            warning
+            aiTotalNeeded: suggested.totalNeeded,
+            aiPackageSize: suggested.packageSize,
+            warnings: warnings.length > 0 ? warnings : null
           });
         }
       } else {

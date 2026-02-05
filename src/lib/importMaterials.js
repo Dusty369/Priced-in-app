@@ -31,23 +31,41 @@ function extractLength(text) {
   return null;
 }
 
+// Extract pack size from product name
+function extractPackSizeFromName(name) {
+  if (!name) return null;
+  const nameUpper = name.toUpperCase();
+
+  // Pattern: "PKT 200", "BOX 500", "PK OF 100", "JAR 250"
+  let match = nameUpper.match(/(?:PKT|PK|BOX|JAR|PACK|BUCKET|TUB)\s*(?:OF\s*)?(\d+)/);
+  if (match) return parseInt(match[1]);
+
+  // Pattern: "200PKT", "500BX", "1000PK", "250BOX"
+  match = nameUpper.match(/(\d+)\s*(?:PKT|PK|BX|BOX|PACK)/);
+  if (match) return parseInt(match[1]);
+
+  // Pattern: "PACK OF 600", "VALUE PACK OF 1000"
+  match = nameUpper.match(/PACK\s*OF\s*(\d+)/);
+  if (match) return parseInt(match[1]);
+
+  // Pattern: "X200", "X500" (common in screw names)
+  match = nameUpper.match(/[^\d]X(\d{2,4})(?:[^\d]|$)/);
+  if (match) return parseInt(match[1]);
+
+  // Pattern: "200'S", "500'S" (plural count)
+  match = nameUpper.match(/(\d+)'?S(?:[^\w]|$)/);
+  if (match && parseInt(match[1]) >= 50) return parseInt(match[1]);
+
+  return null;
+}
+
 // Determine unit type and packaging from unit code and product name
 function determinePackaging(unit, name) {
   const unitUpper = (unit || '').toUpperCase();
   const nameUpper = (name || '').toUpperCase();
 
   // Extract pack size from name
-  let packSize = null;
-  const packMatch1 = nameUpper.match(/(?:PKT|PK|BOX|JAR|PACK|BUCKET)\s*(?:OF\s*)?(\d+)/i);
-  if (packMatch1) packSize = parseInt(packMatch1[1]);
-  if (!packSize) {
-    const packMatch2 = nameUpper.match(/(\d+)\s*(?:PKT|PK|BX|BOX|PACK)/i);
-    if (packMatch2) packSize = parseInt(packMatch2[1]);
-  }
-  if (!packSize) {
-    const packMatch3 = nameUpper.match(/PACK\s*OF\s*(\d+)/i);
-    if (packMatch3) packSize = parseInt(packMatch3[1]);
-  }
+  const packSize = extractPackSizeFromName(name);
 
   // Fasteners (screws, nails, bolts)
   if (/SCREW|NAIL|BOLT|STAPLE|BRAD/i.test(nameUpper)) {

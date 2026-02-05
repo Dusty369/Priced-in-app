@@ -145,4 +145,50 @@ export function getRequiredTreatment(component, inGround = false) {
   return 'H1.2'; // default interior
 }
 
+/**
+ * Validate quantities for suspicious values
+ * @param {Array} materials - Array of material objects with qty, price, unit, packaging
+ * @returns {Array} Array of warning strings
+ */
+export function validateQuantities(materials) {
+  const warnings = [];
+
+  if (!materials || !Array.isArray(materials)) return warnings;
+
+  materials.forEach(mat => {
+    const name = (mat.name || '').toLowerCase();
+    const qty = mat.qty || 0;
+    const price = mat.price || 0;
+    const unitType = mat.packaging?.unitType || mat.unit || '';
+
+    // Flag unusually high box/pack quantities
+    if ((unitType === 'box' || unitType === 'pk') && qty > 50) {
+      warnings.push(`⚠️ ${mat.name}: ${qty} boxes seems very high. Verify calculation.`);
+    }
+
+    // Flag unusually high tin/paint quantities
+    if ((unitType === 'tin' || name.includes('stain') || name.includes('paint')) && qty > 20) {
+      warnings.push(`⚠️ ${mat.name}: ${qty} tins seems high. Check coverage area.`);
+    }
+
+    // Flag unusually high concrete bag quantities
+    if ((unitType === 'bag' || name.includes('concrete')) && qty > 100) {
+      warnings.push(`⚠️ ${mat.name}: ${qty} bags seems high. Verify concrete volume.`);
+    }
+
+    // Flag unusually high line totals
+    const lineTotal = qty * price;
+    if (lineTotal > 5000) {
+      warnings.push(`⚠️ ${mat.name}: $${lineTotal.toFixed(2)} line total is high. Double-check qty ${qty}.`);
+    }
+
+    // Flag zero quantities
+    if (qty === 0 || !qty) {
+      warnings.push(`❌ ${mat.name}: Quantity is zero or missing.`);
+    }
+  });
+
+  return warnings;
+}
+
 export default validateMaterials;

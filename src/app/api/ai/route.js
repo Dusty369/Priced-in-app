@@ -609,11 +609,12 @@ Respond with JSON:
     {
       "name": "Product description",
       "searchTerm": "search term for database",
-      "calculation": "12m² × 22 screws/m² = 264 screws",
+      "dimensions": "140 X 45",
+      "treatment": "H3.2",
+      "calculation": "12m² × 22 screws/m² = 264 screws ÷ 200/box = 2 boxes",
       "totalNeeded": 264,
       "packageSize": 200,
-      "packageUnit": "per box",
-      "qty": 2,
+      "qtyToOrder": 2,
       "unit": "box"
     }
   ],
@@ -624,6 +625,25 @@ Respond with JSON:
   "notes": ["Code compliance notes", "Installation tips"],
   "warnings": ["Missing dimensions needed", "Consent requirements", "Engineering needed"]
 }
+
+═══════════════════════════════════════════════════════════════
+     CRITICAL: qtyToOrder IS THE FINAL PURCHASABLE QUANTITY
+═══════════════════════════════════════════════════════════════
+
+The "qtyToOrder" field is what gets added to the cart. This MUST be:
+• For screws/nails: NUMBER OF BOXES (not screw count)
+• For paint/stain: NUMBER OF TINS (not liters)
+• For concrete: NUMBER OF BAGS (not kg)
+• For timber: LINEAL METERS or LENGTHS depending on sell unit
+• For sheets: NUMBER OF SHEETS
+
+EXAMPLE CALCULATIONS:
+• Deck screws: 264 screws needed ÷ 200 per box = 1.32 → qtyToOrder: 2
+• Stain: 24m² coverage ÷ 12m²/L = 2L needed → qtyToOrder: 1 (5L tin)
+• Concrete: 0.22m³ × 108 bags/m³ = 24 bags → qtyToOrder: 24
+
+❌ WRONG: "qtyToOrder": 264 for screws (orders 264 BOXES = 52,800 screws!)
+✓ RIGHT: "qtyToOrder": 2 for screws (orders 2 boxes = 400 screws)
 
 MATERIAL OUTPUT RULES:
 • totalNeeded = raw calculated quantity (264 screws, 91 lineal meters)
@@ -787,7 +807,17 @@ RESPOND WITH JSON:
     {"item": "Material name", "working": "dimension × formula = result + waste = qty"}
   ],
   "materials": [
-    {"name": "Material with size", "qty": 10, "unit": "ea/lm/m²/sht", "searchTerm": "search term"}
+    {
+      "name": "Material with size",
+      "searchTerm": "search term",
+      "dimensions": "140 X 45",
+      "treatment": "H3.2",
+      "calculation": "working shown here",
+      "totalNeeded": 264,
+      "packageSize": 200,
+      "qtyToOrder": 2,
+      "unit": "box"
+    }
   ],
   "labour": {
     "totalHours": 16,
@@ -796,6 +826,11 @@ RESPOND WITH JSON:
   "notes": ["Code compliance", "Assumptions made"],
   "warnings": ["Unclear dimensions", "Missing info needed"]
 }
+
+CRITICAL: qtyToOrder is what goes in the cart - must be SELLABLE UNITS:
+• Screws: qtyToOrder = screws ÷ per box (e.g., 264 ÷ 200 = 2)
+• Paint: qtyToOrder = liters ÷ tin size (e.g., 2L → 1 × 5L tin)
+• Timber: qtyToOrder = lineal meters or lengths
 
 CRITICAL RULES:
 • Use NZ terminology only (refer to glossary)
