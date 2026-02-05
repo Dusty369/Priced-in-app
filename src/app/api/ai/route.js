@@ -531,12 +531,20 @@ BATHROOMS & WET AREAS
 
 BUILDER SUPPLIES ONLY (tiler does membrane, tiles, grouting):
 
-CORE MATERIALS (always include):
+WALL LININGS - CRITICAL RULES:
+• TILED SHOWER WALLS: ALL walls in shower area = VILLA BOARD 9mm (cement board for tiles)
+• SHOWER WITH LINER (acrylic/plastic): GIB AQUALINE behind liner
+• NON-SHOWER BATHROOM WALLS: GIB AQUALINE
+• CEILING: GIB AQUALINE or moisture resistant
+• FLOOR: TILE/SLATE UNDERLAY 6mm (for tiled floor)
+
+CORE MATERIALS:
 • Framing: 90×45 H3.1 SG8 (wet area treated)
-• Wall lining: GIB AQUALINE (NOT standard GIB)
-• Floor substrate: TILE & SLATE UNDERLAY 6MM
-• Ceiling: GIB AQUALINE or moisture resistant
-• GIB screws, stopping compound, paper tape
+• Villa Board 9mm for ALL tiled shower walls (typically 3 walls)
+• GIB Aqualine for non-shower walls only
+• Tile underlay 6mm for floor
+• Villa Drive screws for Villa Board
+• GIB Grabber screws for Aqualine
 
 DO NOT INCLUDE AUTOMATICALLY:
 • Insulation - not all walls are external, builder adds if needed
@@ -550,9 +558,11 @@ ADD TO "considerations" SECTION (suggestions for builder to review):
 • "Window flashings - if window in wet area"
 • "Threshold/door seal - for shower door location"
 
-Example 3m × 2m bathroom:
-• Wall framing: perimeter 10m at 600mm = 18 studs × 2.4m = 43 lm (90×45 H3.1)
-• Wall GIB Aqualine: 24m² ÷ 2.88 = 8.3 → 9 + 10% = 10 sht
+Example 2.4m × 1.8m bathroom with 1.2m × 0.9m tiled shower:
+• Wall framing: perimeter 8.4m at 600mm = 15 studs × 2.4m = 36 lm (90×45 H3.1)
+• SHOWER WALLS (tiled): 3 walls × ~2.4m² each = 7.2m² → 3 sht Villa Board 9mm
+• NON-SHOWER WALLS: remaining walls = GIB Aqualine
+• Floor underlay: 4.32m² ÷ 2.16m²/sht = 2 sht tile underlay
 • Ceiling: 6m² ÷ 2.88 = 2.1 → 3 sht
 • Floor underlay: 6m² ÷ 2.16 = 2.8 → 3 + 10% = 4 sht
 
