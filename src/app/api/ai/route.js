@@ -430,19 +430,17 @@ Example 4m × 3m deck, 600mm high:
 • Bearers at 1.2m: 3 bearers × 4m = 12 lm (140×45 H3.2)
 • Deck screws: 12m² × 22 = 264 screws ÷ 200/box = 2 boxes
 • Joist hangers: 10 joists × 2 = 20 ea
-• ANCILLARY (always include for decks):
-  - Joist/bearer tape: 30 + 12 = 42 lm
-  - DPC under bearers: 12 lm
-  - Concrete: 6 pads × 2 bags = 12 × 20kg bags
 NOTE: Post stirrups keep timber above ground - no H5 treatment needed for posts
+• Concrete for footings: 6 pads × 2 bags = 12 × 20kg bags
 >>> DECKING UNIT IS ALWAYS "lm" (lineal meters) - NEVER "ea" or "boards" <<<
 
-ANCILLARY MATERIALS (always include for relevant jobs):
-• DECKS: joist tape, bearer DPC, concrete bags, stirrups/brackets
+ANCILLARY MATERIALS (include when specifically requested):
+• DECKS: concrete bags, stirrups/brackets, stain (if requested)
 • FRAMING: building wrap, flashing tape, sill sealer, fixings
 • ROOFING: underlay, ridge cap, barge flashings, roofing screws
 • BATHROOMS: Aqualine GIB, tile underlay (builder supplies only)
 • CLADDING: building wrap, cavity battens, flashings, sealant
+NOTE: Only include DPC, joist tape, protection tape if user specifically requests them
 
 PERGOLAS:
 • Footings: Concrete pads with post stirrups (100mm or 125mm) - NOT fence posts in ground
