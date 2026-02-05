@@ -55,6 +55,7 @@ export default function QuotePage({
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [showPresets, setShowPresets] = useState(false);
   const [newPresetName, setNewPresetName] = useState('');
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
   // Copy materials list to clipboard
   const copyMaterialsList = () => {
@@ -134,20 +135,35 @@ export default function QuotePage({
             <Plus size={18} /> New
           </button>
           <div className="flex-1"></div>
-          <button
-            onClick={onLabourSettings}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-150"
-          >
-            <Settings size={18} />
-            <span className="hidden sm:inline">Rates</span>
-          </button>
-          <button
-            onClick={onCompanySettings}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg transition-colors duration-150 font-medium border border-blue-200"
-          >
-            <Building2 size={18} />
-            <span className="hidden sm:inline">Branding & PDF</span>
-          </button>
+          {/* Settings Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-150"
+            >
+              <Settings size={18} />
+              <span className="hidden sm:inline">Settings</span>
+              <ChevronDown size={14} className={`transition-transform ${showSettingsMenu ? 'rotate-180' : ''}`} />
+            </button>
+            {showSettingsMenu && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border z-20">
+                <button
+                  onClick={() => { onLabourSettings(); setShowSettingsMenu(false); }}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-left text-gray-700 hover:bg-gray-50"
+                >
+                  <Users size={16} />
+                  Labour Rates
+                </button>
+                <button
+                  onClick={() => { onCompanySettings(); setShowSettingsMenu(false); }}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-left text-gray-700 hover:bg-gray-50 border-t"
+                >
+                  <Building2 size={16} />
+                  Branding & PDF
+                </button>
+              </div>
+            )}
+          </div>
           {(cart.length > 0 || labourItems.length > 0) && (
             <>
               <button
