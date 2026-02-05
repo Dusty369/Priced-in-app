@@ -254,47 +254,52 @@ function parseITMCSV(csvText) {
   return materials;
 }
 
-// Parse Carters CSV format (fixed-width or comma-delimited)
+// Parse Carters full CSV format (STANDARD Price Book export)
+// Columns: Date,PriceBook,AcctNum,AcctName,Branch,Category,Group,SubGroup,Description,SKU,Unit,Price,EffectiveDate
 function parseCartersCSV(csvText) {
-  const lines = csvText.split('\n').filter(l => l.trim());
+  const lines = csvText.split('\n');
   const materials = [];
 
-  for (const line of lines) {
-    // Try comma-delimited first
-    if (line.includes(',')) {
-      const cols = line.split(',');
-      if (cols.length >= 4) {
-        const [code, name, unit, priceStr] = cols;
-        if (!name || name === 'name') continue;
+  for (let i = 1; i < lines.length; i++) { // Skip header row
+    const line = lines[i];
+    if (!line.trim()) continue;
 
-        const price = parseFloat((priceStr || '0').replace(/[$,]/g, ''));
-        if (isNaN(price)) continue;
+    const cols = line.split(',');
+    if (cols.length < 12) continue;
 
-        const dimensions = normalizeDimensions(name);
-        const treatment = extractTreatment(name);
-        const productLength = extractLength(name);
-        const packaging = determinePackaging(unit, name);
-        const { category, subcategory } = categorizeProduct(name);
+    const [date, priceBook, accountNum, accountName, branch,
+           category, group, subGroup, description, sku,
+           unit, priceStr, effectiveDate] = cols;
 
-        materials.push({
-          id: `CART-${code?.trim()}`,
-          sku: code?.trim(),
-          code: code?.trim(),
-          supplier: 'Carters',
-          name: name.trim(),
-          category,
-          subcategory,
-          dimensions,
-          treatment,
-          unit: unit?.trim(),
-          packaging,
-          productLength,
-          price,
-          priceUpdated: new Date().toISOString().split('T')[0],
-          priceSource: 'Carters'
-        });
-      }
-    }
+    // Skip if no description or price
+    if (!description || !priceStr) continue;
+
+    const price = parseFloat(priceStr.replace(/[$,]/g, ''));
+    if (isNaN(price)) continue;
+
+    const dimensions = normalizeDimensions(description);
+    const treatment = extractTreatment(description);
+    const productLength = extractLength(description);
+    const packaging = determinePackaging(unit, description);
+
+    materials.push({
+      id: `CART-${sku?.trim()}`,
+      sku: sku?.trim(),
+      code: sku?.trim(),
+      supplier: 'Carters',
+      name: description.trim(),
+      category: category?.trim() || 'Other',
+      subcategory: group?.trim() || '',
+      subsubcategory: subGroup?.trim() || '',
+      dimensions,
+      treatment,
+      unit: unit?.trim(),
+      packaging,
+      productLength,
+      price,
+      priceUpdated: effectiveDate?.trim() || new Date().toISOString().split('T')[0],
+      priceSource: 'Carters'
+    });
   }
 
   return materials;
