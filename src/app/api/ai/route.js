@@ -501,9 +501,11 @@ STANDARD DECK FORMULAS (use these exactly - no variation):
    • Formula: posts × 2 bags per post
    • Example 12 posts: 12 × 2 = 24 bags
 
-8. STAIN (if requested):
-   • Formula: area × 2 coats ÷ 12m²/L coverage ÷ 5L tin
-   • Example 6×4m: 24 × 2 ÷ 12 ÷ 5 = 0.8 → 1 × 5L tin
+8. STAIN (if requested) - ⚠️ COVERAGE IS 10-12m²/L, NOT 0.14m!
+   • Formula: area × 2 coats ÷ 12m²/L coverage = liters needed ÷ 5L per tin
+   • Example 6×4m: 24m² × 2 coats = 48m² ÷ 12m²/L = 4L ÷ 5L/tin = 0.8 → 1 tin
+   • ❌ NEVER use 0.14m (that's decking board width, not stain coverage!)
+   • Typical deck needs 1-2 tins of 5L stain, NOT 100+ tins
 
 DECK OUTPUT - ONLY THESE 8 ITEMS (no extras):
 1. Posts (ea)
@@ -791,23 +793,36 @@ Respond with JSON:
 }
 
 ═══════════════════════════════════════════════════════════════
-     CRITICAL: qtyToOrder IS THE FINAL PURCHASABLE QUANTITY
+     ⚠️⚠️⚠️ CRITICAL: qtyToOrder MUST MATCH YOUR CALCULATION ⚠️⚠️⚠️
 ═══════════════════════════════════════════════════════════════
+
+>>> THE qtyToOrder MUST BE THE RESULT OF YOUR CALCULATION <<<
+>>> IF calculation = "16 posts × 2 bags = 32 bags" THEN qtyToOrder = 32 <<<
+>>> NEVER output a different number than what your calculation shows <<<
 
 The "qtyToOrder" field is what gets added to the cart. This MUST be:
 • For screws/nails: NUMBER OF BOXES (not screw count)
-• For paint/stain: NUMBER OF TINS (not liters)
-• For concrete: NUMBER OF BAGS (not kg)
-• For timber: LINEAL METERS or LENGTHS depending on sell unit
+• For paint/stain: NUMBER OF TINS (not liters) - COVERAGE IS 10-12m²/L
+• For concrete: NUMBER OF BAGS (calculation × bags = qtyToOrder)
+• For timber: LINEAL METERS (calculation result = qtyToOrder)
 • For sheets: NUMBER OF SHEETS
+
+⚠️ STAIN COVERAGE IS 10-12m²/L - NOT 0.14m (that's decking boards!)
+• WRONG: 24m² ÷ 0.14 = 171 tins (this uses DECKING formula!)
+• RIGHT: 24m² × 2 coats ÷ 12m²/L = 4L ÷ 5L/tin = 1 tin
+
+⚠️ CONCRETE: qtyToOrder MUST equal posts × 2
+• If 16 posts: 16 × 2 = 32 bags, qtyToOrder: 32
+• NEVER output a different number!
 
 EXAMPLE CALCULATIONS:
 • Deck screws: 264 screws needed ÷ 200 per box = 1.32 → qtyToOrder: 2
-• Stain: 24m² coverage ÷ 12m²/L = 2L needed → qtyToOrder: 1 (5L tin)
-• Concrete: 0.22m³ × 108 bags/m³ = 24 bags → qtyToOrder: 24
+• Stain: 24m² × 2 coats ÷ 12m²/L = 4L ÷ 5L/tin → qtyToOrder: 1
+• Concrete: 12 posts × 2 bags = 24 bags → qtyToOrder: 24
+• Bearers: 4 bearers × 6m = 24 lm + 10% = 26 lm → qtyToOrder: 26
 
-❌ WRONG: "qtyToOrder": 264 for screws (orders 264 BOXES = 52,800 screws!)
-✓ RIGHT: "qtyToOrder": 2 for screws (orders 2 boxes = 400 screws)
+❌ WRONG: Calculation shows 32 but qtyToOrder is 61 (MISMATCH!)
+✓ RIGHT: Calculation shows 32 and qtyToOrder is 32 (MATCH!)
 
 MATERIAL OUTPUT RULES:
 • totalNeeded = raw calculated quantity (264 screws, 91 lineal meters)
