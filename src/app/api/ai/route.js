@@ -414,7 +414,11 @@ BEARERS (H3.2 SG8):
 • Count: deck width ÷ bearer spacing (1.2-1.5m) + 1
 • Sizes: 140×45 max 1.5m, 190×45 max 2.0m, 2×190×45 max 3.0m
 
-JOIST HANGERS: 2 per joist
+JOIST HANGERS (match joist size, NOT top mount):
+• 140×45 joists: L/LOK 190×47 GALV or S/STEEL
+• 190×45 joists: L/LOK 190×47 or 190×52
+• 240×45 joists: L/LOK 240×65 FACE MOUNT
+• Count: 2 per joist (both ends)
 DECK SCREWS: 20-25 per m²
 
 Example 4m × 3m deck, 600mm high:
@@ -721,7 +725,11 @@ NZ PRODUCT SEARCH TERMS (use EXACT Carters patterns below):
 • Posts: "125 X 125 RAD SG8 POST H5", "100 X 100 RAD POST H4"
 • Post stirrups/brackets: "R6 STIRRUP 150X150", "BOWMAC POST BRACKET"
   (R6 stirrups start at 150mm, use BOWMAC brackets for 100mm posts)
-• Joist hangers: "L/LOK JOIST HANGER 140", "JOIST HANGER 240 X 65"
+• Joist hangers (match to joist size, NOT top mount for decks):
+  - 140×45 joists: "L/LOK 190 X 47MM JOIST HANGER DBLE GALV" ($5.76) or "S/STEEL" ($7.03)
+  - 190×45 joists: "L/LOK 190 X 47MM JOIST HANGER" or "L/LOK 190 X 52MM"
+  - 240×45 joists: "L/LOK JOIST HANGER 240 X 65 FACE MOUNT"
+  - Use GALV for standard outdoor, S/STEEL for coastal/marine
 • Decking boards: "RAD PREMIUM H3.2 DECKING", "KWILA DECKING"
 • Decking screws: "10G X 65MM SS304 DECKING SCREWS" or "DECKING SCREWS SS304"
 • Concrete bags: "CEMIX NO STEEL CONCRETE 20KG" or "MULTICRETE CONCRETE 40KG"
