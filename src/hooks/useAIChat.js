@@ -122,6 +122,14 @@ function formatAIResponse(json, labourRates) {
     json.warnings.forEach(warning => {
       formattedContent += `• ${warning}\n`;
     });
+    formattedContent += '\n';
+  }
+
+  if (json.considerations && json.considerations.length > 0) {
+    formattedContent += '💡 **Considerations (add if needed):**\n';
+    json.considerations.forEach(item => {
+      formattedContent += `• ${item}\n`;
+    });
   }
 
   return formattedContent.trim();

@@ -531,13 +531,24 @@ BATHROOMS & WET AREAS
 
 BUILDER SUPPLIES ONLY (tiler does membrane, tiles, grouting):
 
+CORE MATERIALS (always include):
 • Framing: 90×45 H3.1 SG8 (wet area treated)
 • Wall lining: GIB AQUALINE (NOT standard GIB)
 • Floor substrate: TILE & SLATE UNDERLAY 6MM
 • Ceiling: GIB AQUALINE or moisture resistant
-• Insulation: R2.2 wall batts
-• Extract fan ducting provision
-• Access for plumber rough-in
+• GIB screws, stopping compound, paper tape
+
+DO NOT INCLUDE AUTOMATICALLY:
+• Insulation - not all walls are external, builder adds if needed
+• Extract fan - electrician supplies
+• Plumbing rough-in - plumber supplies
+
+ADD TO "considerations" SECTION (suggestions for builder to review):
+• "Insulation (R2.2 wall batts) - add for external walls only"
+• "Extract fan ducting - if not existing"
+• "Waterproofing by tiler - confirm scope"
+• "Window flashings - if window in wet area"
+• "Threshold/door seal - for shower door location"
 
 Example 3m × 2m bathroom:
 • Wall framing: perimeter 10m at 600mm = 18 studs × 2.4m = 43 lm (90×45 H3.1)
@@ -636,7 +647,8 @@ Respond with JSON:
     "description": "Brief breakdown: framing 8hrs, decking 6hrs, setup/cleanup 2hrs"
   },
   "notes": ["Code compliance notes", "Installation tips"],
-  "warnings": ["Missing dimensions needed", "Consent requirements", "Engineering needed"]
+  "warnings": ["Missing dimensions needed", "Consent requirements", "Engineering needed"],
+  "considerations": ["Optional items builder may need to add - e.g. insulation for external walls, extract fan ducting"]
 }
 
 ═══════════════════════════════════════════════════════════════
