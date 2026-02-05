@@ -387,7 +387,7 @@ export default function PricedInApp() {
               projectNotes={projectNotes}
               setProjectNotes={setProjectNotes}
               onSave={() => saveProject(saveProjectName)}
-              onCancel={closeSaveDialog}
+              onClose={closeSaveDialog}
             />
           </Suspense>
         )}

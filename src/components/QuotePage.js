@@ -59,20 +59,6 @@ export default function QuotePage({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Calculate margin needed for target price
-  const calculateTargetMargin = (target) => {
-    const targetNum = parseFloat(target);
-    if (!targetNum || targetNum <= subtotalBeforeMargin) return null;
-    const beforeGst = gst ? targetNum / 1.15 : targetNum;
-    const marginNeeded = ((beforeGst / subtotalBeforeMargin) - 1) * 100;
-    return marginNeeded.toFixed(1);
-  };
-
-  // Calculate profit
-  const totalCost = materialsSubtotal + labourSubtotal;
-  const profit = grandTotal - (gst ? totalCost * 1.15 : totalCost);
-  const profitMargin = totalCost > 0 ? (profit / grandTotal) * 100 : 0;
-
   // Calculations
   const materialsSubtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
   const materialsWithWastage = materialsSubtotal * (1 + wastage / 100);
@@ -90,6 +76,20 @@ export default function QuotePage({
   const subtotalAfterDiscount = subtotalWithMarginAndContingency - discountAmount;
   const gstAmount = gst ? subtotalAfterDiscount * 0.15 : 0;
   const grandTotal = subtotalAfterDiscount + gstAmount;
+
+  // Profit calculations
+  const totalCost = materialsSubtotal + labourSubtotal;
+  const profit = grandTotal - (gst ? totalCost * 1.15 : totalCost);
+  const profitMargin = totalCost > 0 ? (profit / grandTotal) * 100 : 0;
+
+  // Calculate margin needed for target price
+  const calculateTargetMargin = (target) => {
+    const targetNum = parseFloat(target);
+    if (!targetNum || targetNum <= subtotalBeforeMargin) return null;
+    const beforeGst = gst ? targetNum / 1.15 : targetNum;
+    const marginNeeded = ((beforeGst / subtotalBeforeMargin) - 1) * 100;
+    return marginNeeded.toFixed(1);
+  };
 
   return (
     <div className="space-y-5">
