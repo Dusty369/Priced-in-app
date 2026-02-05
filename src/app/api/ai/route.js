@@ -752,6 +752,20 @@ NZ PRODUCT SEARCH TERMS (use EXACT Carters patterns below):
   - Calculate: lm needed ÷ 30m = rolls, e.g. 93 lm ÷ 30 = 4 rolls
 • GIB: "GIB STANDARD", "GIB AQUALINE", "FYRELINE"
 • GIB screws: "GIB GRABBER", "BATTEN SCREW"
+
+NAILS - USE PASLODE (NZS 3604 compliant):
+• Framing nails 90mm (structural): "PASLODE IMPULSE 90X3.15MM HD GALV D-HEAD NAIL"
+  - Box of 1000 ($123) or 3000 ($275) - for nail guns
+  - Use for wall framing, roof framing, floor framing
+• Fencing nails 65mm (ring shank): "PASLODE JOLTFAST 65X2.87MM HDG RING"
+  - Ring shank for holding power in palings
+  - Box of 1000 ($138)
+• Weatherboard nails (jolt head): "NAIL JOLT HEAD AG 316 STAINLESS" or "NAIL FLAT HEAD GALV"
+  - Stainless for coastal, galv for standard
+  - Jolt head sits flush with weatherboard face
+• Joist hanger nails 30mm: "JOIST HANGER NAILS 30MM GALV"
+  - Short galv nails for fixing joist hangers
+>>> NEVER use generic "galv nails" - always specify Paslode product + size <<<
 • Insulation: "PINK BATTS", "EARTHWOOL"
 • Underlay: "TILE UNDERLAY", "BUILDING PAPER"
 
