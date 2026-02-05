@@ -480,6 +480,7 @@ export default function PricedInApp() {
             onUpdateLabourRole={(id, role) => setLabourItems(labourItems.map(i => i.id === id ? {...i, role} : i))}
             pdfGenerating={pdfGenerating}
             labourRates={labourRates}
+            onUpdateLabourRate={(role, rate) => setLabourRates(prev => ({ ...prev, [role]: rate }))}
             onOpenAddMaterial={() => setShowAddMaterial(true)}
             aiCalculations={aiCalculations}
           />
