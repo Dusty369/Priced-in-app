@@ -1,144 +1,77 @@
 #!/usr/bin/env node
 /**
- * Reimport and normalize materials from source files
+ * Reimport Carters materials from CSV
  * Run: node scripts/reimport-materials.js
  */
 
 const fs = require('fs');
 const path = require('path');
-const { importMaterials, parseJSON, normalizeDimensions, extractTreatment, extractLength, determinePackaging, categorizeProduct } = require('../src/lib/importMaterials');
+const { importMaterials, normalizeDimensions, extractTreatment, extractLength, determinePackaging } = require('../src/lib/importMaterials');
 
-const dataDir = path.join(__dirname, '../src/data');
-const outputPath = path.join(dataDir, 'materials-normalized.json');
+const cartersPath = path.join(__dirname, '../data/carters-full.csv');
+const outputPath = path.join(__dirname, '../src/data/materials-normalized.json');
 
-// Find all source files
-const sourceFiles = [];
+console.log('=== Carters Materials Import ===\n');
 
-// Check for JSON sources
-const itmJson = path.join(__dirname, '../itm_materials.json');
-const itmDataJson = path.join(dataDir, 'itm-materials.json');
-const materialsJson = path.join(dataDir, 'materials.json');
-const processedJson = path.join(dataDir, 'materials-processed.json');
-
-if (fs.existsSync(itmJson)) sourceFiles.push(itmJson);
-if (fs.existsSync(itmDataJson)) sourceFiles.push(itmDataJson);
-if (fs.existsSync(materialsJson)) sourceFiles.push(materialsJson);
-
-// Check for CSV sources
-const csvDir = path.join(__dirname, '../data');
-if (fs.existsSync(csvDir)) {
-  fs.readdirSync(csvDir).forEach(file => {
-    if (file.endsWith('.csv')) {
-      sourceFiles.push(path.join(csvDir, file));
-    }
-  });
+if (!fs.existsSync(cartersPath)) {
+  console.error(`Error: ${cartersPath} not found`);
+  console.log('Place carters-full.csv in ./data/ directory');
+  process.exit(1);
 }
 
-console.log('=== Materials Import Tool ===\n');
+const materials = importMaterials(cartersPath);
 
-if (sourceFiles.length === 0) {
-  console.log('No source files found. Checking existing processed data...\n');
+// Stats
+const stats = {
+  total: materials.length,
+  withDimensions: 0,
+  withTreatment: 0,
+  withLength: 0,
+  categories: {},
+  treatments: {},
+  packagingTypes: {}
+};
 
-  if (fs.existsSync(processedJson)) {
-    console.log(`Found: ${processedJson}`);
-    const existing = JSON.parse(fs.readFileSync(processedJson, 'utf8'));
-    console.log(`Contains ${existing.length} materials\n`);
-
-    // Re-normalize existing data
-    console.log('Re-normalizing existing data...\n');
-
-    const normalized = existing.map((item, idx) => {
-      const dimensions = normalizeDimensions(item.name);
-      const treatment = extractTreatment(item.name);
-      const productLength = extractLength(item.name);
-      const packaging = item.packaging || determinePackaging(item.unit, item.name);
-      const { category, subcategory } = categorizeProduct(item.name, item.category, item.subcategory);
-
-      return {
-        id: item.id || idx + 1,
-        sku: item.code || item.sku,
-        code: item.code || item.sku,
-        supplier: item.supplier || 'Unknown',
-        name: item.name,
-        category,
-        subcategory,
-        dimensions,
-        treatment,
-        unit: item.unit,
-        packaging,
-        productLength,
-        price: item.price,
-        priceUpdated: item.priceUpdated || '2026-02-01',
-        priceSource: item.priceSource || item.supplier
-      };
-    });
-
-    // Stats
-    const stats = {
-      total: normalized.length,
-      bySupplier: {},
-      byCategory: {},
-      withDimensions: 0,
-      withTreatment: 0,
-      withLength: 0
-    };
-
-    normalized.forEach(m => {
-      stats.bySupplier[m.supplier] = (stats.bySupplier[m.supplier] || 0) + 1;
-      stats.byCategory[m.category] = (stats.byCategory[m.category] || 0) + 1;
-      if (m.dimensions) stats.withDimensions++;
-      if (m.treatment) stats.withTreatment++;
-      if (m.productLength) stats.withLength++;
-    });
-
-    console.log('=== Normalization Results ===\n');
-    console.log(`Total materials: ${stats.total}`);
-    console.log(`With dimensions: ${stats.withDimensions}`);
-    console.log(`With treatment: ${stats.withTreatment}`);
-    console.log(`With length: ${stats.withLength}`);
-    console.log('\nBy supplier:');
-    Object.entries(stats.bySupplier).forEach(([k, v]) => console.log(`  ${k}: ${v}`));
-    console.log('\nBy category:');
-    Object.entries(stats.byCategory).sort((a,b) => b[1] - a[1]).forEach(([k, v]) => console.log(`  ${k}: ${v}`));
-
-    // Sample output
-    console.log('\n=== Sample Normalized Items ===\n');
-
-    // Find timber items
-    const timberSamples = normalized.filter(m => m.treatment || m.dimensions).slice(0, 3);
-    console.log('Timber samples:');
-    timberSamples.forEach(m => {
-      console.log(`  ${m.name}`);
-      console.log(`    dimensions: ${m.dimensions}, treatment: ${m.treatment}, length: ${m.productLength}m`);
-      console.log(`    packaging: ${JSON.stringify(m.packaging)}`);
-    });
-
-    // Find screw items
-    const screwSamples = normalized.filter(m => /screw/i.test(m.name)).slice(0, 3);
-    console.log('\nScrew samples:');
-    screwSamples.forEach(m => {
-      console.log(`  ${m.name}`);
-      console.log(`    packaging: ${JSON.stringify(m.packaging)}`);
-    });
-
-    // Save normalized
-    fs.writeFileSync(outputPath, JSON.stringify(normalized, null, 2));
-    console.log(`\n✓ Saved ${normalized.length} normalized materials to ${outputPath}`);
-
-  } else {
-    console.log('No source files found. Place CSV or JSON files in:');
-    console.log('  - ./data/itm-prices.csv');
-    console.log('  - ./data/carters-prices.csv');
-    console.log('  - ./src/data/materials.json');
-    process.exit(1);
+materials.forEach(m => {
+  if (m.dimensions) stats.withDimensions++;
+  if (m.treatment) {
+    stats.withTreatment++;
+    stats.treatments[m.treatment] = (stats.treatments[m.treatment] || 0) + 1;
   }
-} else {
-  console.log('Found source files:');
-  sourceFiles.forEach(f => console.log(`  - ${path.basename(f)}`));
-  console.log('');
+  if (m.productLength) stats.withLength++;
+  stats.categories[m.category] = (stats.categories[m.category] || 0) + 1;
+  stats.packagingTypes[m.packaging?.unitType] = (stats.packagingTypes[m.packaging?.unitType] || 0) + 1;
+});
 
-  const materials = importMaterials(...sourceFiles);
+console.log('\n=== Stats ===');
+console.log('Total materials:', stats.total);
+console.log('With dimensions:', stats.withDimensions);
+console.log('With treatment:', stats.withTreatment);
+console.log('With length:', stats.withLength);
 
-  fs.writeFileSync(outputPath, JSON.stringify(materials, null, 2));
-  console.log(`\n✓ Saved ${materials.length} normalized materials to ${outputPath}`);
-}
+console.log('\nTreatment codes:', stats.treatments);
+
+console.log('\nTop categories:');
+Object.entries(stats.categories)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 10)
+  .forEach(([k, v]) => console.log(`  ${k}: ${v}`));
+
+console.log('\nPackaging types:', stats.packagingTypes);
+
+// Sample items
+console.log('\n=== Sample Timber ===');
+materials.filter(m => m.treatment).slice(0, 3).forEach(m => {
+  console.log(`${m.name.substring(0, 55)}`);
+  console.log(`  dim: ${m.dimensions} | treat: ${m.treatment} | len: ${m.productLength}m`);
+});
+
+console.log('\n=== Sample Screws ===');
+materials.filter(m => /deck.*screw/i.test(m.name)).slice(0, 3).forEach(m => {
+  console.log(`${m.name.substring(0, 55)}`);
+  console.log(`  pkg: ${JSON.stringify(m.packaging)}`);
+});
+
+// Save
+fs.writeFileSync(outputPath, JSON.stringify(materials, null, 2));
+console.log(`\n✓ Saved ${materials.length} materials to ${outputPath}`);

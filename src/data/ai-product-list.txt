@@ -1,0 +1,516 @@
+# NZ Building Materials Reference
+# 13566 products from Carters and ITM
+# Use this list to select appropriate materials for building estimates
+
+## PILE (22 products)
+Available sizes: 125×125 H5, 55×55 UT
+- pile SS (4 variants)
+- pile Standard (2 variants)
+- pile SS304 (2 variants)
+- 55×55 pile SS
+- 55×55 pile galv
+- 9mm pile SS304
+- L/LOK 6KN PILE FIXING SET MEDIUM CORROSIVE
+- SPACE-IT 125MM SQUARE PILE PAD 235MM BASE SPACE-IT
+
+## BEARER (22 products)
+- BOWMAC POST & BEARER BRACKET S/STEEL BS138 (2 variants)
+- BOWMAC POST & BEARER BRACKET S/STEEL BS135 (2 variants)
+- BOWMAC B28 POST & BEARER BRACKET
+- BOWMAC POST & BEARER BRACKET S/STEEL BS78
+- BOWMAC POST & BEARER BRACKET S/STEEL BS79
+- BOWMAC POST & BEARER BRACKET B134
+- BOWMAC POST & BEARER BRACKET B135
+- BOWMAC POST & BEARER BRACKET B138
+
+## JOIST (20 products)
+Available sizes: 140×45 UT, 200×45 H1.2, 240×45 UT, 240×63 H1.2, 240×90 H1.2, 290×45 UT, 300×63 H1.2, 300×90 H1.2, 360×63 H1.2, 360×90 H1.2, 400×90 H1.2
+- 47mm joist (2 variants)
+- 290×45 joist
+- 240×45 joist
+- 140×45 joist
+- joist ×8
+- L/LOK DECK JOIST FIXING (1 X CPC40 SS & 4 X SCREWS) DJF EACH
+- L/LOK DECK JOIST FIXING (50 X CPC40 SS & SCREWS) DJF
+- LUMBERLOK FLOOR JOIST STIFFENER (2 SETS PER BOX)
+
+## POST (107 products)
+Available sizes: 100×100 H4, 100×75 H4, 112×112 H5, 120×30 H4, 130×35 H4, 135×135 H5, 180×180 H5, 250×16 UT, 275×20 UT, 350×20 UT, 88×88 H5
+- 100×100 H4 post (8 variants)
+- 275×20 post (3 variants)
+- 350×20 post (3 variants)
+- 50mm post 275×20mm (2 variants)
+- post 275×20mm (2 variants)
+- post 350×20mm (2 variants)
+- post 25kg (2 variants)
+- 250×16 post (2 variants)
+
+## FRAMING (253 products)
+Available sizes: 100×100 H5, 100×25 H3.2, 100×25 H4, 100×25 UT, 100×50 H1.2, 100×50 H3.2, 100×50 H4, 100×50 H5, 100×50 UT, 100×75 H5, 125×25 H3.2, 140×45 H1.2, 140×45 H3.2, 140×45 H4, 150×23 H4, 150×25 H3.2, 150×25 UT, 150×40 H1.2, 150×50 H1.2, 150×50 H3.2, 150×50 H4, 150×50 H5, 190×45 H1.2, 190×45 H3.2, 200×25 H3.2...
+- 250×50 H3.2 framing (5 variants)
+- 300×50 H3.2 framing (5 variants)
+- 200×50 H3.2 framing (4 variants)
+- 150×50 H3.2 framing (4 variants)
+- 100×50 H3.2 framing (4 variants)
+- 240×45 H3.2 framing 4.8m (3 variants)
+- 200×50 H5 framing (3 variants)
+- 75×25 H3.2 framing (3 variants)
+
+## STUD (24 products)
+- stud 16×190mm galv (2 variants)
+- 25mm stud (2 variants)
+- stud 12×160mm galv (2 variants)
+- BOSTIK ULTRAGRIP STUD ADHESIVE 600ML SAUSAGE 30605919
+- LUMBERLOK FRAMING STUD STIFFENER WITH T17 35M SCREWS EACH
+- L/LOK STUD STRAP TO TOP PLATE FIXING 4.7KN TO 6KN
+- LUMBERLOK FRAMING STUD STIFFENER WITH SCREWS 8 PER CTN FSS
+- L/LOK STUD TO BOTTOM PLATE FIXING 1=6KN/2=12KN
+
+## RAFTER (7 products)
+- rafter galv
+- MILWAUKEE 180MM METRIC RAFTER SQUARE
+- OX TRADE 2PC RAFTER SET SQUARE SET
+- OX PRO ALUMINUM RAFTER SQUARE 180MM
+- OX PRO ALUMINUM RAFTER SQUARE 300MM
+- STANWAY RAFTER/SPEED ALUMINIUM SQUARE 180MM
+- STANWAY RAFTER/SPEED SQUARE 300MM ALUMINIUM TWJS300
+
+## PURLIN (17 products)
+Available sizes: 80×10 UT
+- purlin 10g×80mm (2 variants)
+- 40mm purlin (2 variants)
+- 0mm purlin (2 variants)
+- purlin galv (2 variants)
+- purlin 10g×80mm ×500
+- LUMBERLOK PURLIN SCREW 80MM BLUE PER 250
+- purlin 10g×80mm ×250
+- purlin 10g×80mm ×100
+
+## BATTEN (102 products)
+- batten SS316 (8 variants)
+- batten galv (5 variants)
+- 75×25 H3.1 batten (3 variants)
+- batten 14g×100mm ×500 (3 variants)
+- 65×19 H3.2 batten (3 variants)
+- 50×25 H3.1 batten (3 variants)
+- batten B8 ×100 (2 variants)
+- batten 14g×75mm ×100 (2 variants)
+
+## PLYWOOD (148 products)
+- 17mm plywood 2400×1200 (9 variants)
+- 12mm plywood 2400×1200 (9 variants)
+- 9mm plywood 2400×1200 (8 variants)
+- 7mm plywood 2400×1200 (6 variants)
+- 17mm H3.2 plywood 2400×1200 (6 variants)
+- 19mm H3.2 plywood 2400×1200 (6 variants)
+- 12mm H3.2 plywood 2400×1200 (5 variants)
+- 12mm plywood 2700×1200 (5 variants)
+
+## PLASTERBOARD (195 products)
+- plasterboard 20kg (13 variants)
+- plasterboard 5kg (9 variants)
+- 10mm plasterboard 4800×1200mm (4 variants)
+- plasterboard 3.6m (4 variants)
+- 10mm plasterboard 4.8m (4 variants)
+- 10mm plasterboard (3 variants)
+- 10mm plasterboard 3.6m (3 variants)
+- 10mm plasterboard 3000×1200mm (2 variants)
+
+## FIBRE CEMENT (51 products)
+- fibre-cement galv 5kg (5 variants)
+- 15mm fibre-cement galv 5kg (3 variants)
+- 14mm fibre-cement (3 variants)
+- fibre-cement galv (3 variants)
+- fibre-cement SS304 (3 variants)
+- fibre-cement SS304 2kg (3 variants)
+- fibre-cement SS304 5kg (3 variants)
+- 8mm fibre-cement SS316 5kg (2 variants)
+
+## MDF (70 products)
+- 18mm mdf 2440×1220 (4 variants)
+- 25mm mdf 2440×1220 (3 variants)
+- 16mm mdf 2440×1220 (3 variants)
+- 9mm mdf 2440×1220 (2 variants)
+- 12mm mdf 2440×1220 (2 variants)
+- mdf 1980×460 (2 variants)
+- mdf 1980×510 (2 variants)
+- mdf 1980×560 (2 variants)
+
+## DECKING (69 products)
+Available sizes: 100×25 H3.2, 100×40 H3.2, 125×25 H3.2, 150×40 H3.2, 150×50 H3.2, 60×10 UT
+- 100×25 H3.2 decking (6 variants)
+- 100×40 H3.2 decking (5 variants)
+- 150×40 H3.2 decking (5 variants)
+- decking galv 5kg (3 variants)
+- 15mm decking SS316 2kg (2 variants)
+- 15mm decking SS316 5kg (2 variants)
+- decking 10g×65mm SS304 (2 variants)
+- 60×10 decking SS304 (2 variants)
+
+## CLADDING (36 products)
+- 14mm cladding (7 variants)
+- 14mm cladding 4200×405mm (2 variants)
+- 14mm cladding 4200×325mm (2 variants)
+- cladding 2.7m
+- 14mm cladding 3000×325mm
+- cladding 3m
+- cladding 4m
+- 14mm cladding 3000×405mm
+
+## WEATHERBOARD (58 products)
+- 150×25 H3.1 weatherboard (5 variants)
+- weatherboard 2.7m (3 variants)
+- 187×18 H3.1 weatherboard 6.1m (2 variants)
+- 18mm weatherboard 6.1m 142×18mm (2 variants)
+- 250×25 H3.1 weatherboard (2 variants)
+- 18mm weatherboard 6.1m 187×18mm (2 variants)
+- 150×25 weatherboard (2 variants)
+- 200×25 weatherboard (2 variants)
+
+## ROOFING (7 products)
+- roofing 2g×65mm B8 ×100 (2 variants)
+- 50mm roofing 2g×50mm B8 ×100
+- TBR T/KRAFT 215 SELF SUPPORTING ROOFING U/LAY 1250X40M 50M2
+- TBR T/KRAFT 215 SELF SUPPORTING ROOFING UNDERLAY 1250X20M 25
+- DONAGHYS ROOFING TWINE WHITE 500M LAS0022
+- SIKASIL ROOFING/PLUMBING 300ML TRANSLUCENT 447539
+
+## GUTTERING (19 products)
+- guttering zinc ×10 (3 variants)
+- BOSTIK ROOF AND GUTTER SILICONE 300ML 30804193
+- SELLEYS ROOF & GUTTER SILICONE SEALANT 310G BLACK 100622
+- SELLEYS ROOF & GUTTER SILICONE SEALANT 310G GREY 100623
+- SELLEYS ROOF & GUTTER SILICONE SEALANT TRANSLUCENT 310G
+- guttering zinc ×16
+- guttering zinc ×25
+- guttering zinc ×20
+
+## DOWNPIPE (20 products)
+- downpipe 3m (7 variants)
+- downpipe 1.5m (2 variants)
+- downpipe 65×50mm
+- downpipe 100×50mm
+- MARLEY DOWNPIPE SPREADER KIT 80MM SKIT80
+- MARLEY DOWNPIPE END CAP 80MM CS80
+- downpipe 4m
+- MARLEY DOWNPIPE SPREADER KIT 80MM TITANIUM SKIT80.TTN
+
+## FLASHING (100 products)
+- flashing 3m (3 variants)
+- 75×75 flashing 2.44m (3 variants)
+- 75×75 flashing 3m (3 variants)
+- 30mm flashing 10m Standard (3 variants)
+- flashing 1140×1180 (3 variants)
+- flashing galv (2 variants)
+- 45mm flashing 10m (2 variants)
+- 50mm flashing (2 variants)
+
+## INSULATION (207 products)
+- insulation R2.2 (12 variants)
+- insulation R3.6 (10 variants)
+- insulation R3.2 (7 variants)
+- insulation R2.6 (7 variants)
+- insulation R2.8 (6 variants)
+- insulation R4.0 (5 variants)
+- insulation R1.5 (5 variants)
+- insulation R5.0 (5 variants)
+
+## MEMBRANE (36 products)
+- membrane 1.5m (4 variants)
+- 74×36 membrane (2 variants)
+- membrane 2.74m (2 variants)
+- membrane 2.75m
+- 74×18 membrane
+- CARTERS TEKTON 2740 X 37M BUILDING WRAP 101M2
+- THERMAKRAFT WATERGATE PLUS W/WRAP 1370MM X 18.5M 25M2
+- TEKTON 1370 X 37M BUILDING WRAP 50M2
+
+## BUILDING PAPER (3 products)
+- 743×30 building-paper
+- TBR THERMAKRAFT 213 BUILDING PAPER HVY WEIGHT 1370X37 50M2
+- TBR THERMAKRAFT 213 BUILDING PAPER HVY WEIGHT 1370X73 100M2
+
+## SCREW (822 products)
+- screw galv (94 variants)
+- screw SS316 (21 variants)
+- screw SS304 (13 variants)
+- 10mm screw galv (6 variants)
+- screw 10g×65mm SS304 ×500 (5 variants)
+- screw 10×100mm (5 variants)
+- 12mm screw galv (5 variants)
+- screw 10g×65mm SS316 ×250 (4 variants)
+
+## NAIL (299 products)
+- nail galv (14 variants)
+- nail galv 5kg (12 variants)
+- 15mm nail SS316 5kg (11 variants)
+- 15mm nail SS316 2kg (11 variants)
+- 25mm nail 5kg (10 variants)
+- 15mm nail (9 variants)
+- 15mm nail galv (8 variants)
+- 6mm nail galv (7 variants)
+
+## BOLT (508 products)
+- bolt galv (263 variants)
+- bolt SS316 (70 variants)
+- bolt SS304 (9 variants)
+- bolt 8×75mm (6 variants)
+- bolt 8×100mm (6 variants)
+- bolt ×1 (5 variants)
+- bolt ×2 (5 variants)
+- bolt zinc (5 variants)
+
+## BRACKET (310 products)
+- bracket galv (15 variants)
+- 6mm bracket galv (9 variants)
+- 50mm bracket (5 variants)
+- 16mm bracket (4 variants)
+- 38mm bracket (4 variants)
+- 25mm bracket (3 variants)
+- bracket brass (3 variants)
+- 19mm bracket (3 variants)
+
+## HANGER (126 products)
+- 240×90 hanger (8 variants)
+- 300×90 hanger (8 variants)
+- 400×90 hanger (7 variants)
+- 360×90 hanger (6 variants)
+- 360×63 hanger (4 variants)
+- 300×63 hanger (4 variants)
+- 300×65 hanger (4 variants)
+- 240×63 hanger (4 variants)
+
+## STIRRUP (14 products)
+- 150×150 stirrup R6
+- 200×150 stirrup R6
+- 200×200 stirrup R6
+- 250×150 stirrup R6
+- 250×200 stirrup R6
+- 250×250 stirrup R6
+- 300×150 stirrup R6
+- 300×200 stirrup R6
+
+## ANCHOR (121 products)
+- 16mm anchor (5 variants)
+- anchor SS304 (3 variants)
+- anchor galv (3 variants)
+- anchor 6.5×50mm ×100 (3 variants)
+- anchor 6.5×38mm (3 variants)
+- anchor 6.5×50mm (3 variants)
+- anchor 6.5×25mm (3 variants)
+- anchor 5.0×25mm (3 variants)
+
+## STRAP (90 products)
+- strap galv (7 variants)
+- strap SS304 (4 variants)
+- strap 2.5m (2 variants)
+- strap 2m (2 variants)
+- strap 3.5m (2 variants)
+- BOWMAC TEE STRAP S/STEEL BS38
+- BOWMAC B84 STRAP
+- BOWMAC BS88 SS STRAP
+
+## ADHESIVE (201 products)
+- SIKAFLEX-118 EXTREME GRAB CONSTRUCTION ADHESIVE WHITE
+- SIKAFLEX AT FACADE SEALANT GREY 600ML SAUSAGE 153729
+- NAILBOND PREMIUM CONST ADHESIVE 600ML SAUSAGE 520472
+- SIKAFLEX AT FACADE SEALANT BLACK 600ML SAUSAGE 153731
+- SIKA SUPERGRIP 30 MIN PU CONSTRUCTION ADHESIVE 310ML 411563
+- SIKA ANCHORFIX-3001 ANCHORING ADHESIVE 250ML 663848
+- NAILBOND SB 375ML ADHESIVE 494580
+- SIKAFLEX AT FACADE SEALANT WHITE 600ML SAUSAGE 153730
+
+## CONCRETE (136 products)
+- 10mm concrete (13 variants)
+- 20mm concrete Standard (11 variants)
+- 19mm concrete (10 variants)
+- 13mm concrete (6 variants)
+- 19mm concrete Standard (6 variants)
+- 13mm concrete Standard (5 variants)
+- 7mm concrete (5 variants)
+- 20mm concrete (5 variants)
+
+## CEMENT (14 products)
+- cement 20kg (4 variants)
+- cement 40kg (2 variants)
+- SELLEYS FIREPROOF CEMENT 700G FC 850G
+- ADOS PVC PIPE CEMENT 75ML
+- ADOS PVC PIPE CEMENT 125ML
+- ADOS PVC PIPE CEMENT 250ML
+- ADOS PVC PIPE CEMENT 500ML
+- STANWAY FIBRO CEMENT CUTTER
+
+## REINFORCING (40 products)
+- reinforcing 4.56m (3 variants)
+- reinforcing 6.05m (2 variants)
+- 16mm reinforcing (2 variants)
+- SIKA DECKWEB REINFORCING FABRIC 190MM X 50M 451931
+- reinforcing 2m
+- TBR STEEL REINFORCING MESH SE720-500STD 5.85X2.42M 11.93M2
+- TBR STEEL REINFORCING MESH SE820-500STD 5.85X2.42M 11.93M2
+- STEEL REINFORCING MESH 147XP CVR 10.08M2
+
+## MESH (40 products)
+- mesh 1m galv (12 variants)
+- 5mm mesh (10 variants)
+- mesh 10m (3 variants)
+- mesh 2m (2 variants)
+- SIKA FIBRE MESH 50M ROLL 450669
+- STEEL DUCTILE MESH SE82 500E 5.7X2.31M NETT CVR 10.43M2
+- mesh 1.99m
+- mesh 11m
+
+## DOOR (241 products)
+- door brass (8 variants)
+- 40mm door (5 variants)
+- door 45kg (4 variants)
+- door SS304 (4 variants)
+- 38mm door (4 variants)
+- door 2.4m 40kg (3 variants)
+- 19mm door (3 variants)
+- 50mm door (3 variants)
+
+## WINDOW (56 products)
+- window galv (12 variants)
+- 40mm H3.1 window 5.4m
+- INTERLOCK ALUMINIUM FRICTION WINDOW STAY P1530B BLACK 500A
+- INTERLOCK ALUMINIUM FRICTION WINDOW STAY P1553B BLACK 420HD
+- SC WEDGELESS WINDOW HANDLE SUB FIX RIGHT HAND MC420B
+- WB QUBE WINDOW FASTENER SATIN CHROME 5343-SC
+- SC WEDGELESS WINDOW HANDLE SUB FIX LEFT HAND MC421B
+- INTERLOCK ALUMINIUM FRICTION WINDOW STAY 330MM P1561B BLACK
+
+## HINGE (154 products)
+- hinge galv (14 variants)
+- 90×60 hinge (12 variants)
+- hinge SS304 (5 variants)
+- 90×60 hinge zinc (5 variants)
+- hinge brass (5 variants)
+- 100×75 hinge zinc (4 variants)
+- 90×90 hinge zinc (4 variants)
+- 100×75 hinge (4 variants)
+
+## LOCK (71 products)
+- lock SS304 (2 variants)
+- 25mm lock (2 variants)
+- COWDROY ROBEMAKER TT591 SNAP LOCK FIXING ADAPTOR P/MTR
+- SCHLAGE STELLA SLIDING DR LOCK SGL CYL & SNIB BLK V SSD12205
+- MN CIRQUE ENTRANCE LOCK SET CONC FIX SS 870SS
+- XCEL RIM LOCK SET GREY 150MM
+- LEGGE ALPHA EXT LOCK FURNITURE SCP EMERG RELEASE 704 SCP
+- SCHLAGE REGENT R51V LEONARDO ENTRANCE LOCK SCP VP RLENTSS
+
+## HANDLE (132 products)
+- 40mm handle (8 variants)
+- 46mm handle (3 variants)
+- 8mm handle (2 variants)
+- handle zinc (2 variants)
+- WB ASTRON APOLLO RH DUMMY HANDLE SET 7015 & 1152 7015RH-BN
+- SCHLAGE CHEST HANDLE ZP STD PACK B372
+- SCHLAGE CENTURY/LATITUDE LOWER HALF HANDLE SET 622 BLK FE285
+- SCHLAGE CENTURY/LATITUDE LOWER HALF HANDLE SET 619 SNP FE285
+
+## PAINT (71 products)
+- 50mm paint (7 variants)
+- 38mm paint (5 variants)
+- 25mm paint (4 variants)
+- NORTON DISC MASTER NO-FIL PAINT ASSTD GRIT 50PK 66254434950
+- BOSTIK KWIK PAINT GLAZING PUTTY 700GM 30607187
+- 230×92 paint
+- U-CAN PLASTIC PAINT POT / BUCKET WITH LID 10L
+- U-CAN PLASTIC PAINT POT / BUCKET WITH LID 20L
+
+## PRIMER (25 products)
+- SIKA ACTIVATOR 205 PRIMER CLEAR 1LTR 92517
+- DUNLOP PRIMER & ADDITIVE 4LT 10348
+- PROTECTO PRIMER # 100 VOC - 1 LITRE PRM1001
+- PROTECTO PRIMER # 100 VOC - 4 LITRE PRM1004
+- DUNLOP PRIMER & ADDITIVE 1 LITRE
+- DUNLOP PRIMER & ADDITIVE 4 LITRE
+- SIKAFLOOR 01 PRIMER 1L
+- SIKAFLOOR 01 PRIMER 5L
+
+## STAIN (16 products)
+- ZINSSER COVERS-UP STAIN KILLER AEROSOL
+- WATTYL MASTER PREP SPIRIT BASED STAIN BLOCKER 4L
+- FORESTWOOD TRAD OIL STAIN 5LT BLONDE
+- FORESTWOOD TRAD OIL STAIN 5LT CEDAR
+- FORESTWOOD TRAD OIL STAIN 5LT CHARCOAL
+- FORESTWOOD TRAD OIL STAIN 5LT LIQUID AMBER
+- FORESTWOOD TRAD OIL STAIN 5LT KOWHAI
+- FORESTWOOD TRAD OIL STAIN 5LT MISSION BROWN
+
+## FENCE POST (8 products)
+- 100×75 H4 fence-post 1.8m
+- 100×100 H4 fence-post 1.8m
+- 100×75 H4 fence-post 2.4m
+- 100×100 H4 fence-post 2.4m
+- 100×75 H4 fence-post 2.7m
+- 100×100 H4 fence-post 2.7m
+- 100×75 H4 fence-post 3m
+- 100×100 H4 fence-post 3m
+
+## TIMBER (412 products)
+- H4 50×50mm (8 variants)
+- 150×25 H3.1 (7 variants)
+- 200×25 H3.1 (6 variants)
+- 100×25 H3.1 (4 variants)
+- 250×25 H3.1 (4 variants)
+- 300×25 H3.1 (3 variants)
+- 20mm 3600×1200 (2 variants)
+- 240×90 H1.2 (2 variants)
+
+## TOOL (720 products)
+- 0mm tool (38 variants)
+- 280×230 tool (33 variants)
+- tool ×5 (32 variants)
+- tool ×2 (19 variants)
+- tool ×3 (15 variants)
+- 25mm tool (15 variants)
+- 50mm tool (11 variants)
+- 5mm tool (11 variants)
+
+## OTHER (6456 products)
+- 6mm zinc (19 variants)
+- H6 3.6m (12 variants)
+- H6 10m (11 variants)
+- H6 4.2m (11 variants)
+- H6 4.8m (11 variants)
+- H6 5.4m (11 variants)
+- H6 6m (11 variants)
+- H6 7m (11 variants)
+
+## BOTTOM PLATE (7 products)
+- bottom-plate SS304 (2 variants)
+- L/LOK BOTTOM PLATE FIX ANCHOR
+- 135×12 bottom-plate
+- 135×12 bottom-plate galv ×25
+- LUMBERLOK BOTTOM PLATE FIXING ANCHOR BPA
+- HIANDRI BOTTOM PLATE PACKERS PER EACH
+
+## FIXING (865 products)
+- SS304 ×200 (22 variants)
+- galv 5kg (19 variants)
+- galv 2kg (14 variants)
+- SS304 ×100 (9 variants)
+- galv 15kg (9 variants)
+- 50×50 galv (6 variants)
+- 1m SS304 (4 variants)
+- 1m galv (4 variants)
+
+## TIE DOWN (13 products)
+- AEROFAST SUPASTRAP TWIN PACK RATCHET TIE DOWN
+- AEROFAST SUPASTRAP QUAD PACK RATCHET TIE DOWN
+- AEROFAST SUPASTRAP TIE37 RATCHET TIE DOWN
+- tie-down 700kg
+- AEROFAST MOTORCYCLE TIEDOWN 2MX25MM (1 PAIR)
+- tie-down 2500kg
+- tie-down 350kg
+- AEROFAST COMMERCIAL TIEDOWN 6MX50MM
+
+## TOP PLATE (5 products)
+- L/LOK 9KN TRUSS TO TOP PLATE FIXING
+- LUMBERLOK TOP PLATE STIFFENER WITH SCREWS 8 PER CARTON
+- LUMBERLOK TOP PLATE STIFFENER INCL T17 75MM SCREWS EACH
+- L/LOK 16KN TRUSS TO TOP PLATE FIXING 16KNTTP
+- LUMBERLOK TOP PLATE STIFFENER

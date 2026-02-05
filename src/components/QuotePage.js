@@ -316,7 +316,7 @@ export default function QuotePage({
                   <p className="text-sm text-gray-500">
                     ${item.price.toFixed(2)} / {item.unit}
                     <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
-                      item.supplier === 'ITM' ? 'bg-blue-50 text-blue-700' : 'bg-orange-50 text-orange-700'
+                      'bg-orange-50 text-orange-700'
                     }`}>
                       {item.supplier || 'Carters'}
                     </span>

@@ -173,7 +173,7 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
                         <p className="font-medium text-gray-900 truncate">{material.name}</p>
                         <p className="text-xs text-gray-500 mt-0.5">
                           <span className={`inline-block px-1.5 py-0.5 rounded mr-2 ${
-                            material.supplier === 'ITM' ? 'bg-blue-50 text-blue-700' : 'bg-orange-50 text-orange-700'
+                            'bg-orange-50 text-orange-700'
                           }`}>
                             {material.supplier || 'Carters'}
                           </span>

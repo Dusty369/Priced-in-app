@@ -1,13 +1,11 @@
-// Optimized materials loader with fuzzy search and supplier balancing
-// Uses normalized materials with dimensions, treatment, length, and packaging data
+// Optimized materials loader with fuzzy search
+// Uses Carters normalized materials with dimensions, treatment, length, and packaging data
 
 import normalizedMaterialsData from '../data/materials-normalized.json';
 
 // Cache for better performance
 let cachedMaterials = null;
 let cachedCategories = null;
-let cachedSuppliers = null;
-let cachedBySupplier = null;
 let cachedTypes = null;
 let cachedTreatments = null;
 
@@ -40,17 +38,6 @@ export function getNormalizedMaterials() {
   return normalizedMaterialsData;
 }
 
-export function getMaterialsBySupplierCache() {
-  if (!cachedBySupplier) {
-    const all = getAllMaterials();
-    cachedBySupplier = {
-      Carters: all.filter(m => m.supplier === 'Carters'),
-      ITM: all.filter(m => m.supplier === 'ITM'),
-    };
-  }
-  return cachedBySupplier;
-}
-
 export function getCategories() {
   if (!cachedCategories) {
     const all = getAllMaterials();
@@ -60,10 +47,7 @@ export function getCategories() {
 }
 
 export function getSuppliers() {
-  if (!cachedSuppliers) {
-    cachedSuppliers = ['All', 'Carters', 'ITM'];
-  }
-  return cachedSuppliers;
+  return ['Carters'];  // Single supplier
 }
 
 /**
@@ -305,65 +289,21 @@ function scoreMatch(material, searchTerms, normalizedQuery) {
   return score;
 }
 
-// ============================================================================
-// SUPPLIER INTERLEAVING
-// ============================================================================
-
-/**
- * Interleave results from different suppliers for balanced display
- */
-function interleaveBySupplier(results) {
-  const bySupplier = {
-    Carters: [],
-    ITM: [],
-    Other: [],
-  };
-
-  // Group by supplier
-  for (const item of results) {
-    const supplier = item.supplier || 'Other';
-    if (bySupplier[supplier]) {
-      bySupplier[supplier].push(item);
-    } else {
-      bySupplier.Other.push(item);
-    }
-  }
-
-  // Interleave: take one from each supplier in turn
-  const interleaved = [];
-  const suppliers = ['Carters', 'ITM', 'Other'];
-  const indices = { Carters: 0, ITM: 0, Other: 0 };
-
-  let added = true;
-  while (added) {
-    added = false;
-    for (const supplier of suppliers) {
-      if (indices[supplier] < bySupplier[supplier].length) {
-        interleaved.push(bySupplier[supplier][indices[supplier]]);
-        indices[supplier]++;
-        added = true;
-      }
-    }
-  }
-
-  return interleaved;
-}
 
 // ============================================================================
 // MAIN SEARCH FUNCTION
 // ============================================================================
 
 /**
- * Search materials with fuzzy matching and supplier balancing
+ * Search materials with fuzzy matching
  *
  * @param {string} query - Search query
  * @param {number} limit - Max results to return
- * @param {string} supplier - Filter by supplier ('All', 'Carters', 'ITM')
  * @returns {Array} - Matched materials sorted by relevance
  */
-export function searchMaterials(query, limit = 2000, supplier = 'All') {
+export function searchMaterials(query, limit = 2000) {
   if (!query || query.trim().length === 0) {
-    return getMaterialsByCategory('All', limit, supplier);
+    return getMaterialsByCategory('All', limit);
   }
 
   const all = getAllMaterials();
@@ -371,20 +311,14 @@ export function searchMaterials(query, limit = 2000, supplier = 'All') {
   const normalizedQuery = normalizeText(query);
 
   if (searchTerms.length === 0) {
-    return getMaterialsByCategory('All', limit, supplier);
+    return getMaterialsByCategory('All', limit);
   }
 
   // Score all materials
   const scored = [];
 
   for (const material of all) {
-    // Apply supplier filter
-    if (supplier !== 'All' && material.supplier !== supplier) {
-      continue;
-    }
-
     const score = scoreMatch(material, searchTerms, normalizedQuery);
-
     if (score > 0) {
       scored.push({ material, score });
     }
@@ -393,27 +327,8 @@ export function searchMaterials(query, limit = 2000, supplier = 'All') {
   // Sort by score descending
   scored.sort((a, b) => b.score - a.score);
 
-  // Extract materials
-  let results = scored.map(s => s.material);
-
-  // If filtering by specific supplier, just slice
-  if (supplier !== 'All') {
-    return results.slice(0, limit);
-  }
-
-  // For 'All' suppliers, interleave results for balance
-  // But only interleave within score tiers to maintain relevance
-  const highScore = scored.filter(s => s.score >= 50).map(s => s.material);
-  const medScore = scored.filter(s => s.score >= 20 && s.score < 50).map(s => s.material);
-  const lowScore = scored.filter(s => s.score > 0 && s.score < 20).map(s => s.material);
-
-  const balanced = [
-    ...interleaveBySupplier(highScore),
-    ...interleaveBySupplier(medScore),
-    ...interleaveBySupplier(lowScore),
-  ];
-
-  return balanced.slice(0, limit);
+  // Return top results
+  return scored.map(s => s.material).slice(0, limit);
 }
 
 // ============================================================================
@@ -421,14 +336,13 @@ export function searchMaterials(query, limit = 2000, supplier = 'All') {
 // ============================================================================
 
 /**
- * Get materials by category with supplier balancing
+ * Get materials by category
  *
  * @param {string} category - Category to filter by
  * @param {number} limit - Max results
- * @param {string} supplier - Supplier filter
  * @returns {Array} - Materials in category
  */
-export function getMaterialsByCategory(category, limit = 2000, supplier = 'All') {
+export function getMaterialsByCategory(category, limit = 2000) {
   const all = getAllMaterials();
 
   let filtered = all;
@@ -438,14 +352,7 @@ export function getMaterialsByCategory(category, limit = 2000, supplier = 'All')
     filtered = filtered.filter(m => m.category === category);
   }
 
-  // Apply supplier filter
-  if (supplier !== 'All') {
-    filtered = filtered.filter(m => m.supplier === supplier);
-    return filtered.slice(0, limit);
-  }
-
-  // For 'All' suppliers, interleave for balanced display
-  return interleaveBySupplier(filtered).slice(0, limit);
+  return filtered.slice(0, limit);
 }
 
 /**
@@ -453,20 +360,11 @@ export function getMaterialsByCategory(category, limit = 2000, supplier = 'All')
  *
  * @param {string} type - Packaging type (box, length, meter, sheet, tin, bag, etc.)
  * @param {number} limit - Max results
- * @param {string} supplier - Supplier filter
  * @returns {Array} - Materials of given packaging type
  */
-export function getMaterialsByType(type, limit = 500, supplier = 'All') {
+export function getMaterialsByType(type, limit = 500) {
   const all = getAllMaterials();
-
-  let filtered = all.filter(m => m.packaging?.unitType === type);
-
-  if (supplier !== 'All') {
-    filtered = filtered.filter(m => m.supplier === supplier);
-    return filtered.slice(0, limit);
-  }
-
-  return interleaveBySupplier(filtered).slice(0, limit);
+  return all.filter(m => m.packaging?.unitType === type).slice(0, limit);
 }
 
 /**
@@ -474,20 +372,11 @@ export function getMaterialsByType(type, limit = 500, supplier = 'All') {
  *
  * @param {string} treatment - H1.2, H3.1, H3.2, H4, H5, H6
  * @param {number} limit - Max results
- * @param {string} supplier - Supplier filter
  * @returns {Array} - Materials with given treatment
  */
-export function getMaterialsByTreatment(treatment, limit = 500, supplier = 'All') {
+export function getMaterialsByTreatment(treatment, limit = 500) {
   const all = getAllMaterials();
-
-  let filtered = all.filter(m => m.treatment === treatment);
-
-  if (supplier !== 'All') {
-    filtered = filtered.filter(m => m.supplier === supplier);
-    return filtered.slice(0, limit);
-  }
-
-  return interleaveBySupplier(filtered).slice(0, limit);
+  return all.filter(m => m.treatment === treatment).slice(0, limit);
 }
 
 /**
@@ -517,15 +406,8 @@ export function getFramingBySize(width, depth, treatment = null) {
 // PAGINATION (for large lists)
 // ============================================================================
 
-export function getMaterialsPaginated(page = 1, perPage = 100, supplier = 'All') {
-  let materials = getAllMaterials();
-
-  if (supplier !== 'All') {
-    materials = materials.filter(m => m.supplier === supplier);
-  } else {
-    materials = interleaveBySupplier(materials);
-  }
-
+export function getMaterialsPaginated(page = 1, perPage = 100) {
+  const materials = getAllMaterials();
   const start = (page - 1) * perPage;
   const end = start + perPage;
 

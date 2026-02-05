@@ -54,7 +54,7 @@ export const MaterialSchema = {
   unitDisplay: 'string',        // Original: "per LGTH", "per BOX", "per EA"
 
   // Source
-  supplier: 'string',           // Carters, ITM
+  supplier: 'string',           // Carters
   code: 'string',               // Supplier product code
   category: 'string',           // Original category from source
 
