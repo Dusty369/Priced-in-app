@@ -481,11 +481,12 @@ export default function PricedInApp() {
         )}
 
         {page === 'projects' && (
-          <Dashboard 
+          <Dashboard
             projects={projects}
             onNewProject={newProject}
             onLoadProject={loadProject}
             onDeleteProject={deleteProject}
+            labourRates={labourRates}
           />
         )}
 

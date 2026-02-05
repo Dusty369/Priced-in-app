@@ -2,10 +2,34 @@
 
 import { FolderOpen, Plus, TrendingUp, DollarSign, Trash2, Clock } from 'lucide-react';
 
-export default function Dashboard({ projects, onNewProject, onLoadProject, onDeleteProject }) {
+// Calculate full project quote total (materials + labour + wastage + margin + GST)
+function calculateProjectTotal(project, labourRates = { builder: 95, labourer: 45, apprentice: 30, electrician: 105, plumber: 105, tiler: 120, painter: 65, plasterer: 40 }) {
+  const cart = project.cart || [];
+  const labourItems = project.labourItems || [];
+  const wastage = project.wastage ?? 10;
+  const margin = project.margin ?? 20;
+  const gst = project.gst ?? true;
+
+  // Materials subtotal
+  const materialsSubtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+  const materialsWithWastage = materialsSubtotal * (1 + wastage / 100);
+  const materialsWithMargin = materialsWithWastage * (1 + margin / 100);
+
+  // Labour subtotal
+  const labourSubtotal = labourItems.reduce((sum, item) => {
+    const rate = labourRates[item.role] || 0;
+    return sum + (rate * item.hours);
+  }, 0);
+  const labourWithMargin = labourSubtotal * (1 + margin / 100);
+
+  // Total with GST
+  const subtotal = materialsWithMargin + labourWithMargin;
+  return gst ? subtotal * 1.15 : subtotal;
+}
+
+export default function Dashboard({ projects, onNewProject, onLoadProject, onDeleteProject, labourRates }) {
   const totalValue = projects.reduce((sum, p) => {
-    const projectTotal = (p.cart || []).reduce((s, i) => s + i.price * i.qty, 0);
-    return sum + projectTotal;
+    return sum + calculateProjectTotal(p, labourRates);
   }, 0);
 
   const recentProjects = projects
@@ -86,7 +110,7 @@ export default function Dashboard({ projects, onNewProject, onLoadProject, onDel
                   </div>
                   <div className="flex items-center gap-3 ml-4">
                     <p className="font-semibold text-emerald-600">
-                      ${((project.cart || []).reduce((s, i) => s + i.price * i.qty, 0)).toLocaleString('en-NZ', { maximumFractionDigits: 0 })}
+                      ${calculateProjectTotal(project, labourRates).toLocaleString('en-NZ', { maximumFractionDigits: 0 })}
                     </p>
                     <button
                       onClick={(e) => { e.stopPropagation(); onDeleteProject(project.id); }}
