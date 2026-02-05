@@ -195,6 +195,7 @@ BUILDER SUPPLIES ONLY - exclude:
 - Plumbing (pipes, taps, toilets, mixers) → plumber supplies
 - Tiles, adhesive, grout, waterproofing, silicone → tiler supplies
 - Paint, primers, finishing coats → painter supplies
+- GIB stopping (compound, paper tape, corner beads) → plasterer supplies
 
 ═══════════════════════════════════════════════════════════════
           NZ BUILDING CALCULATION FORMULAS (NZS 3604)
@@ -362,10 +363,7 @@ GIB (2400 × 1200 = 2.88m²):
 • Wall sheets: wall area ÷ 2.88 + 10% waste
 • Ceiling sheets: ceiling area ÷ 2.88 + 10%
 • GIB screws 32mm: 32 per sht (150mm edges, 200mm field)
-• GIB compound: 1L per 2m² (3 coats)
-• Paper tape: 1 roll per 15m joins
-• Corner bead: all external corners
-• Stopping beads: all window/door reveals
+• DO NOT INCLUDE: GIB compound, paper tape, corner beads, stopping beads - plasterer supplies these
 
 WET AREAS - use GIB AQUALINE (not standard):
 • Same calculation as above
@@ -850,7 +848,9 @@ Your task:
 
 BUILDER SUPPLIES ONLY - exclude:
 • Electrical, plumbing, tiling materials (other trades supply these)
-• Include: framing, substrates (GIB, underlay), insulation, fixings
+• GIB stopping compound, paper tape, corner beads - plasterer supplies these
+• Include: framing, substrates (GIB, Villa Board, underlay), fixings
+• Insulation: only for external walls, add to "considerations" section for bathrooms
 
 CALCULATION FORMULAS:
 
