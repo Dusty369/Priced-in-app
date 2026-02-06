@@ -23,8 +23,6 @@ export default function AIAssistant({
 }) {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
-  if (!showAI) return null;
-
   const aiQuotesUsed = tierUsage?.aiQuotes || 0;
   const aiQuotesLimit = tierLimits?.aiQuotesPerMonth || 0;
   const usagePercent = aiQuotesLimit > 0 ? (aiQuotesUsed / aiQuotesLimit) * 100 : 100;

@@ -55,7 +55,7 @@ export default function PricedInApp() {
   // Page state
   const [page, setPage] = useState('projects');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showAI, setShowAI] = useState(false); // AI only shown on quote page
+  const [showAI, setShowAI] = useState(true); // AI shown by default on quote page
 
   // Cart hook
   const { cart, setCart, addToCart, updateQty, removeFromCart, addItemsToCart, clearCart } = useCart();
@@ -507,8 +507,8 @@ export default function PricedInApp() {
       />
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
-        {/* AI Assistant - only show on Quote page */}
-        {page === 'quote' && showAI && (
+        {/* AI Assistant - always show on Quote page */}
+        {page === 'quote' && (
           <AIAssistant
             showAI={showAI}
             chatHistory={chatHistory}
