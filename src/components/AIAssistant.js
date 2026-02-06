@@ -28,7 +28,7 @@ export default function AIAssistant({
   const aiQuotesUsed = tierUsage?.aiQuotes || 0;
   const aiQuotesLimit = tierLimits?.aiQuotesPerMonth || 0;
   const usagePercent = aiQuotesLimit > 0 ? (aiQuotesUsed / aiQuotesLimit) * 100 : 100;
-  const isFreeUser = userTier === 'free';
+  const isFreeUser = false; // TODO: restore userTier === 'free' when tier system is implemented
   const isAtLimit = !canUseAI;
 
   return (
