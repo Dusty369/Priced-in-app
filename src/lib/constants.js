@@ -1,3 +1,12 @@
+// Currency formatting helper
+export const formatNZD = (amount) => {
+  return new Intl.NumberFormat('en-NZ', {
+    style: 'currency',
+    currency: 'NZD',
+    minimumFractionDigits: 2
+  }).format(amount);
+};
+
 // Storage Keys
 export const PROJECTS_KEY = 'priced-in-projects';
 export const CURRENT_PROJECT_KEY = 'priced-in-current-project';
@@ -6,8 +15,46 @@ export const COMPANY_INFO_KEY = 'priced-in-company-info';
 export const MATERIAL_PRESETS_KEY = 'priced-in-material-presets';
 export const PLAN_USAGE_KEY = 'priced-in-plan-usage';
 export const USER_TIER_KEY = 'priced-in-user-tier';
+export const TIER_USAGE_KEY = 'priced-in-tier-usage';
 
-// Plan analysis limits by tier
+// Tier limits and features
+export const TIER_LIMITS = {
+  free: {
+    name: 'Free',
+    price: 0,
+    aiQuotesPerMonth: 0,
+    manualQuotesPerMonth: 3,
+    planPdfsPerQuote: 0,
+    imagesPerQuote: 0,
+    hasBranding: false,
+    hasWatermark: true,
+    hasXeroExport: false
+  },
+  starter: {
+    name: 'Starter',
+    price: 29,
+    aiQuotesPerMonth: 5,
+    manualQuotesPerMonth: Infinity,
+    planPdfsPerQuote: 0,
+    imagesPerQuote: 1,
+    hasBranding: true,
+    hasWatermark: false,
+    hasXeroExport: true
+  },
+  professional: {
+    name: 'Professional',
+    price: 79,
+    aiQuotesPerMonth: 25,
+    manualQuotesPerMonth: Infinity,
+    planPdfsPerQuote: 3,
+    imagesPerQuote: 10,
+    hasBranding: true,
+    hasWatermark: false,
+    hasXeroExport: true
+  }
+};
+
+// Legacy plan limits (for backwards compatibility during migration)
 export const PLAN_LIMITS = {
   basic: { plansPerMonth: 4, pagesPerPlan: 10, name: 'Basic' },
   pro: { plansPerMonth: 6, pagesPerPlan: 20, name: 'Pro' }

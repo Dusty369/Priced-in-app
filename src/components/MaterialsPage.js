@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Plus, Package, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { searchMaterials, getMaterialsByCategory, getCategories } from '../lib/materialsLoader';
+import { formatNZD } from '../lib/constants';
 
 const ITEMS_PER_PAGE = 100;
 
@@ -167,7 +168,7 @@ export default function MaterialsPage({ onAddToCart, initialSearch = '' }) {
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="text-right">
-                          <p className="font-semibold text-emerald-600">${material.price.toFixed(2)}</p>
+                          <p className="font-semibold text-emerald-600">{formatNZD(material.price)}</p>
                           <p className="text-xs text-gray-500">/{material.unit}</p>
                         </div>
                         <button

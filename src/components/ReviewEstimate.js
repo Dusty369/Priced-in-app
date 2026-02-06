@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { AlertTriangle, Check, Edit2, Trash2, X, FileText } from 'lucide-react';
+import { formatNZD } from '../lib/constants';
 
 /**
  * Review Estimate component
@@ -56,7 +57,7 @@ export default function ReviewEstimate({
         warnings.push({
           id: item.id,
           type: 'high_value',
-          message: `$${lineTotal.toFixed(0)} line total - verify`
+          message: `${formatNZD(lineTotal)} line total - verify`
         });
       }
     });
@@ -93,7 +94,7 @@ export default function ReviewEstimate({
           <div>
             <h2 className="text-xl font-bold text-gray-900">Review AI Estimate</h2>
             <p className="text-sm text-gray-500 mt-1">
-              {analysis.itemCount} items • ${analysis.totalValue.toFixed(2)} total
+              {analysis.itemCount} items • {formatNZD(analysis.totalValue)} total
             </p>
           </div>
           <button
@@ -178,10 +179,10 @@ export default function ReviewEstimate({
                       {item.unit}
                     </td>
                     <td className="py-3 px-4 text-right text-sm text-gray-600">
-                      ${(item.price || 0).toFixed(2)}
+                      {formatNZD(item.price || 0)}
                     </td>
                     <td className="py-3 px-4 text-right font-medium text-gray-900">
-                      ${lineTotal.toFixed(2)}
+                      {formatNZD(lineTotal)}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-1 justify-end">

@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus, FolderOpen, Clock, Trash2 } from 'lucide-react';
-import { DEFAULT_LABOUR_RATES } from '../lib/constants';
+import { DEFAULT_LABOUR_RATES, formatNZD } from '../lib/constants';
 
 export default function ProjectsList({
   projects,
@@ -79,7 +79,7 @@ export default function ProjectsList({
                   </div>
                   <div className="text-right">
                     <p className="text-xl font-bold text-emerald-600">
-                      ${projectFinal.toFixed(2)}
+                      {formatNZD(projectFinal)}
                     </p>
                     <p className="text-xs text-gray-500">
                       {project.cart?.length || 0} materials, {(project.labourItems || []).length} labour

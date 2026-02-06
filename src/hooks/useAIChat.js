@@ -145,6 +145,11 @@ function formatAIResponse(json, labourRates) {
  * @param {Array} options.allMaterials - All materials array
  * @param {Map} options.materialWordIndex - Word index for material lookup
  * @param {Function} options.onSetAiCalculations - Callback to store AI calculations for quote display
+ * @param {Function} options.canUseAI - Function to check if AI can be used
+ * @param {Function} options.onAIUsed - Callback when AI is used (to increment usage)
+ * @param {string} options.userTier - Current user tier
+ * @param {Object} options.tierUsage - Current tier usage stats
+ * @param {Object} options.tierLimits - Current tier limits
  */
 export function useAIChat({
   labourRates,
@@ -153,7 +158,12 @@ export function useAIChat({
   onNavigateToQuote,
   allMaterials,
   materialWordIndex,
-  onSetAiCalculations
+  onSetAiCalculations,
+  canUseAI,
+  onAIUsed,
+  userTier,
+  tierUsage,
+  tierLimits
 }) {
   const [chatInput, setChatInput] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
@@ -162,6 +172,24 @@ export function useAIChat({
   // Send message to AI
   const sendAIMessage = async () => {
     if (!chatInput.trim() || aiLoading) return;
+
+    // Check if user can use AI (tier enforcement)
+    if (canUseAI && !canUseAI()) {
+      const tierName = tierLimits?.name || 'Free';
+      const limit = tierLimits?.aiQuotesPerMonth || 0;
+      setChatHistory(prev => [...prev,
+        { role: 'user', content: chatInput },
+        {
+          role: 'assistant',
+          content: limit === 0
+            ? `AI quotes are not available on the ${tierName} tier. Upgrade to Starter ($29/month) for 5 AI quotes per month, or Professional ($79/month) for 25 AI quotes.`
+            : `You've used all ${limit} AI quotes for this month. Upgrade to Professional for 25 AI quotes/month, or wait until next month.`,
+          type: 'tier-limit'
+        }
+      ]);
+      setChatInput('');
+      return;
+    }
 
     const userMessage = chatInput;
     setChatInput('');
@@ -190,6 +218,11 @@ export function useAIChat({
         }]);
       } else {
         const text = data.content?.find(c => c.type === 'text')?.text || 'No response';
+
+        // Increment AI usage on successful response
+        if (onAIUsed) {
+          onAIUsed();
+        }
 
         try {
           const json = extractJSON(text);

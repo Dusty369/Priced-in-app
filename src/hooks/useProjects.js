@@ -19,6 +19,8 @@ export function useProjects({
   const [currentProjectId, setCurrentProjectId] = useState(null);
   const [currentProjectName, setCurrentProjectName] = useState('');
   const [projectNotes, setProjectNotes] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [clientAddress, setClientAddress] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [saveProjectName, setSaveProjectName] = useState('');
 
@@ -37,6 +39,8 @@ export function useProjects({
           setCurrentProjectId(current.id);
           setCurrentProjectName(current.name);
           setProjectNotes(current.notes || '');
+          setClientName(current.clientName || '');
+          setClientAddress(current.clientAddress || '');
           onLoadProject(current);
         }
       }
@@ -51,6 +55,8 @@ export function useProjects({
       const newProject = {
         id: overwrite && currentProjectId ? currentProjectId : Date.now().toString(),
         name: name || currentProjectName || 'Untitled Project',
+        clientName,
+        clientAddress,
         ...projectData,
         notes: projectNotes,
         createdAt: overwrite && currentProjectId
@@ -71,22 +77,22 @@ export function useProjects({
 
       return updatedProjects;
     });
-  }, [currentProjectId, currentProjectName, projectNotes, getProjectData]);
+  }, [currentProjectId, currentProjectName, projectNotes, clientName, clientAddress, getProjectData]);
 
   // Load project
   const loadProject = useCallback((project) => {
     setCurrentProjectId(project.id);
     setCurrentProjectName(project.name);
     setProjectNotes(project.notes || '');
+    setClientName(project.clientName || '');
+    setClientAddress(project.clientAddress || '');
     localStorage.setItem(CURRENT_PROJECT_KEY, project.id);
     onLoadProject(project);
     onNavigate('quote');
   }, [onLoadProject, onNavigate]);
 
-  // Delete project
+  // Delete project (confirm handled by caller)
   const deleteProject = useCallback((projectId) => {
-    if (!confirm('Delete this project?')) return;
-
     setProjects(prev => {
       const updatedProjects = prev.filter(p => p.id !== projectId);
       localStorage.setItem(PROJECTS_KEY, JSON.stringify(updatedProjects));
@@ -95,6 +101,8 @@ export function useProjects({
         setCurrentProjectId(null);
         setCurrentProjectName('');
         setProjectNotes('');
+        setClientName('');
+        setClientAddress('');
         localStorage.removeItem(CURRENT_PROJECT_KEY);
       }
 
@@ -102,11 +110,43 @@ export function useProjects({
     });
   }, [currentProjectId]);
 
+  // Duplicate project
+  const duplicateProject = useCallback((project) => {
+    const newProject = {
+      ...project,
+      id: Date.now().toString(),
+      name: `${project.name} (Copy)`,
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setProjects(prev => {
+      const updated = [newProject, ...prev];
+      localStorage.setItem(PROJECTS_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  // Update project status
+  const updateProjectStatus = useCallback((projectId, newStatus) => {
+    setProjects(prev => {
+      const updatedProjects = prev.map(p =>
+        p.id === projectId
+          ? { ...p, status: newStatus, updatedAt: new Date().toISOString() }
+          : p
+      );
+      localStorage.setItem(PROJECTS_KEY, JSON.stringify(updatedProjects));
+      return updatedProjects;
+    });
+  }, []);
+
   // New project
   const newProject = useCallback(() => {
     setCurrentProjectId(null);
     setCurrentProjectName('');
     setProjectNotes('');
+    setClientName('');
+    setClientAddress('');
     localStorage.removeItem(CURRENT_PROJECT_KEY);
     onNewProject();
     onNavigate('materials');
@@ -130,6 +170,10 @@ export function useProjects({
     currentProjectName,
     projectNotes,
     setProjectNotes,
+    clientName,
+    setClientName,
+    clientAddress,
+    setClientAddress,
     showSaveDialog,
     saveProjectName,
     setSaveProjectName,
@@ -138,6 +182,8 @@ export function useProjects({
     saveProject,
     loadProject,
     deleteProject,
+    duplicateProject,
+    updateProjectStatus,
     newProject,
     openSaveDialog,
     closeSaveDialog

@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, Upload, Zap, Crown } from 'lucide-react';
+import { FileText, Upload, Zap, Crown, Lock } from 'lucide-react';
 
 export default function PlansUpload({
   planFile,
@@ -13,15 +13,17 @@ export default function PlansUpload({
   onAnalyzePlan,
   onNavigateToQuote,
   onClearPlan,
-  // Usage tracking props
-  planUsage,
-  userTier,
-  plansPerMonth,
-  pagesPerPlan,
-  plansRemaining
+  // Tier props
+  userTier = 'free',
+  tierLimits = {},
+  tierUsage = {},
+  canAnalyzePlan = false
 }) {
-  const usagePercent = plansPerMonth > 0 ? (planUsage?.plans || 0) / plansPerMonth * 100 : 0;
-  const isAtLimit = plansRemaining <= 0;
+  const planPdfsAllowed = tierLimits?.planPdfsPerQuote || 0;
+  const imagesAllowed = tierLimits?.imagesPerQuote || 0;
+  const planAnalysesUsed = tierUsage?.planAnalyses || 0;
+  const isProfessional = userTier === 'professional';
+  const isBlocked = !canAnalyzePlan;
 
   return (
     <div className="space-y-4">
@@ -29,72 +31,96 @@ export default function PlansUpload({
         <div>
           <h2 className="text-2xl font-bold mb-2">Plan Reader</h2>
           <p className="text-gray-600 mb-4">
-            Upload building plans (PDF or image). AI will analyze dimensions and generate a materials list.
+            {isProfessional
+              ? 'Upload building plans (PDF or image). AI will analyze dimensions and generate a materials list.'
+              : 'Plan analysis is a Professional feature. Upgrade to analyze building plans with AI.'}
           </p>
         </div>
 
-        {/* Usage Meter */}
+        {/* Tier Badge */}
         <div className="bg-white rounded-xl shadow-sm p-4 min-w-[200px]">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-700">
-              {userTier === 'pro' ? (
+              {isProfessional ? (
                 <span className="flex items-center gap-1 text-amber-600">
-                  <Crown size={14} /> Pro
+                  <Crown size={14} /> Professional
                 </span>
               ) : (
-                'Basic'
+                <span className="flex items-center gap-1 text-gray-500">
+                  <Lock size={14} /> {tierLimits?.name || 'Free'}
+                </span>
               )}
             </span>
-            <span className="text-sm text-gray-500">
-              {planUsage?.plans || 0} / {plansPerMonth} plans
-            </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all ${
-                usagePercent >= 90 ? 'bg-red-500' : usagePercent >= 70 ? 'bg-amber-500' : 'bg-emerald-500'
-              }`}
-              style={{ width: `${Math.min(usagePercent, 100)}%` }}
-            />
-          </div>
-          <p className="text-xs text-gray-500 mt-1">
-            {plansRemaining} plans remaining ({pagesPerPlan} pages max each)
-          </p>
-          {userTier === 'basic' && (
-            <button className="mt-2 text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1">
-              <Zap size={12} /> Upgrade to Pro (6 plans, 20 pages)
-            </button>
+          {isProfessional ? (
+            <>
+              <p className="text-sm text-gray-600">
+                {planPdfsAllowed} PDFs per quote • {imagesAllowed} images per quote
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                {planAnalysesUsed} plan analyses this month
+              </p>
+            </>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-xs text-gray-500">
+                Plan analysis not available on {tierLimits?.name || 'Free'} tier
+              </p>
+              <button className="w-full text-xs px-3 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition flex items-center justify-center gap-1">
+                <Zap size={12} /> Upgrade to Professional ($79/mo)
+              </button>
+            </div>
           )}
         </div>
       </div>
 
       {/* Upload area */}
       <div className="bg-white rounded-xl shadow overflow-hidden">
-        <div className="p-8 border-2 border-dashed border-emerald-300 bg-emerald-50 text-center">
-          {!planPreview ? (
+        <div className={`p-8 border-2 border-dashed text-center ${
+          isBlocked ? 'border-gray-200 bg-gray-50' : 'border-emerald-300 bg-emerald-50'
+        }`}>
+          {isBlocked ? (
+            // Blocked - not professional tier
+            <div>
+              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock size={28} className="text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">Professional Feature</h3>
+              <p className="text-gray-500 mb-4 max-w-md mx-auto">
+                Plan analysis uses AI to read building plans and automatically generate material estimates.
+                This feature is available on the Professional plan.
+              </p>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 max-w-sm mx-auto">
+                <p className="font-semibold text-amber-800 mb-2">Professional - $79/month</p>
+                <ul className="text-sm text-amber-700 text-left space-y-1">
+                  <li>• 25 AI quotes per month</li>
+                  <li>• 3 PDF plans per quote</li>
+                  <li>• 10 images per quote</li>
+                  <li>• Full branding & Xero export</li>
+                </ul>
+                <button className="mt-3 w-full px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition">
+                  Upgrade Now
+                </button>
+              </div>
+            </div>
+          ) : !planPreview ? (
             <div>
               <div className="text-4xl mb-3">📐</div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Upload your building plan</h3>
               <p className="text-gray-600 mb-2">PNG, JPG, or PDF format</p>
-              <p className="text-sm text-amber-600 mb-4">
-                Max {pagesPerPlan} pages per PDF • {plansRemaining} plans remaining
+              <p className="text-sm text-emerald-600 mb-4">
+                Up to {planPdfsAllowed} PDFs or {imagesAllowed} images per quote
               </p>
-              {isAtLimit ? (
-                <div className="text-red-600 font-medium">
-                  Monthly limit reached. {userTier === 'basic' ? 'Upgrade to Pro for more pages.' : 'Resets next month.'}
-                </div>
-              ) : (
-                <label className="inline-block px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 cursor-pointer font-medium">
-                  <Upload size={18} className="inline mr-2" />
-                  Choose File
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    onChange={onHandlePlanUpload}
-                    className="hidden"
-                  />
-                </label>
-              )}
+              <label className="inline-block px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 cursor-pointer font-medium">
+                <Upload size={18} className="inline mr-2" />
+                Choose File
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={onHandlePlanUpload}
+                  className="hidden"
+                />
+              </label>
             </div>
           ) : (
             <div>
@@ -124,7 +150,7 @@ export default function PlansUpload({
                 </label>
                 <button
                   onClick={onAnalyzePlan}
-                  disabled={planAnalyzing || isAtLimit}
+                  disabled={planAnalyzing}
                   className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {planAnalyzing ? (
@@ -138,11 +164,6 @@ export default function PlansUpload({
                   )}
                 </button>
               </div>
-              {isAtLimit && (
-                <p className="mt-3 text-red-600 text-sm">
-                  Monthly limit reached. {userTier === 'basic' ? 'Upgrade to Pro for more pages.' : 'Resets next month.'}
-                </p>
-              )}
             </div>
           )}
         </div>

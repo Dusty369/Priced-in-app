@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Search, Plus, Package, ChevronDown, Check } from 'lucide-react';
 import { searchMaterials, getMaterialsByCategory, getCategories } from '../lib/materialsLoader';
+import { formatNZD } from '../lib/constants';
 
 export default function AddMaterialModal({ isOpen, onClose, onAddToCart }) {
   const [materials, setMaterials] = useState([]);
@@ -138,7 +139,7 @@ export default function AddMaterialModal({ isOpen, onClose, onAddToCart }) {
                               </div>
                               <div className="flex items-center gap-3">
                                 <div className="text-right">
-                                  <p className="font-semibold text-emerald-600 text-sm">${material.price.toFixed(2)}</p>
+                                  <p className="font-semibold text-emerald-600 text-sm">{formatNZD(material.price)}</p>
                                   <p className="text-xs text-gray-500">/{material.unit}</p>
                                 </div>
                                 <button

@@ -1,6 +1,9 @@
 'use client';
 
-import { MessageSquare, Send, Plus, CheckCircle, AlertTriangle, Search } from 'lucide-react';
+import { useState, lazy, Suspense } from 'react';
+import { MessageSquare, Send, Plus, CheckCircle, AlertTriangle, Search, Zap, Lock, ChevronLeft, FileText } from 'lucide-react';
+
+const DeckTemplate = lazy(() => import('./DeckTemplate'));
 
 export default function AIAssistant({
   showAI,
@@ -11,26 +14,73 @@ export default function AIAssistant({
   onSendMessage,
   onAddMaterialsToQuote,
   onAddLabourToQuote,
-  onSearchMaterial
+  onSearchMaterial,
+  // Tier props
+  userTier = 'free',
+  tierUsage = { aiQuotes: 0 },
+  tierLimits = { aiQuotesPerMonth: 0, name: 'Free' },
+  canUseAI = false
 }) {
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+
   if (!showAI) return null;
+
+  const aiQuotesUsed = tierUsage?.aiQuotes || 0;
+  const aiQuotesLimit = tierLimits?.aiQuotesPerMonth || 0;
+  const usagePercent = aiQuotesLimit > 0 ? (aiQuotesUsed / aiQuotesLimit) * 100 : 100;
+  const isFreeUser = userTier === 'free';
+  const isAtLimit = !canUseAI;
 
   return (
     <div className="bg-white rounded-xl shadow-lg mb-4 overflow-hidden animate-slideIn">
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4">
-        <h2 className="font-bold flex items-center gap-2">
-          <MessageSquare size={20} />
-          AI Assistant
-        </h2>
-        <p className="text-sm text-white/80">Describe your project and I'll help you estimate</p>
-        
-        {chatHistory.length === 0 && (
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="font-bold flex items-center gap-2">
+              <MessageSquare size={20} />
+              AI Assistant
+              {isFreeUser && (
+                <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Free</span>
+              )}
+            </h2>
+            <p className="text-sm text-white/80">
+              {isFreeUser
+                ? 'Upgrade to use AI-powered estimates'
+                : 'Describe your project and I\'ll help you estimate'}
+            </p>
+          </div>
+
+          {/* Usage Meter */}
+          {!isFreeUser && (
+            <div className="text-right min-w-[120px]">
+              <p className="text-xs text-white/80 mb-1">
+                {aiQuotesUsed} / {aiQuotesLimit} AI quotes
+              </p>
+              <div className="w-full bg-white/20 rounded-full h-1.5">
+                <div
+                  className={`h-1.5 rounded-full transition-all ${
+                    usagePercent >= 90 ? 'bg-red-400' : usagePercent >= 70 ? 'bg-amber-400' : 'bg-white'
+                  }`}
+                  style={{ width: `${Math.min(usagePercent, 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Templates & quick prompts */}
+        {!isFreeUser && (
           <div className="mt-3 flex gap-2 flex-wrap">
             <button
-              onClick={() => setChatInput('I need to build a 4m x 3m deck with steps')}
-              className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
+              onClick={() => setSelectedTemplate(selectedTemplate === 'deck' ? null : 'deck')}
+              className={`text-xs px-2.5 py-1.5 rounded border transition ${
+                selectedTemplate === 'deck'
+                  ? 'bg-white text-purple-700 border-white font-medium'
+                  : 'bg-white/20 hover:bg-white/30 border-white/20'
+              }`}
             >
-              🛠️ Deck
+              <FileText size={12} className="inline mr-1" />
+              Deck Template
             </button>
             <button
               onClick={() => setChatInput('Bathroom renovation - 2m x 2m with shower')}
@@ -52,13 +102,71 @@ export default function AIAssistant({
             </button>
           </div>
         )}
+
+        {/* Upgrade prompt for free users */}
+        {isFreeUser && chatHistory.length === 0 && (
+          <div className="mt-3 bg-white/10 rounded-lg p-3">
+            <p className="text-sm mb-2">
+              <Lock size={14} className="inline mr-1" />
+              AI quotes are available on paid plans
+            </p>
+            <div className="flex gap-2 text-xs">
+              <button className="px-3 py-1.5 bg-white text-purple-600 rounded font-medium hover:bg-white/90 transition">
+                Starter - $29/mo (5 AI quotes)
+              </button>
+              <button className="px-3 py-1.5 bg-amber-400 text-amber-900 rounded font-medium hover:bg-amber-300 transition">
+                Pro - $79/mo (25 AI quotes)
+              </button>
+            </div>
+          </div>
+        )}
       </div>
       
       <div className="h-96 overflow-y-auto p-4 space-y-3">
-        {chatHistory.length === 0 && (
+        {/* Deck Template Panel */}
+        {selectedTemplate === 'deck' && !isFreeUser && (
+          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
+                <FileText size={16} className="text-emerald-600" />
+                Deck Estimate Template
+              </h3>
+              <button
+                onClick={() => setSelectedTemplate(null)}
+                className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <ChevronLeft size={14} /> Back to chat
+              </button>
+            </div>
+            <Suspense fallback={<div className="py-8 text-center text-gray-500 text-sm">Loading template...</div>}>
+              <DeckTemplate
+                onGeneratePrompt={(prompt) => {
+                  setChatInput(prompt);
+                  setSelectedTemplate(null);
+                }}
+              />
+            </Suspense>
+          </div>
+        )}
+
+        {chatHistory.length === 0 && !isFreeUser && !selectedTemplate && (
           <p className="text-gray-500 text-center py-8">
             👋 Try: "I need to build a 4m x 3m deck" or "Materials for a bathroom renovation"
           </p>
+        )}
+        {chatHistory.length === 0 && isFreeUser && (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock size={28} className="text-purple-500" />
+            </div>
+            <p className="text-gray-700 font-medium mb-2">AI Assistant is a premium feature</p>
+            <p className="text-gray-500 text-sm mb-4">
+              Get instant material estimates, labour calculations, and NZ Building Code compliance checks.
+            </p>
+            <p className="text-sm text-gray-400">
+              You can still browse 13,500+ materials and create manual quotes on the Free plan.
+            </p>
+          </div>
         )}
         {chatHistory.map((msg, idx) => (
           <div key={idx}>
@@ -167,23 +275,44 @@ export default function AIAssistant({
         )}
       </div>
       
-      <div className="p-4 border-t flex gap-2">
-        <input
-          type="text"
-          value={chatInput}
-          onChange={(e) => setChatInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !aiLoading && chatInput.trim() && onSendMessage()}
-          placeholder="Describe your project..."
-          className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-          disabled={aiLoading}
-        />
-        <button
-          onClick={onSendMessage}
-          disabled={aiLoading || !chatInput.trim()}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition active:scale-95"
-        >
-          <Send size={20} />
-        </button>
+      <div className="p-4 border-t">
+        {/* Show upgrade prompt when at limit */}
+        {isAtLimit && !isFreeUser && (
+          <div className="mb-3 bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center justify-between">
+            <p className="text-sm text-amber-800">
+              <AlertTriangle size={14} className="inline mr-1" />
+              You've used all your AI quotes for this month.
+            </p>
+            <button className="text-xs px-3 py-1 bg-amber-600 text-white rounded font-medium hover:bg-amber-700 transition">
+              Upgrade
+            </button>
+          </div>
+        )}
+
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !aiLoading && !isAtLimit && chatInput.trim() && onSendMessage()}
+            placeholder={isAtLimit ? 'AI quota reached - upgrade to continue' : 'Describe your project...'}
+            className={`flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${
+              isAtLimit ? 'bg-gray-100 text-gray-400' : ''
+            }`}
+            disabled={aiLoading || isAtLimit}
+          />
+          <button
+            onClick={onSendMessage}
+            disabled={aiLoading || !chatInput.trim() || isAtLimit}
+            className={`px-4 py-2 rounded-lg transition active:scale-95 ${
+              isAtLimit
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed'
+            }`}
+          >
+            {isAtLimit ? <Lock size={20} /> : <Send size={20} />}
+          </button>
+        </div>
       </div>
     </div>
   );

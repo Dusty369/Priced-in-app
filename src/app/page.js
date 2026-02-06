@@ -30,7 +30,8 @@ import {
   MATERIAL_PRESETS_KEY,
   PLAN_USAGE_KEY,
   USER_TIER_KEY,
-  PLAN_LIMITS
+  TIER_USAGE_KEY,
+  TIER_LIMITS
 } from '../lib/constants';
 
 
@@ -54,7 +55,7 @@ export default function PricedInApp() {
   // Page state
   const [page, setPage] = useState('projects');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showAI, setShowAI] = useState(true);
+  const [showAI, setShowAI] = useState(false); // AI only shown on quote page
 
   // Cart hook
   const { cart, setCart, addToCart, updateQty, removeFromCart, addItemsToCart, clearCart } = useCart();
@@ -84,12 +85,18 @@ export default function PricedInApp() {
     currentProjectName,
     projectNotes,
     setProjectNotes,
+    clientName,
+    setClientName,
+    clientAddress,
+    setClientAddress,
     showSaveDialog,
     saveProjectName,
     setSaveProjectName,
     saveProject,
     loadProject,
     deleteProject,
+    duplicateProject,
+    updateProjectStatus,
     newProject,
     openSaveDialog,
     closeSaveDialog
@@ -118,8 +125,14 @@ export default function PricedInApp() {
   const [showCompanySettings, setShowCompanySettings] = useState(false);
   const [companyInfo, setCompanyInfo] = useState(DEFAULT_COMPANY_INFO);
   const [materialPresets, setMaterialPresets] = useState([]);
-  const [userTier, setUserTier] = useState('basic');
+  const [userTier, setUserTier] = useState('free');
   const [planUsage, setPlanUsage] = useState({ month: new Date().toISOString().slice(0, 7), plans: 0 });
+  const [tierUsage, setTierUsage] = useState({
+    month: new Date().toISOString().slice(0, 7),
+    aiQuotes: 0,
+    manualQuotes: 0,
+    planAnalyses: 0
+  });
   const [pdfGenerating, setPdfGenerating] = useState(false);
   const [showPriceComparison, setShowPriceComparison] = useState(null);
   const [showAddMaterial, setShowAddMaterial] = useState(false);
@@ -159,6 +172,19 @@ export default function PricedInApp() {
         setPlanUsage(usage);
       }
     }
+
+    // Load tier usage
+    const savedTierUsage = localStorage.getItem(TIER_USAGE_KEY);
+    if (savedTierUsage) {
+      const usage = JSON.parse(savedTierUsage);
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      // Reset if new month
+      if (usage.month !== currentMonth) {
+        setTierUsage({ month: currentMonth, aiQuotes: 0, manualQuotes: 0, planAnalyses: 0 });
+      } else {
+        setTierUsage(usage);
+      }
+    }
   }, []);
 
   // Persist labour rates
@@ -185,6 +211,43 @@ export default function PricedInApp() {
   useEffect(() => {
     localStorage.setItem(USER_TIER_KEY, userTier);
   }, [userTier]);
+
+  // Persist tier usage
+  useEffect(() => {
+    localStorage.setItem(TIER_USAGE_KEY, JSON.stringify(tierUsage));
+  }, [tierUsage]);
+
+  // Get current tier limits
+  const currentTierLimits = TIER_LIMITS[userTier] || TIER_LIMITS.free;
+
+  // Tier enforcement functions
+  const canUseAI = useCallback(() => {
+    if (currentTierLimits.aiQuotesPerMonth === 0) return false;
+    return tierUsage.aiQuotes < currentTierLimits.aiQuotesPerMonth;
+  }, [currentTierLimits, tierUsage.aiQuotes]);
+
+  const canSaveQuote = useCallback(() => {
+    if (currentTierLimits.manualQuotesPerMonth === Infinity) return true;
+    return tierUsage.manualQuotes < currentTierLimits.manualQuotesPerMonth;
+  }, [currentTierLimits, tierUsage.manualQuotes]);
+
+  const canAnalyzePlan = useCallback(() => {
+    return currentTierLimits.planPdfsPerQuote > 0;
+  }, [currentTierLimits]);
+
+  const incrementAIUsage = useCallback(() => {
+    setTierUsage(prev => ({
+      ...prev,
+      aiQuotes: prev.aiQuotes + 1
+    }));
+  }, []);
+
+  const incrementManualQuoteUsage = useCallback(() => {
+    setTierUsage(prev => ({
+      ...prev,
+      manualQuotes: prev.manualQuotes + 1
+    }));
+  }, []);
 
   // Clear materialSearch when leaving materials page
   useEffect(() => {
@@ -287,7 +350,13 @@ export default function PricedInApp() {
     onNavigateToQuote: () => {},  // Don't auto-navigate - we navigate after review confirmation
     allMaterials,
     materialWordIndex,
-    onSetAiCalculations: setAiCalculations
+    onSetAiCalculations: setAiCalculations,
+    // Tier enforcement
+    canUseAI,
+    onAIUsed: incrementAIUsage,
+    userTier,
+    tierUsage,
+    tierLimits: currentTierLimits
   });
 
   // Calculations (memoized to prevent recalculation on every render)
@@ -404,7 +473,9 @@ export default function PricedInApp() {
         projectNotes,
         wastage,
         margin,
-        gst
+        gst,
+        // Add watermark for free tier
+        watermark: currentTierLimits.hasWatermark
       });
     } catch (error) {
       console.error('PDF generation failed:', error);
@@ -436,7 +507,8 @@ export default function PricedInApp() {
       />
 
       <main className="max-w-7xl mx-auto p-4">
-        {showAI && (
+        {/* AI Assistant - only show on Quote page */}
+        {page === 'quote' && showAI && (
           <AIAssistant
             showAI={showAI}
             chatHistory={chatHistory}
@@ -450,6 +522,11 @@ export default function PricedInApp() {
               setMaterialSearch(term);
               setPage('materials');
             }}
+            // Tier props
+            userTier={userTier}
+            tierUsage={tierUsage}
+            tierLimits={currentTierLimits}
+            canUseAI={canUseAI()}
           />
         )}
 
@@ -459,6 +536,10 @@ export default function PricedInApp() {
               isOpen={showSaveDialog}
               saveProjectName={saveProjectName}
               setSaveProjectName={setSaveProjectName}
+              clientName={clientName}
+              setClientName={setClientName}
+              clientAddress={clientAddress}
+              setClientAddress={setClientAddress}
               projectNotes={projectNotes}
               setProjectNotes={setProjectNotes}
               onSave={() => saveProject(saveProjectName)}
@@ -569,6 +650,11 @@ export default function PricedInApp() {
             onSavePreset={savePreset}
             onLoadPreset={loadPreset}
             onDeletePreset={deletePreset}
+            // Tier props
+            userTier={userTier}
+            tierLimits={currentTierLimits}
+            tierUsage={tierUsage}
+            canSaveQuote={canSaveQuote()}
           />
         )}
 
@@ -578,6 +664,8 @@ export default function PricedInApp() {
             onNewProject={newProject}
             onLoadProject={loadProject}
             onDeleteProject={deleteProject}
+            onDuplicateProject={duplicateProject}
+            onUpdateProjectStatus={updateProjectStatus}
             labourRates={labourRates}
           />
         )}
@@ -591,11 +679,11 @@ export default function PricedInApp() {
               chatHistory={chatHistory}
               cart={cart}
               labourItems={labourItems}
-              planUsage={planUsage}
+              // Tier props
               userTier={userTier}
-              plansPerMonth={PLAN_LIMITS[userTier]?.plansPerMonth || 4}
-              pagesPerPlan={PLAN_LIMITS[userTier]?.pagesPerPlan || 10}
-              plansRemaining={Math.max(0, (PLAN_LIMITS[userTier]?.plansPerMonth || 4) - (planUsage?.plans || 0))}
+              tierLimits={currentTierLimits}
+              tierUsage={tierUsage}
+              canAnalyzePlan={canAnalyzePlan()}
               onHandlePlanUpload={(e) => {
                 const file = e.target.files?.[0];
                 if (!file) return;
@@ -610,16 +698,15 @@ export default function PricedInApp() {
               }}
               onAnalyzePlan={async () => {
                 if (!planFile || !planPreview) return;
-                const plansLimit = PLAN_LIMITS[userTier]?.plansPerMonth || 4;
-                const used = planUsage?.plans || 0;
-                if (used >= plansLimit) {
-                  alert(`Monthly plan limit reached (${plansLimit} plans). ${userTier === 'basic' ? 'Upgrade to Pro for more.' : 'Resets next month.'}`);
+                // Check tier allows plan analysis
+                if (!canAnalyzePlan()) {
+                  alert('Plan analysis is only available on Professional tier. Upgrade to analyze building plans.');
                   return;
                 }
                 setPlanAnalyzing(true);
-                setPlanUsage(prev => ({
+                setTierUsage(prev => ({
                   ...prev,
-                  plans: (prev?.plans || 0) + 1
+                  planAnalyses: (prev.planAnalyses || 0) + 1
                 }));
                 // Use sendAIMessage with plan mode
                 await sendAIMessage('Analyze this building plan and estimate materials needed', 'plan');

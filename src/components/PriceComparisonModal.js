@@ -2,6 +2,7 @@
 
 import { Wrench } from 'lucide-react';
 import materials from '../data/materials.json';
+import { formatNZD } from '../lib/constants';
 
 export default function PriceComparisonModal({ 
   isOpen, 
@@ -49,9 +50,9 @@ export default function PriceComparisonModal({
                   )}
                 </p>
                 <p className="text-sm text-gray-500">
-                  ${option.price.toFixed(2)}{option.id !== itemId && (
+                  {formatNZD(option.price)}{option.id !== itemId && (
                     <span className="ml-2 text-emerald-600 font-medium">
-                      Save ${(currentItem?.price ? (currentItem.price - option.price) * currentItem.qty : 0).toFixed(2)}
+                      Save {formatNZD(currentItem?.price ? (currentItem.price - option.price) * currentItem.qty : 0)}
                     </span>
                   )}
                 </p>

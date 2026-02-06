@@ -4,8 +4,9 @@ import { useState } from 'react';
 import {
   Save, Plus, Settings, Download, Building2, Package, Users,
   Calculator, DollarSign, Trash2, Minus, Edit3, FileText,
-  TrendingUp, Search, Clock, StickyNote, FolderPlus, ChevronDown
+  TrendingUp, Search, Clock, StickyNote, FolderPlus, ChevronDown, Lock
 } from 'lucide-react';
+import { formatNZD, LABOUR_PRESETS } from '../lib/constants';
 
 export default function QuotePage({
   cart,
@@ -42,8 +43,15 @@ export default function QuotePage({
   materialPresets,
   onSavePreset,
   onLoadPreset,
-  onDeletePreset
+  onDeletePreset,
+  // Tier props
+  userTier = 'free',
+  tierLimits = {},
+  tierUsage = {},
+  canSaveQuote = true
 }) {
+  const hasXeroExport = tierLimits?.hasXeroExport ?? false;
+  const hasBranding = tierLimits?.hasBranding ?? false;
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showCalcs, setShowCalcs] = useState(false);
   const [showRates, setShowRates] = useState(false);
@@ -60,9 +68,9 @@ export default function QuotePage({
   // Copy materials list to clipboard
   const copyMaterialsList = () => {
     const list = cart.map(item =>
-      `${item.qty} × ${item.name} @ $${item.price.toFixed(2)}/${item.unit}`
+      `${item.qty} × ${item.name} @ ${formatNZD(item.price)}/${item.unit}`
     ).join('\n');
-    const total = `\nMaterials Total: $${materialsWithWastage.toFixed(2)} (inc ${wastage}% wastage)`;
+    const total = `\nMaterials Total: ${formatNZD(materialsWithWastage)} (inc ${wastage}% wastage)`;
     navigator.clipboard.writeText(list + total);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -173,12 +181,22 @@ export default function QuotePage({
               >
                 <Download size={18} /> {pdfGenerating ? 'Generating...' : 'PDF'}
               </button>
-              <button
-                onClick={onExportXero}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-150 font-medium"
-              >
-                📊 Xero
-              </button>
+              {hasXeroExport ? (
+                <button
+                  onClick={onExportXero}
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-150 font-medium"
+                >
+                  📊 Xero
+                </button>
+              ) : (
+                <button
+                  disabled
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 border border-gray-200 text-gray-400 rounded-lg cursor-not-allowed font-medium"
+                  title="Xero export available on Starter and Professional plans"
+                >
+                  <Lock size={14} /> Xero
+                </button>
+              )}
             </>
           )}
         </div>
@@ -193,7 +211,7 @@ export default function QuotePage({
             </div>
             <div>
               <p className="text-xs text-gray-500">Materials</p>
-              <p className="text-lg font-bold text-gray-900">${materialsWithWastage.toLocaleString('en-NZ', { maximumFractionDigits: 0 })}</p>
+              <p className="text-lg font-bold text-gray-900">{formatNZD(materialsWithWastage)}</p>
             </div>
           </div>
         </div>
@@ -205,7 +223,7 @@ export default function QuotePage({
             </div>
             <div>
               <p className="text-xs text-gray-500">Labour</p>
-              <p className="text-lg font-bold text-gray-900">${labourSubtotal.toLocaleString('en-NZ', { maximumFractionDigits: 0 })}</p>
+              <p className="text-lg font-bold text-gray-900">{formatNZD(labourSubtotal)}</p>
             </div>
           </div>
         </div>
@@ -217,7 +235,7 @@ export default function QuotePage({
             </div>
             <div>
               <p className="text-xs text-gray-500">Margin ({margin}%)</p>
-              <p className="text-lg font-bold text-gray-900">${marginAmount.toLocaleString('en-NZ', { maximumFractionDigits: 0 })}</p>
+              <p className="text-lg font-bold text-gray-900">{formatNZD(marginAmount)}</p>
             </div>
           </div>
         </div>
@@ -229,7 +247,7 @@ export default function QuotePage({
             </div>
             <div>
               <p className="text-xs text-emerald-100">Total Quote</p>
-              <p className="text-lg font-bold text-white">${grandTotal.toLocaleString('en-NZ', { maximumFractionDigits: 0 })}</p>
+              <p className="text-lg font-bold text-white">{formatNZD(grandTotal)}</p>
             </div>
           </div>
         </div>
@@ -420,7 +438,7 @@ export default function QuotePage({
             >
               <Plus size={16} /> Add
             </button>
-            <span className="text-blue-600 font-semibold">${materialsWithWastage.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+            <span className="text-blue-600 font-semibold">{formatNZD(materialsWithWastage)}</span>
           </div>
         </div>
 
@@ -456,7 +474,7 @@ export default function QuotePage({
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 truncate">{item.name}</p>
                     <p className="text-sm text-gray-500">
-                      ${item.price.toFixed(2)} / {item.unit}
+                      {formatNZD(item.price)} / {item.unit}
                       <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
                         'bg-orange-50 text-orange-700'
                       }`}>
@@ -493,7 +511,7 @@ export default function QuotePage({
                   </div>
 
                   <div className="text-right w-24">
-                    <p className="font-semibold text-gray-900">${(item.price * item.qty).toFixed(2)}</p>
+                    <p className="font-semibold text-gray-900">{formatNZD(item.price * item.qty)}</p>
                   </div>
 
                   <button
@@ -586,7 +604,7 @@ export default function QuotePage({
               >
                 <Settings size={14} /> Rates {showRates ? '▲' : '▼'}
               </button>
-              <span className="text-purple-600 font-semibold">${labourSubtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+              <span className="text-purple-600 font-semibold">{formatNZD(labourSubtotal)}</span>
             </div>
           </div>
 
@@ -621,7 +639,7 @@ export default function QuotePage({
                         onClick={() => setEditingRate(role)}
                         className="text-left px-2 py-1.5 text-sm font-medium bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
                       >
-                        ${rate}/hr
+                        {formatNZD(rate)}/hr
                       </button>
                     )}
                   </div>
@@ -633,20 +651,13 @@ export default function QuotePage({
 
           {/* Quick Add Buttons */}
           <div className="mt-4 flex flex-wrap gap-2">
-            {[
-              { role: 'builder', label: 'Builder', hours: 8 },
-              { role: 'labourer', label: 'Labourer', hours: 8 },
-              { role: 'electrician', label: 'Sparky', hours: 4 },
-              { role: 'plumber', label: 'Plumber', hours: 4 },
-              { role: 'tiler', label: 'Tiler', hours: 8 },
-              { role: 'plasterer', label: 'Plasterer', hours: 4 },
-            ].map(({ role, label, hours }) => (
+            {LABOUR_PRESETS.map((preset, idx) => (
               <button
-                key={role}
-                onClick={() => onAddLabourItem({ role, hours, description: `${label} - ${hours}hrs` })}
+                key={idx}
+                onClick={() => onAddLabourItem(preset)}
                 className="px-3 py-1.5 text-xs font-medium bg-purple-50 text-purple-700 rounded-full hover:bg-purple-100 transition-colors"
               >
-                + {label}
+                + {preset.role.charAt(0).toUpperCase() + preset.role.slice(1)}: {preset.description} ({preset.hours}h)
               </button>
             ))}
           </div>
@@ -667,7 +678,7 @@ export default function QuotePage({
                 </span>
               </div>
               <div className="text-gray-500">
-                Avg ${(labourSubtotal / Math.max(1, labourItems.reduce((s, i) => s + i.hours, 0))).toFixed(0)}/hr blended
+                Avg {formatNZD(labourSubtotal / Math.max(1, labourItems.reduce((s, i) => s + i.hours, 0)))}/hr blended
               </div>
             </div>
           )}
@@ -706,7 +717,7 @@ export default function QuotePage({
                         <option value="labourer">Labourer</option>
                         <option value="apprentice">Apprentice</option>
                       </select>
-                      <span className="text-xs text-gray-400">@${rate}/hr</span>
+                      <span className="text-xs text-gray-400">@{formatNZD(rate)}/hr</span>
                     </div>
                   </div>
 
@@ -735,7 +746,7 @@ export default function QuotePage({
 
                   {/* Cost */}
                   <div className="text-right w-20">
-                    <p className="font-semibold text-gray-900 text-sm">${cost.toFixed(0)}</p>
+                    <p className="font-semibold text-gray-900 text-sm">{formatNZD(cost)}</p>
                   </div>
 
                   {/* Delete */}
@@ -780,12 +791,12 @@ export default function QuotePage({
               <div className="pb-2.5 border-b border-gray-100">
                 <div className="flex justify-between text-gray-700 mb-1">
                   <span>Materials Subtotal</span>
-                  <span className="font-medium">${materialsSubtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+                  <span className="font-medium">{formatNZD(materialsSubtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-500 text-sm">
                   <span>+ Wastage ({wastage}%)</span>
                   <span className="text-amber-600">
-                    ${(materialsWithWastage - materialsSubtotal).toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
+                    {formatNZD(materialsWithWastage - materialsSubtotal)}
                   </span>
                 </div>
               </div>
@@ -795,27 +806,27 @@ export default function QuotePage({
             {labourItems.length > 0 && (
               <div className="flex justify-between text-gray-700 pb-2.5 border-b border-gray-100">
                 <span>Labour ({labourItems.reduce((s, i) => s + i.hours, 0)} hrs)</span>
-                <span className="font-medium">${labourSubtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+                <span className="font-medium">{formatNZD(labourSubtotal)}</span>
               </div>
             )}
 
             {/* Subtotal */}
             <div className="flex justify-between font-semibold text-gray-900 pt-1">
               <span>Subtotal</span>
-              <span>${subtotalBeforeMargin.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+              <span>{formatNZD(subtotalBeforeMargin)}</span>
             </div>
 
             {/* Margin */}
             <div className="flex justify-between text-gray-600 text-sm">
               <span>+ Margin ({margin}%)</span>
-              <span className="text-emerald-600">${marginAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+              <span className="text-emerald-600">{formatNZD(marginAmount)}</span>
             </div>
 
             {/* Contingency */}
             {showAdvanced && contingency > 0 && (
               <div className="flex justify-between text-gray-600 text-sm">
                 <span>+ Contingency ({contingency}%)</span>
-                <span className="text-orange-600">${contingencyAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+                <span className="text-orange-600">{formatNZD(contingencyAmount)}</span>
               </div>
             )}
 
@@ -823,7 +834,7 @@ export default function QuotePage({
             {showAdvanced && discount > 0 && (
               <div className="flex justify-between text-gray-600 text-sm">
                 <span>- Discount ({discount}%)</span>
-                <span className="text-red-600">-${discountAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+                <span className="text-red-600">-{formatNZD(discountAmount)}</span>
               </div>
             )}
 
@@ -831,7 +842,7 @@ export default function QuotePage({
             {gst && (
               <div className="flex justify-between text-gray-600 text-sm">
                 <span>+ GST (15%)</span>
-                <span className="text-purple-600">${gstAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</span>
+                <span className="text-purple-600">{formatNZD(gstAmount)}</span>
               </div>
             )}
 
@@ -840,7 +851,7 @@ export default function QuotePage({
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold text-gray-900">TOTAL QUOTE</span>
                 <span className="text-2xl font-bold text-emerald-600">
-                  ${grandTotal.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
+                  {formatNZD(grandTotal)}
                 </span>
               </div>
             </div>
@@ -852,7 +863,7 @@ export default function QuotePage({
                   <span className="text-sm font-medium text-gray-700">Your Profit</span>
                   <div className="text-right">
                     <span className="text-lg font-bold text-emerald-600">
-                      ${profit.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
+                      {formatNZD(profit)}
                     </span>
                     <span className="text-xs text-gray-500 ml-2">
                       ({profitMargin.toFixed(1)}% of quote)
@@ -860,8 +871,8 @@ export default function QuotePage({
                   </div>
                 </div>
                 <div className="text-xs text-gray-500">
-                  Cost: ${totalCost.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
-                  {gst && ` + GST = $${(totalCost * 1.15).toLocaleString('en-NZ', { minimumFractionDigits: 2 })}`}
+                  Cost: {formatNZD(totalCost)}
+                  {gst && ` + GST = ${formatNZD(totalCost * 1.15)}`}
                 </div>
 
                 {/* Target Price Calculator */}

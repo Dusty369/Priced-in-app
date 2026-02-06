@@ -2,6 +2,7 @@
 
 import { Package, Plus, Search } from 'lucide-react';
 import materials from '../data/materials.json';
+import { formatNZD } from '../lib/constants';
 
 export default function MaterialsList({
   search,
@@ -138,7 +139,7 @@ export default function MaterialsList({
                         </div>
                         <div className="flex items-center gap-3 ml-4 flex-shrink-0">
                           <div className="text-right">
-                            <p className="font-bold text-emerald-600">${material.price.toFixed(2)}</p>
+                            <p className="font-bold text-emerald-600">{formatNZD(material.price)}</p>
                             <p className="text-xs text-gray-500">/{material.unit}</p>
                           </div>
                           <button
