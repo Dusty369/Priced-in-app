@@ -122,7 +122,7 @@ export default function AIAssistant({
         )}
       </div>
       
-      <div className="h-96 overflow-y-auto p-4 space-y-3">
+      <div className="h-64 sm:h-96 overflow-y-auto p-3 sm:p-4 space-y-3">
         {/* Deck Template Panel */}
         {selectedTemplate === 'deck' && !isFreeUser && (
           <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
@@ -172,7 +172,7 @@ export default function AIAssistant({
           <div key={idx}>
             {/* Warning message for unmatched materials */}
             {msg.type === 'warning' && msg.unmatched ? (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mr-8 animate-fadeIn">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4 mr-2 sm:mr-8 animate-fadeIn">
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={20} />
                   <div className="flex-1">
@@ -227,10 +227,10 @@ export default function AIAssistant({
               /* Regular message (user/assistant/error) */
               <div className={`p-3 rounded-lg animate-fadeIn ${
                 msg.role === 'user'
-                  ? 'bg-emerald-100 ml-8'
+                  ? 'bg-emerald-100 ml-4 sm:ml-8'
                   : msg.type === 'error'
-                  ? 'bg-red-100 mr-8'
-                  : 'bg-gray-100 mr-8'
+                  ? 'bg-red-100 mr-4 sm:mr-8'
+                  : 'bg-gray-100 mr-4 sm:mr-8'
               }`}>
                 <div className="text-sm whitespace-pre-wrap">
                   {msg.content.split(/(\*\*[^*]+\*\*)/).map((part, i) => {
@@ -245,7 +245,7 @@ export default function AIAssistant({
 
             {/* Add to Quote buttons if AI response has parsed data */}
             {msg.role === 'assistant' && msg.parsed && !msg.added && (
-              <div className="mt-2 mr-8 flex gap-2 justify-end">
+              <div className="mt-2 mr-2 sm:mr-8 flex gap-2 justify-end">
                 <button
                   onClick={() => {
                     onAddMaterialsToQuote(msg.parsed.materials, idx);
@@ -260,7 +260,7 @@ export default function AIAssistant({
 
             {/* Show confirmation if added */}
             {msg.role === 'assistant' && msg.added && (
-              <div className="mt-2 mr-8 flex justify-end">
+              <div className="mt-2 mr-2 sm:mr-8 flex justify-end">
                 <div className="flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg font-medium">
                   <CheckCircle size={18} /> Added to Quote!
                 </div>
@@ -275,7 +275,7 @@ export default function AIAssistant({
         )}
       </div>
       
-      <div className="p-4 border-t">
+      <div className="p-3 sm:p-4 border-t">
         {/* Show upgrade prompt when at limit */}
         {isAtLimit && !isFreeUser && (
           <div className="mb-3 bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center justify-between">

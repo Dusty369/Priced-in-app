@@ -22,13 +22,13 @@ export const TIER_LIMITS = {
   free: {
     name: 'Free',
     price: 0,
-    aiQuotesPerMonth: 0,
-    manualQuotesPerMonth: 3,
-    planPdfsPerQuote: 0,
-    imagesPerQuote: 0,
-    hasBranding: false,
-    hasWatermark: true,
-    hasXeroExport: false
+    aiQuotesPerMonth: Infinity,
+    manualQuotesPerMonth: Infinity,
+    planPdfsPerQuote: 10,
+    imagesPerQuote: 10,
+    hasBranding: true,
+    hasWatermark: false,
+    hasXeroExport: true
   },
   starter: {
     name: 'Starter',

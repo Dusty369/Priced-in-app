@@ -211,67 +211,67 @@ export default function Dashboard({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Projects Dashboard</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Projects Dashboard</h1>
           <p className="text-gray-500 text-sm mt-1">Manage your quotes and track project progress</p>
         </div>
         <button
           onClick={onNewProject}
-          className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium shadow-sm transition-all"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium shadow-sm transition-all w-full sm:w-auto"
         >
           <Plus size={20} /> New Project
         </button>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center">
-              <FolderOpen size={22} className="text-emerald-600" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        <div className="bg-white rounded-xl p-3 sm:p-5 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+              <FolderOpen size={20} className="text-emerald-600" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.activeCount}</p>
-              <p className="text-sm text-gray-500">Active Projects</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.activeCount}</p>
+              <p className="text-xs sm:text-sm text-gray-500">Active Projects</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center">
-              <DollarSign size={22} className="text-blue-600" />
+        <div className="bg-white rounded-xl p-3 sm:p-5 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <DollarSign size={20} className="text-blue-600" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="min-w-0">
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">
                 {formatNZD(stats.pipelineValue)}
               </p>
-              <p className="text-sm text-gray-500">Pipeline Value</p>
+              <p className="text-xs sm:text-sm text-gray-500">Pipeline Value</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center">
-              <FileText size={22} className="text-amber-600" />
+        <div className="bg-white rounded-xl p-3 sm:p-5 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+              <FileText size={20} className="text-amber-600" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.pendingQuotes}</p>
-              <p className="text-sm text-gray-500">Pending Quotes</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.pendingQuotes}</p>
+              <p className="text-xs sm:text-sm text-gray-500">Pending Quotes</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center">
-              <Award size={22} className="text-green-600" />
+        <div className="bg-white rounded-xl p-3 sm:p-5 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+              <Award size={20} className="text-green-600" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.wonThisMonth}</p>
-              <p className="text-sm text-gray-500">Won This Month</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.wonThisMonth}</p>
+              <p className="text-xs sm:text-sm text-gray-500">Won This Month</p>
             </div>
           </div>
         </div>
@@ -300,7 +300,7 @@ export default function Dashboard({
       {/* Filter & Search Bar */}
       <div className="bg-white rounded-xl shadow-sm p-4">
         {/* Status Tabs */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-1 -mx-1 px-1">
           {[
             { value: 'all', label: 'All', count: projects.length },
             { value: 'draft', label: 'Draft', count: projects.filter(p => (p.status || 'draft') === 'draft').length },
@@ -312,7 +312,7 @@ export default function Dashboard({
             <button
               key={tab.value}
               onClick={() => setStatusFilter(tab.value)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 statusFilter === tab.value
                   ? 'bg-emerald-600 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -331,7 +331,7 @@ export default function Dashboard({
         </div>
 
         {/* Search & Sort */}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <div className="flex-1 relative">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
@@ -372,16 +372,16 @@ export default function Dashboard({
                 key={project.id}
                 className="bg-white rounded-xl shadow-sm border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all duration-150 overflow-hidden"
               >
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-4">
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-start justify-between gap-3 sm:gap-4">
                     {/* Left: Project Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-2xl">{projectType.icon}</span>
+                      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                        <span className="text-xl sm:text-2xl">{projectType.icon}</span>
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold text-gray-900 truncate">{project.name}</h3>
+                          <h3 className="font-semibold text-gray-900 truncate text-sm sm:text-base">{project.name}</h3>
                           {project.clientName && (
-                            <p className="text-sm text-gray-500 truncate">{project.clientName}</p>
+                            <p className="text-xs sm:text-sm text-gray-500 truncate">{project.clientName}</p>
                           )}
                         </div>
                       </div>

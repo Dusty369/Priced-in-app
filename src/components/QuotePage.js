@@ -111,7 +111,7 @@ export default function QuotePage({
   return (
     <div className="space-y-5">
       {/* Action Bar */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
+      <div className="bg-white rounded-xl shadow-sm p-3 sm:p-4">
         <div className="flex flex-wrap gap-2">
           {currentProjectId ? (
             <>
@@ -203,51 +203,51 @@ export default function QuotePage({
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <Package size={20} className="text-blue-600" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+        <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <Package size={18} className="text-blue-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs text-gray-500">Materials</p>
-              <p className="text-lg font-bold text-gray-900">{formatNZD(materialsWithWastage)}</p>
+              <p className="text-sm sm:text-lg font-bold text-gray-900 truncate">{formatNZD(materialsWithWastage)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-              <Users size={20} className="text-purple-600" />
+        <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+              <Users size={18} className="text-purple-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs text-gray-500">Labour</p>
-              <p className="text-lg font-bold text-gray-900">{formatNZD(labourSubtotal)}</p>
+              <p className="text-sm sm:text-lg font-bold text-gray-900 truncate">{formatNZD(labourSubtotal)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-              <TrendingUp size={20} className="text-emerald-600" />
+        <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+              <TrendingUp size={18} className="text-emerald-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs text-gray-500">Margin ({margin}%)</p>
-              <p className="text-lg font-bold text-gray-900">{formatNZD(marginAmount)}</p>
+              <p className="text-sm sm:text-lg font-bold text-gray-900 truncate">{formatNZD(marginAmount)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-emerald-600 rounded-xl p-4 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-              <DollarSign size={20} className="text-white" />
+        <div className="bg-emerald-600 rounded-xl p-3 sm:p-4 shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+              <DollarSign size={18} className="text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs text-emerald-100">Total Quote</p>
-              <p className="text-lg font-bold text-white">{formatNZD(grandTotal)}</p>
+              <p className="text-sm sm:text-lg font-bold text-white truncate">{formatNZD(grandTotal)}</p>
             </div>
           </div>
         </div>
@@ -349,14 +349,16 @@ export default function QuotePage({
 
       {/* Materials Section */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-            <Package size={18} className="text-blue-600" />
-            Materials
-            <span className="text-sm font-normal text-gray-500">({cart.length})</span>
-          </h2>
-          <div className="flex items-center gap-2">
-            {/* Presets Dropdown */}
+        <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Package size={18} className="text-blue-600" />
+              Materials
+              <span className="text-sm font-normal text-gray-500">({cart.length})</span>
+              <span className="text-blue-600 font-semibold ml-auto sm:hidden">{formatNZD(materialsWithWastage)}</span>
+            </h2>
+            <div className="flex items-center gap-2 overflow-x-auto">
+              {/* Presets Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setShowPresets(!showPresets)}
@@ -438,7 +440,8 @@ export default function QuotePage({
             >
               <Plus size={16} /> Add
             </button>
-            <span className="text-blue-600 font-semibold">{formatNZD(materialsWithWastage)}</span>
+            <span className="hidden sm:inline text-blue-600 font-semibold">{formatNZD(materialsWithWastage)}</span>
+            </div>
           </div>
         </div>
 
@@ -470,73 +473,123 @@ export default function QuotePage({
           <div className="divide-y divide-gray-100">
             {cart.map(item => (
               <div key={item.id} className="hover:bg-gray-50 transition-colors duration-150">
-                <div className="px-5 py-4 flex items-center gap-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{item.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {formatNZD(item.price)} / {item.unit}
-                      <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
-                        'bg-orange-50 text-orange-700'
-                      }`}>
-                        Carters
-                      </span>
-                      {item.itemNote && (
-                        <span className="ml-2 text-xs text-amber-600">
-                          Has note
+                <div className="px-4 sm:px-5 py-3 sm:py-4">
+                  {/* Desktop: single row */}
+                  <div className="hidden sm:flex items-center gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{item.name}</p>
+                      <p className="text-sm text-gray-500">
+                        {formatNZD(item.price)} / {item.unit}
+                        <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-orange-50 text-orange-700">
+                          Carters
                         </span>
-                      )}
+                        {item.itemNote && (
+                          <span className="ml-2 text-xs text-amber-600">Has note</span>
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1 bg-gray-100 rounded-lg">
+                      <button
+                        onClick={() => onUpdateCartQty(item.id, -1)}
+                        className="p-2 hover:bg-gray-200 rounded-l-lg transition-colors duration-150"
+                      >
+                        <Minus size={16} className="text-gray-600" />
+                      </button>
+                      <input
+                        type="number"
+                        min="1"
+                        value={item.qty}
+                        onChange={(e) => onUpdateCartQty(item.id, parseInt(e.target.value) || 1, true)}
+                        className="w-14 text-center font-semibold text-gray-900 bg-transparent border-0 focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <button
+                        onClick={() => onUpdateCartQty(item.id, 1)}
+                        className="p-2 hover:bg-gray-200 rounded-r-lg transition-colors duration-150"
+                      >
+                        <Plus size={16} className="text-gray-600" />
+                      </button>
+                    </div>
+
+                    <div className="text-right w-24">
+                      <p className="font-semibold text-gray-900">{formatNZD(item.price * item.qty)}</p>
+                    </div>
+
+                    <button
+                      onClick={() => setEditingNoteId(editingNoteId === item.id ? null : item.id)}
+                      className={`p-2 rounded-lg transition-colors duration-150 ${
+                        item.itemNote
+                          ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50'
+                          : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                      }`}
+                      title="Add note"
+                    >
+                      <StickyNote size={18} />
+                    </button>
+
+                    <button
+                      onClick={() => onRemoveFromCart(item.id)}
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+
+                  {/* Mobile: stacked card */}
+                  <div className="sm:hidden">
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                      <p className="font-medium text-gray-900 text-sm leading-tight flex-1 min-w-0">{item.name}</p>
+                      <button
+                        onClick={() => onRemoveFromCart(item.id)}
+                        className="p-1.5 text-gray-400 hover:text-red-500 flex-shrink-0"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3">
+                      {formatNZD(item.price)} / {item.unit}
+                      <span className="ml-2 px-1.5 py-0.5 rounded bg-orange-50 text-orange-700">Carters</span>
                     </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1 bg-gray-100 rounded-lg">
+                        <button
+                          onClick={() => onUpdateCartQty(item.id, -1)}
+                          className="p-2 hover:bg-gray-200 rounded-l-lg"
+                        >
+                          <Minus size={16} className="text-gray-600" />
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          value={item.qty}
+                          onChange={(e) => onUpdateCartQty(item.id, parseInt(e.target.value) || 1, true)}
+                          className="w-12 text-center font-semibold text-gray-900 bg-transparent border-0 focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <button
+                          onClick={() => onUpdateCartQty(item.id, 1)}
+                          className="p-2 hover:bg-gray-200 rounded-r-lg"
+                        >
+                          <Plus size={16} className="text-gray-600" />
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setEditingNoteId(editingNoteId === item.id ? null : item.id)}
+                          className={`p-1.5 rounded-lg ${
+                            item.itemNote ? 'text-amber-500' : 'text-gray-400'
+                          }`}
+                        >
+                          <StickyNote size={16} />
+                        </button>
+                        <p className="font-semibold text-gray-900">{formatNZD(item.price * item.qty)}</p>
+                      </div>
+                    </div>
                   </div>
-
-                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg">
-                    <button
-                      onClick={() => onUpdateCartQty(item.id, -1)}
-                      className="p-2 hover:bg-gray-200 rounded-l-lg transition-colors duration-150"
-                    >
-                      <Minus size={16} className="text-gray-600" />
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      value={item.qty}
-                      onChange={(e) => onUpdateCartQty(item.id, parseInt(e.target.value) || 1, true)}
-                      className="w-14 text-center font-semibold text-gray-900 bg-transparent border-0 focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                    <button
-                      onClick={() => onUpdateCartQty(item.id, 1)}
-                      className="p-2 hover:bg-gray-200 rounded-r-lg transition-colors duration-150"
-                    >
-                      <Plus size={16} className="text-gray-600" />
-                    </button>
-                  </div>
-
-                  <div className="text-right w-24">
-                    <p className="font-semibold text-gray-900">{formatNZD(item.price * item.qty)}</p>
-                  </div>
-
-                  <button
-                    onClick={() => setEditingNoteId(editingNoteId === item.id ? null : item.id)}
-                    className={`p-2 rounded-lg transition-colors duration-150 ${
-                      item.itemNote
-                        ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50'
-                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                    }`}
-                    title="Add note"
-                  >
-                    <StickyNote size={18} />
-                  </button>
-
-                  <button
-                    onClick={() => onRemoveFromCart(item.id)}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-150"
-                  >
-                    <Trash2 size={18} />
-                  </button>
                 </div>
 
                 {/* Expandable note input */}
                 {editingNoteId === item.id && (
-                  <div className="px-5 pb-4">
+                  <div className="px-4 sm:px-5 pb-3 sm:pb-4">
                     <input
                       type="text"
                       value={item.itemNote || ''}
@@ -650,7 +703,7 @@ export default function QuotePage({
           )}
 
           {/* Quick Add Buttons */}
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2 max-h-24 sm:max-h-none overflow-y-auto sm:overflow-visible">
             {LABOUR_PRESETS.map((preset, idx) => (
               <button
                 key={idx}
@@ -699,14 +752,67 @@ export default function QuotePage({
               const cost = rate * item.hours;
 
               return (
-                <div key={item.id} className="px-5 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors duration-150">
-                  {/* Role & Rate */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                <div key={item.id} className="px-4 sm:px-5 py-3 hover:bg-gray-50 transition-colors duration-150">
+                  {/* Desktop: single row */}
+                  <div className="hidden sm:flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={item.role}
+                          onChange={(e) => onUpdateLabourRole(item.id, e.target.value)}
+                          className="px-2 py-1 border border-gray-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                        >
+                          <option value="builder">Builder</option>
+                          <option value="electrician">Electrician</option>
+                          <option value="plumber">Plumber</option>
+                          <option value="tiler">Tiler</option>
+                          <option value="painter">Painter</option>
+                          <option value="plasterer">Plasterer</option>
+                          <option value="labourer">Labourer</option>
+                          <option value="apprentice">Apprentice</option>
+                        </select>
+                        <span className="text-xs text-gray-400">@{formatNZD(rate)}/hr</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 bg-gray-100 rounded-lg">
+                      <button
+                        onClick={() => onUpdateLabourHours(item.id, item.hours - 1)}
+                        className="p-1.5 hover:bg-gray-200 rounded-l-lg transition-colors duration-150"
+                      >
+                        <Minus size={14} className="text-gray-600" />
+                      </button>
+                      <input
+                        type="number"
+                        value={item.hours}
+                        onChange={(e) => onUpdateLabourHours(item.id, parseFloat(e.target.value) || 0)}
+                        className="w-12 text-center font-semibold text-gray-900 bg-transparent focus:outline-none text-sm"
+                      />
+                      <button
+                        onClick={() => onUpdateLabourHours(item.id, item.hours + 1)}
+                        className="p-1.5 hover:bg-gray-200 rounded-r-lg transition-colors duration-150"
+                      >
+                        <Plus size={14} className="text-gray-600" />
+                      </button>
+                    </div>
+                    <span className="text-xs text-gray-400">hrs</span>
+                    <div className="text-right w-20">
+                      <p className="font-semibold text-gray-900 text-sm">{formatNZD(cost)}</p>
+                    </div>
+                    <button
+                      onClick={() => onRemoveLabourItem(item.id)}
+                      className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
+                  {/* Mobile: stacked card */}
+                  <div className="sm:hidden">
+                    <div className="flex justify-between items-center mb-2">
                       <select
                         value={item.role}
                         onChange={(e) => onUpdateLabourRole(item.id, e.target.value)}
-                        className="px-2 py-1 border border-gray-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                        className="px-2 py-1.5 border border-gray-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
                       >
                         <option value="builder">Builder</option>
                         <option value="electrician">Electrician</option>
@@ -717,45 +823,40 @@ export default function QuotePage({
                         <option value="labourer">Labourer</option>
                         <option value="apprentice">Apprentice</option>
                       </select>
-                      <span className="text-xs text-gray-400">@{formatNZD(rate)}/hr</span>
+                      <button
+                        onClick={() => onRemoveLabourItem(item.id)}
+                        className="p-1.5 text-gray-400 hover:text-red-500"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 bg-gray-100 rounded-lg">
+                          <button
+                            onClick={() => onUpdateLabourHours(item.id, item.hours - 1)}
+                            className="p-2 hover:bg-gray-200 rounded-l-lg"
+                          >
+                            <Minus size={14} className="text-gray-600" />
+                          </button>
+                          <input
+                            type="number"
+                            value={item.hours}
+                            onChange={(e) => onUpdateLabourHours(item.id, parseFloat(e.target.value) || 0)}
+                            className="w-12 text-center font-semibold text-gray-900 bg-transparent focus:outline-none text-sm"
+                          />
+                          <button
+                            onClick={() => onUpdateLabourHours(item.id, item.hours + 1)}
+                            className="p-2 hover:bg-gray-200 rounded-r-lg"
+                          >
+                            <Plus size={14} className="text-gray-600" />
+                          </button>
+                        </div>
+                        <span className="text-xs text-gray-500">hrs @ {formatNZD(rate)}/hr</span>
+                      </div>
+                      <p className="font-semibold text-gray-900 text-sm">{formatNZD(cost)}</p>
                     </div>
                   </div>
-
-                  {/* Hours */}
-                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg">
-                    <button
-                      onClick={() => onUpdateLabourHours(item.id, item.hours - 1)}
-                      className="p-1.5 hover:bg-gray-200 rounded-l-lg transition-colors duration-150"
-                    >
-                      <Minus size={14} className="text-gray-600" />
-                    </button>
-                    <input
-                      type="number"
-                      value={item.hours}
-                      onChange={(e) => onUpdateLabourHours(item.id, parseFloat(e.target.value) || 0)}
-                      className="w-12 text-center font-semibold text-gray-900 bg-transparent focus:outline-none text-sm"
-                    />
-                    <button
-                      onClick={() => onUpdateLabourHours(item.id, item.hours + 1)}
-                      className="p-1.5 hover:bg-gray-200 rounded-r-lg transition-colors duration-150"
-                    >
-                      <Plus size={14} className="text-gray-600" />
-                    </button>
-                  </div>
-                  <span className="text-xs text-gray-400">hrs</span>
-
-                  {/* Cost */}
-                  <div className="text-right w-20">
-                    <p className="font-semibold text-gray-900 text-sm">{formatNZD(cost)}</p>
-                  </div>
-
-                  {/* Delete */}
-                  <button
-                    onClick={() => onRemoveLabourItem(item.id)}
-                    className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-150"
-                  >
-                    <Trash2 size={16} />
-                  </button>
                 </div>
               );
             })}
@@ -905,6 +1006,36 @@ export default function QuotePage({
             )}
           </div>
         </div>
+      )}
+
+      {/* Mobile sticky total bar */}
+      {(cart.length > 0 || labourItems.length > 0) && (
+        <>
+          <div className="sm:hidden h-28"></div>
+          <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-30">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-semibold text-gray-900">Total Quote</span>
+              <span className="text-xl font-bold text-emerald-600">
+                {formatNZD(grandTotal)}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={onGeneratePDF}
+                disabled={pdfGenerating}
+                className="flex items-center justify-center gap-2 bg-emerald-600 text-white py-2.5 rounded-lg font-semibold disabled:opacity-50"
+              >
+                <Download size={16} /> {pdfGenerating ? 'Generating...' : 'PDF'}
+              </button>
+              <button
+                onClick={currentProjectId ? onSave : onSaveAs}
+                className="flex items-center justify-center gap-2 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-semibold"
+              >
+                <Save size={16} /> Save
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

@@ -20,7 +20,23 @@
 
 /* Mobile-friendly touch targets */
 @media (max-width: 640px) {
-  button, input, select {
+  button, input, select, textarea {
     min-height: 44px;
+  }
+  /* Smaller inline buttons (qty steppers, icon buttons) should not be forced tall */
+  button.btn-sm, .btn-sm button {
+    min-height: auto;
+  }
+}
+
+@layer utilities {
+  /* Touch-friendly buttons on mobile */
+  .btn-mobile {
+    @apply min-h-[48px] text-base;
+  }
+
+  /* Bigger inputs on mobile */
+  .input-mobile {
+    @apply min-h-[44px] text-base;
   }
 }

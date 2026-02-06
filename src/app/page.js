@@ -506,7 +506,7 @@ export default function PricedInApp() {
         setMobileMenuOpen={setMobileMenuOpen}
       />
 
-      <main className="max-w-7xl mx-auto p-4">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
         {/* AI Assistant - only show on Quote page */}
         {page === 'quote' && showAI && (
           <AIAssistant
