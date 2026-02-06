@@ -98,13 +98,30 @@ function formatAIResponse(json, labourRates) {
     formattedContent += '\n';
   }
 
-  if (json.labour && json.labour.totalHours) {
-    const rate = labourRates.builder || 95;
-    const cost = rate * json.labour.totalHours;
+  if (json.labour) {
     formattedContent += '👷 **Labour estimate:**\n';
-    formattedContent += `• ${json.labour.totalHours} builder hours ($${cost.toFixed(0)})\n`;
-    if (json.labour.description) {
-      formattedContent += `  ${json.labour.description}\n`;
+    // Support both array format [{role, hours, description}] and legacy {totalHours, description}
+    if (Array.isArray(json.labour)) {
+      let totalCost = 0;
+      json.labour.forEach(item => {
+        const role = item.role || 'builder';
+        const rate = labourRates[role] || labourRates.builder || 95;
+        const cost = rate * item.hours;
+        totalCost += cost;
+        formattedContent += `• ${item.hours} ${role} hours × $${rate}/hr = $${cost.toFixed(0)}`;
+        if (item.description) formattedContent += ` — ${item.description}`;
+        formattedContent += '\n';
+      });
+      if (json.labour.length > 1) {
+        formattedContent += `• **Total labour: $${totalCost.toFixed(0)}**\n`;
+      }
+    } else if (json.labour.totalHours) {
+      const rate = labourRates.builder || 95;
+      const cost = rate * json.labour.totalHours;
+      formattedContent += `• ${json.labour.totalHours} builder hours ($${cost.toFixed(0)})\n`;
+      if (json.labour.description) {
+        formattedContent += `  ${json.labour.description}\n`;
+      }
     }
     formattedContent += '\n';
   }
@@ -407,13 +424,26 @@ export function useAIChat({
 
   // Add AI-suggested labour to quote
   const addLabourToQuote = (labour) => {
-    if (!labour || !labour.totalHours) return;
+    if (!labour) return;
 
-    onAddLabourItem({
-      role: 'builder',
-      hours: labour.totalHours,
-      description: labour.description || 'Builder labour'
-    });
+    // Support both array format and legacy object format
+    if (Array.isArray(labour)) {
+      labour.forEach(item => {
+        if (item.hours > 0) {
+          onAddLabourItem({
+            role: item.role || 'builder',
+            hours: item.hours,
+            description: item.description || `${item.role || 'Builder'} labour`
+          });
+        }
+      });
+    } else if (labour.totalHours) {
+      onAddLabourItem({
+        role: 'builder',
+        hours: labour.totalHours,
+        description: labour.description || 'Builder labour'
+      });
+    }
   };
 
   return {

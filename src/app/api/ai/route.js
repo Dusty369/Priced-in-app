@@ -100,6 +100,8 @@ function getProjectBuilderPrompt(materials, labourRates) {
     .join('\n') || '';
 
   const builderRate = labourRates?.builder || 95;
+  const labourerRate = labourRates?.labourer || 45;
+  const specialistRate = labourRates?.specialist || 105;
 
   // Get the NZ glossary and assemblies
   const glossary = getGlossaryForPrompt();
@@ -717,32 +719,88 @@ Hardware (if builder-supplied):
                     LABOUR ESTIMATION
 ════════════════════════════════════════════════════════════════
 
-Estimate TOTAL BUILDER HOURS for one qualified builder to complete the job.
-Include: setup, measuring, cutting, fixing, cleanup.
+Current Hourly Rates (user-configured):
+• Builder: $${builderRate}/hr
+• Labourer: $${labourerRate}/hr
+• Specialist trades: $${specialistRate}/hr
 
-Do NOT break down by role (builder/labourer/apprentice) - the user adds
-crew members manually in the quote.
+DECK LABOUR CALCULATION FORMULA:
 
-Typical build rates (experienced builder):
+1. BASE HOURS (by deck area):
+   Height Complexity Factor:
+   • Ground level (<600mm): 2.5 hrs/m² — simple jacks/blocks
+   • Low deck (600-1000mm): 3.0 hrs/m² — posts in concrete
+   • Medium deck (1000-1500mm): 3.5 hrs/m² — bracing needed
+   • High deck (>1500mm): 4.5-6.0 hrs/m² — scaffolding, engineer spec
+
+   Base Hours = area × height factor
+   Example: 4m × 3m = 12m² at 800mm height → 12 × 3.0 = 36 base hours
+
+2. FOUNDATION/PILING HOURS (per post):
+   • Nuralock jacks: 0.5 hrs each (level and fix)
+   • H5 posts in concrete: 1.0 hrs each (dig, set, brace, pour)
+   • Bored piles: 1.5 hrs each (machine access + setup)
+
+3. STAIR HOURS (per flight):
+   • Simple box steps (2-3 risers): 6 hrs
+   • Standard stairs (4-8 risers): 10-12 hrs
+   • Complex stairs (>8 risers, winders): 14-16 hrs
+
+4. HANDRAIL/BALUSTRADE (per linear metre):
+   • Wire balustrade: 1.5 hrs/m (posts, tensioners, wires)
+   • Timber balustrade: 2.0 hrs/m (posts, rails, balusters)
+   • Glass balustrade: 2.5-3.0 hrs/m (specialist — use specialist rate)
+
+5. FINISHING:
+   • Stain/oil application: 0.3 hrs/m² per coat (typically 2 coats)
+   • Sanding between coats: 0.15 hrs/m²
+   • Cleanup and site tidy: 2-4 hours per job
+
+6. CREW EFFICIENCY:
+   • Solo builder: base hours × 1.0
+   • Builder + labourer (2 crew): total hours ÷ 1.65 (not ÷ 2 — coordination overhead)
+
+COST CALCULATION:
+   Builder cost = builder hours × $${builderRate}/hr
+   Labourer cost = labourer hours × $${labourerRate}/hr
+   Specialist cost = specialist hours × $${specialistRate}/hr
+   Total labour = builder cost + labourer cost + specialist cost
+
+   Example: 4m × 3m deck at 800mm, 6 posts in concrete, stain finish:
+   • Base: 12m² × 3.0 = 36 hrs
+   • Foundation: 6 posts × 1.0 = 6 hrs
+   • Finishing: 12m² × 0.3 × 2 coats = 7.2 hrs
+   • Cleanup: 3 hrs
+   • Total: 52.2 builder hours
+   • Solo builder cost: 52.2 × $${builderRate} = $${(52.2 * builderRate).toFixed(0)}
+   • 2-person crew: 52.2 ÷ 1.65 = 31.6 hrs each
+     Builder: 31.6 × $${builderRate} = $${(31.6 * builderRate).toFixed(0)}
+     Labourer: 31.6 × $${labourerRate} = $${(31.6 * labourerRate).toFixed(0)}
+     Total: $${((31.6 * builderRate) + (31.6 * labourerRate)).toFixed(0)}
+
+OTHER PROJECT TYPES — Build Rates (experienced builder):
 • Wall framing: 1.5-2m² per hour
-• Deck framing & boards: 1-1.5m² per hour
 • Fencing: 2-3 lm per hour
 • Roofing (steel): 3-5m² per hour
 • GIB lining: 4-6m² per hour
 • Interior doors: 1-1.5 hours per door
 • Skirting/architraves: 10-15 lm per hour
+• Bathroom renovation: 80-120 hrs (full gut and refit)
+• Kitchen cabinetry install: 16-24 hrs
 
 Add 20-30% for:
 • Difficult access
 • Complex cuts/angles
-• High work (scaffolding)
+• High work (scaffolding required)
 • Renovation vs new build
+• Heritage/character home work
 
-Example: 4m × 3m deck
-• Framing: 12m² × 1.5 = 8 hours
-• Decking: 12m² × 1.25 = 9.6 hours
-• Setup/cleanup: 2 hours
-• Total: ~20 builder hours
+LABOUR OUTPUT FORMAT:
+Always provide labour as structured items the user can add to their quote:
+• role: "builder", "labourer", or "specialist"
+• description: what the work involves
+• hours: estimated hours for that role
+• rate: use the rates above ($${builderRate}, $${labourerRate}, or $${specialistRate}/hr)
 
 ════════════════════════════════════════════════════════════════
                     OUTPUT FORMAT
@@ -783,10 +841,10 @@ Respond with JSON:
       "unit": "box"
     }
   ],
-  "labour": {
-    "totalHours": 16,
-    "description": "Brief breakdown: framing 8hrs, decking 6hrs, setup/cleanup 2hrs"
-  },
+  "labour": [
+    {"role": "builder", "hours": 32, "description": "Deck framing, boarding, finishing"},
+    {"role": "labourer", "hours": 16, "description": "Assist framing, cleanup, site tidy"}
+  ],
   "notes": ["Code compliance notes", "Installation tips"],
   "warnings": ["Missing dimensions needed", "Consent requirements", "Engineering needed"],
   "considerations": ["Optional items builder may need to add - e.g. insulation for external walls, extract fan ducting"]
@@ -941,7 +999,7 @@ NAILS - USE PASLODE (NZS 3604 compliant):
 AVAILABLE MATERIALS (sample):
 ${materialSummary}
 
-Current builder rate: $${builderRate}/hr`;
+Current rates — Builder: $${builderRate}/hr | Labourer: $${labourerRate}/hr | Specialist: $${specialistRate}/hr`;
 }
 
 function getSearchPrompt(materials) {
@@ -972,6 +1030,8 @@ function getPlanAnalysisPrompt(materials, labourRates) {
     .join('\n') || '';
 
   const builderRate = labourRates?.builder || 95;
+  const labourerRate = labourRates?.labourer || 45;
+  const specialistRate = labourRates?.specialist || 105;
 
   // Get the NZ glossary and assemblies
   const glossary = getGlossaryForPrompt();
@@ -1031,10 +1091,9 @@ RESPOND WITH JSON:
       "unit": "box"
     }
   ],
-  "labour": {
-    "totalHours": 16,
-    "description": "Breakdown of hours by task"
-  },
+  "labour": [
+    {"role": "builder", "hours": 16, "description": "Framing, boarding, finishing"}
+  ],
   "notes": ["Code compliance", "Assumptions made"],
   "warnings": ["Unclear dimensions", "Missing info needed"]
 }
@@ -1066,5 +1125,5 @@ TIMBER TREATMENT RULES (NZS 3604):
 AVAILABLE MATERIALS:
 ${materialSummary}
 
-Builder rate: $${builderRate}/hr`;
+Current rates — Builder: $${builderRate}/hr | Labourer: $${labourerRate}/hr | Specialist: $${specialistRate}/hr`;
 }
