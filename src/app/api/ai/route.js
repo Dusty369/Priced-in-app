@@ -500,8 +500,8 @@ STANDARD DECK FORMULAS (use these exactly - no variation):
    • Example 6×4m: 24 × 22 = 528 ÷ 500 = 1.06 → 2 boxes
 
 7. CONCRETE (20kg bags):
-   • Formula: posts × 2 bags per post
-   • Example 12 posts: 12 × 2 = 24 bags
+   • Formula: posts × 3.5 bags per post (600mm deep, ~300mm hole)
+   • Example 12 posts: 12 × 3.5 = 42 bags (round up)
 
 8. STAIN (if requested) - ⚠️ COVERAGE IS 10-12m²/L, NOT 0.14m!
    • Formula: area × 2 coats ÷ 12m²/L coverage = liters needed ÷ 5L per tin
@@ -555,8 +555,8 @@ STANDARD FENCE FORMULAS (use these exactly - no variation):
    • Example 15m: 15 ÷ 0.1 = 150 palings × 1.8m = 270 lm + 10% = 297 lm
 
 4. POST CONCRETE (20kg bags):
-   • Formula: posts × 2 bags per post
-   • Example 9 posts: 9 × 2 = 18 bags
+   • Formula: posts × 3.5 bags per post (600mm deep, ~300mm hole)
+   • Example 9 posts: 9 × 3.5 = 32 bags (round up)
 
 5. NAILS (Paslode Joltfast 65mm ring shank):
    • Formula: palings × 6 nails (2 per rail × 3 rails) ÷ 1000 per box, round up
@@ -855,7 +855,7 @@ Respond with JSON:
 ═══════════════════════════════════════════════════════════════
 
 >>> THE qtyToOrder MUST BE THE RESULT OF YOUR CALCULATION <<<
->>> IF calculation = "16 posts × 2 bags = 32 bags" THEN qtyToOrder = 32 <<<
+>>> IF calculation = "16 posts × 3.5 bags = 56 bags" THEN qtyToOrder = 56 <<<
 >>> NEVER output a different number than what your calculation shows <<<
 
 The "qtyToOrder" field is what gets added to the cart. This MUST be:
@@ -869,14 +869,14 @@ The "qtyToOrder" field is what gets added to the cart. This MUST be:
 • WRONG: 24m² ÷ 0.14 = 171 tins (this uses DECKING formula!)
 • RIGHT: 24m² × 2 coats ÷ 12m²/L = 4L ÷ 5L/tin = 1 tin
 
-⚠️ CONCRETE: qtyToOrder MUST equal posts × 2
-• If 16 posts: 16 × 2 = 32 bags, qtyToOrder: 32
+⚠️ CONCRETE: qtyToOrder MUST equal posts × 3.5 (rounded up)
+• If 16 posts: 16 × 3.5 = 56 bags, qtyToOrder: 56
 • NEVER output a different number!
 
 EXAMPLE CALCULATIONS:
 • Deck screws: 264 screws needed ÷ 200 per box = 1.32 → qtyToOrder: 2
 • Stain: 24m² × 2 coats ÷ 12m²/L = 4L ÷ 5L/tin → qtyToOrder: 1
-• Concrete: 12 posts × 2 bags = 24 bags → qtyToOrder: 24
+• Concrete: 12 posts × 3.5 bags = 42 bags → qtyToOrder: 42
 • Bearers: 4 bearers × 6m = 24 lm + 10% = 26 lm → qtyToOrder: 26
 
 ❌ WRONG: Calculation shows 32 but qtyToOrder is 61 (MISMATCH!)
@@ -938,7 +938,7 @@ TIMBER - output in PRODUCT UNITS:
 WORKING MUST SHOW UNIT CONVERSION:
 ✓ "Deck screws: 12m² × 22 screws/m² = 264 screws ÷ 200/box = 2 boxes"
 ✓ "Stain: 12m² × 2 coats ÷ 12m²/L coverage = 2L needed → 1 × 5L tin"
-✓ "Concrete: 0.3m × 0.3m × 0.4m × 6 pads = 0.22m³ × 108 = 24 bags"
+✓ "Concrete: 6 posts × 3.5 bags/post (600mm deep, 300mm hole) = 21 bags"
 ✗ "264 screws needed" with qty: 264 ← WRONG, this orders 264 boxes!
 
 IMPORTANT:
