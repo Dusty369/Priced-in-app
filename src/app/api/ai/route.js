@@ -34,19 +34,31 @@ export async function POST(request) {
       systemPrompt = getSearchPrompt(materials);
     } else if (mode === 'plan') {
       systemPrompt = getPlanAnalysisPrompt(materials, labourRates);
-      // Add image to the first message
+      // Add image/document to the first message
       if (planImage) {
-        requestMessages = [{
-          role: 'user',
-          content: [
-            {
+        const isPdf = planMediaType === 'application/pdf';
+        const contentBlock = isPdf
+          ? {
+              type: 'document',
+              source: {
+                type: 'base64',
+                media_type: 'application/pdf',
+                data: planImage
+              }
+            }
+          : {
               type: 'image',
               source: {
                 type: 'base64',
                 media_type: planMediaType || 'image/jpeg',
                 data: planImage
               }
-            },
+            };
+
+        requestMessages = [{
+          role: 'user',
+          content: [
+            contentBlock,
             {
               type: 'text',
               text: messages[0]?.content || 'Analyze this building plan and provide a materials list with labour estimate.'

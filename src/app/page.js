@@ -698,18 +698,33 @@ export default function PricedInApp() {
               }}
               onAnalyzePlan={async () => {
                 if (!planFile || !planPreview) return;
-                // Check tier allows plan analysis
-                if (!canAnalyzePlan()) {
-                  alert('Plan analysis is only available on Professional tier. Upgrade to analyze building plans.');
-                  return;
-                }
                 setPlanAnalyzing(true);
                 setTierUsage(prev => ({
                   ...prev,
                   planAnalyses: (prev.planAnalyses || 0) + 1
                 }));
-                // Use sendAIMessage with plan mode
-                await sendAIMessage('Analyze this building plan and estimate materials needed', 'plan');
+                try {
+                  // Read file as base64
+                  const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      // Strip data:...;base64, prefix to get raw base64
+                      const result = reader.result;
+                      const base64Data = result.split(',')[1];
+                      resolve(base64Data);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(planFile);
+                  });
+                  const mediaType = planFile.type || 'image/jpeg';
+                  await sendAIMessage(
+                    'Analyze this building plan and estimate materials needed',
+                    'plan',
+                    { planImage: base64, planMediaType: mediaType }
+                  );
+                } catch (err) {
+                  console.error('Failed to read plan file:', err);
+                }
                 setPlanAnalyzing(false);
               }}
               onNavigateToQuote={() => setPage('quote')}

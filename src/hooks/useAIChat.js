@@ -187,15 +187,16 @@ export function useAIChat({
   const [aiLoading, setAiLoading] = useState(false);
 
   // Send message to AI
-  const sendAIMessage = async () => {
-    if (!chatInput.trim() || aiLoading) return;
+  const sendAIMessage = async (overrideMessage, mode, planData) => {
+    const messageText = overrideMessage || chatInput.trim();
+    if (!messageText || aiLoading) return;
 
     // Check if user can use AI (tier enforcement)
     if (canUseAI && !canUseAI()) {
       const tierName = tierLimits?.name || 'Free';
       const limit = tierLimits?.aiQuotesPerMonth || 0;
       setChatHistory(prev => [...prev,
-        { role: 'user', content: chatInput },
+        { role: 'user', content: messageText },
         {
           role: 'assistant',
           content: limit === 0
@@ -204,25 +205,33 @@ export function useAIChat({
           type: 'tier-limit'
         }
       ]);
-      setChatInput('');
+      if (!overrideMessage) setChatInput('');
       return;
     }
 
-    const userMessage = chatInput;
-    setChatInput('');
+    const userMessage = messageText;
+    if (!overrideMessage) setChatInput('');
     setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
     setAiLoading(true);
 
     try {
+      const fetchBody = {
+        mode: mode || 'project',
+        materials: [],
+        labourRates,
+        messages: [{ role: 'user', content: userMessage }]
+      };
+
+      // Include plan image data if provided
+      if (planData) {
+        fetchBody.planImage = planData.planImage;
+        fetchBody.planMediaType = planData.planMediaType;
+      }
+
       const response = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'project',
-          materials: [],
-          labourRates,
-          messages: [{ role: 'user', content: userMessage }]
-        })
+        body: JSON.stringify(fetchBody)
       });
 
       const data = await response.json();
