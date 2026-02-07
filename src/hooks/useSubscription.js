@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getOrCreateDeviceId } from '../lib/deviceId';
+import { getOrCreateDeviceId, getTrialDaysRemaining, isTrialActive } from '../lib/deviceId';
 import { STRIPE_CUSTOMER_ID_KEY } from '../lib/constants';
 
 export function useSubscription() {
@@ -9,20 +9,40 @@ export function useSubscription() {
   const [loading, setLoading] = useState(true);
   const [customerId, setCustomerId] = useState(null);
   const [subscription, setSubscription] = useState(null);
+  const [trialDaysLeft, setTrialDaysLeft] = useState(0);
 
   const checkStatus = useCallback(async () => {
     try {
       const deviceId = getOrCreateDeviceId();
       const res = await fetch(`/api/stripe/status?deviceId=${deviceId}`);
       const data = await res.json();
-      setTier(data.tier || 'free');
+
+      if (data.tier === 'professional') {
+        // Paid subscriber - always professional
+        setTier('professional');
+      } else if (isTrialActive()) {
+        // Within 14-day trial window
+        setTier('trial');
+      } else {
+        // Trial expired, no subscription
+        setTier('free');
+      }
+
+      setTrialDaysLeft(getTrialDaysRemaining());
+
       if (data.customerId) {
         setCustomerId(data.customerId);
         localStorage.setItem(STRIPE_CUSTOMER_ID_KEY, data.customerId);
       }
       setSubscription(data.subscription || null);
     } catch {
-      setTier('free');
+      // On error, still check trial locally
+      if (isTrialActive()) {
+        setTier('trial');
+        setTrialDaysLeft(getTrialDaysRemaining());
+      } else {
+        setTier('free');
+      }
     } finally {
       setLoading(false);
     }
@@ -96,6 +116,7 @@ export function useSubscription() {
     loading,
     customerId,
     subscription,
+    trialDaysLeft,
     startCheckout,
     openPortal,
     refreshStatus: checkStatus,

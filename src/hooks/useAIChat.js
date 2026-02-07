@@ -191,6 +191,16 @@ export function useAIChat({
     const messageText = overrideMessage || chatInput.trim();
     if (!messageText || aiLoading) return;
 
+    // Count existing user messages to determine if this is a new quote or follow-up
+    const userMessageCount = chatHistory.filter(m => m.role === 'user').length;
+    const isPlanMode = mode === 'plan';
+    const isNewSession = userMessageCount === 0;
+    const followUpLimit = isPlanMode
+      ? (tierLimits?.planFollowUpsPerUpload ?? Infinity)
+      : (tierLimits?.aiFollowUpsPerQuote ?? Infinity);
+    // Follow-ups are all user messages after the first one
+    const followUpsUsed = Math.max(0, userMessageCount - 1);
+
     // Check if user can use AI (tier enforcement)
     if (canUseAI && !canUseAI()) {
       const tierName = tierLimits?.name || 'Free';
@@ -200,8 +210,23 @@ export function useAIChat({
         {
           role: 'assistant',
           content: limit === 0
-            ? `AI quotes are not available on the ${tierName} tier. Upgrade to Starter ($29/month) for 5 AI quotes per month, or Professional ($79/month) for 25 AI quotes.`
+            ? `AI quotes are not available on the ${tierName} tier. Upgrade to Professional ($79/month) for 25 AI quotes.`
             : `You've used all ${limit} AI quotes for this month. Upgrade to Professional for 25 AI quotes/month, or wait until next month.`,
+          type: 'tier-limit'
+        }
+      ]);
+      if (!overrideMessage) setChatInput('');
+      return;
+    }
+
+    // Check follow-up limit (only if not the first message)
+    if (!isNewSession && followUpsUsed >= followUpLimit) {
+      const label = isPlanMode ? 'plan follow-up' : 'follow-up';
+      setChatHistory(prev => [...prev,
+        { role: 'user', content: messageText },
+        {
+          role: 'assistant',
+          content: `You've used all ${followUpLimit} ${label} questions for this session. Start a new project for another quote, or upgrade to Professional for unlimited follow-ups.`,
           type: 'tier-limit'
         }
       ]);
@@ -245,8 +270,8 @@ export function useAIChat({
       } else {
         const text = data.content?.find(c => c.type === 'text')?.text || 'No response';
 
-        // Increment AI usage on successful response
-        if (onAIUsed) {
+        // Increment AI usage on successful response (only for new sessions, not follow-ups)
+        if (onAIUsed && isNewSession) {
           onAIUsed();
         }
 

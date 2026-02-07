@@ -54,13 +54,20 @@ export default function Header({ page, setPage, currentProjectName, cart, showAI
               <Sparkles size={18} /> AI
             </button>
           )}
-          {/* Pro badge or Upgrade button */}
+          {/* Tier badge */}
           {userTier === 'professional' ? (
             <button
               onClick={openPortal}
               className="px-3 py-1.5 rounded-lg font-medium text-xs bg-amber-400 text-amber-900 hover:bg-amber-300 transition-colors duration-150 flex items-center gap-1"
             >
               <Crown size={14} /> Pro
+            </button>
+          ) : userTier === 'trial' ? (
+            <button
+              onClick={startCheckout}
+              className="px-3 py-1.5 rounded-lg font-medium text-xs bg-purple-400/30 hover:bg-purple-400/40 transition-colors duration-150 flex items-center gap-1"
+            >
+              <Sparkles size={14} /> Trial
             </button>
           ) : (
             <button
@@ -118,13 +125,20 @@ export default function Header({ page, setPage, currentProjectName, cart, showAI
               <Sparkles size={20} /> AI Assistant
             </button>
           )}
-          {/* Pro badge or Upgrade button */}
+          {/* Tier badge */}
           {userTier === 'professional' ? (
             <button
               onClick={() => { openPortal(); setMobileMenuOpen(false); }}
               className="px-4 py-3 rounded-lg text-left font-medium transition-colors duration-150 flex items-center gap-2 bg-amber-400/20"
             >
               <Crown size={20} /> Pro Plan
+            </button>
+          ) : userTier === 'trial' ? (
+            <button
+              onClick={() => { startCheckout(); setMobileMenuOpen(false); }}
+              className="px-4 py-3 rounded-lg text-left font-medium transition-colors duration-150 flex items-center gap-2 bg-purple-400/20"
+            >
+              <Sparkles size={20} /> Trial - Upgrade to Pro
             </button>
           ) : (
             <button

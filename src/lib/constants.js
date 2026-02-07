@@ -18,15 +18,36 @@ export const USER_TIER_KEY = 'priced-in-user-tier';
 export const TIER_USAGE_KEY = 'priced-in-tier-usage';
 export const DEVICE_ID_KEY = 'priced-in-device-id';
 export const STRIPE_CUSTOMER_ID_KEY = 'priced-in-stripe-customer-id';
+export const TRIAL_START_KEY = 'priced-in-trial-start';
+
+// Trial duration
+export const TRIAL_DURATION_DAYS = 14;
 
 // Tier limits and features
 export const TIER_LIMITS = {
   free: {
     name: 'Free',
     price: 0,
-    aiQuotesPerMonth: Infinity,
+    aiQuotesPerMonth: 0,
+    aiFollowUpsPerQuote: 0,
     manualQuotesPerMonth: Infinity,
-    planPdfsPerQuote: 10,
+    planUploadsPerMonth: 0,
+    planPagesPerUpload: 0,
+    planFollowUpsPerUpload: 0,
+    imagesPerQuote: 10,
+    hasBranding: true,
+    hasWatermark: false,
+    hasXeroExport: true
+  },
+  trial: {
+    name: 'Trial',
+    price: 0,
+    aiQuotesPerMonth: 10,
+    aiFollowUpsPerQuote: 5,
+    manualQuotesPerMonth: Infinity,
+    planUploadsPerMonth: 3,
+    planPagesPerUpload: 20,
+    planFollowUpsPerUpload: 3,
     imagesPerQuote: 10,
     hasBranding: true,
     hasWatermark: false,
@@ -36,8 +57,11 @@ export const TIER_LIMITS = {
     name: 'Professional',
     price: 79,
     aiQuotesPerMonth: 25,
+    aiFollowUpsPerQuote: 8,
     manualQuotesPerMonth: Infinity,
-    planPdfsPerQuote: 3,
+    planUploadsPerMonth: 10,
+    planPagesPerUpload: 50,
+    planFollowUpsPerUpload: 5,
     imagesPerQuote: 10,
     hasBranding: true,
     hasWatermark: false,
@@ -45,11 +69,8 @@ export const TIER_LIMITS = {
   }
 };
 
-// Legacy plan limits (for backwards compatibility during migration)
-export const PLAN_LIMITS = {
-  basic: { plansPerMonth: 4, pagesPerPlan: 10, name: 'Basic' },
-  pro: { plansPerMonth: 6, pagesPerPlan: 20, name: 'Pro' }
-};
+// NZ GST rate (15%)
+export const GST_RATE = 0.15;
 
 // Default labour rates (NZD/hour or /sqm) - NZ Auckland rates 2026
 // Source: NZ Certified Builders, Master Builders Association, trade avg Feb 2026

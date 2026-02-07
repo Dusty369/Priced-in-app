@@ -31,7 +31,8 @@ import {
   MATERIAL_PRESETS_KEY,
   PLAN_USAGE_KEY,
   TIER_USAGE_KEY,
-  TIER_LIMITS
+  TIER_LIMITS,
+  GST_RATE
 } from '../lib/constants';
 
 
@@ -125,7 +126,7 @@ export default function PricedInApp() {
   const [showCompanySettings, setShowCompanySettings] = useState(false);
   const [companyInfo, setCompanyInfo] = useState(DEFAULT_COMPANY_INFO);
   const [materialPresets, setMaterialPresets] = useState([]);
-  const { tier: userTier, loading: subscriptionLoading, customerId: stripeCustomerId, subscription: stripeSubscription, startCheckout, openPortal, refreshStatus } = useSubscription();
+  const { tier: userTier, loading: subscriptionLoading, customerId: stripeCustomerId, subscription: stripeSubscription, trialDaysLeft, startCheckout, openPortal, refreshStatus } = useSubscription();
   const [planUsage, setPlanUsage] = useState({ month: new Date().toISOString().slice(0, 7), plans: 0 });
   const [tierUsage, setTierUsage] = useState({
     month: new Date().toISOString().slice(0, 7),
@@ -224,8 +225,11 @@ export default function PricedInApp() {
   }, [currentTierLimits, tierUsage.manualQuotes]);
 
   const canAnalyzePlan = useCallback(() => {
-    return currentTierLimits.planPdfsPerQuote > 0;
-  }, [currentTierLimits]);
+    const limit = currentTierLimits.planUploadsPerMonth ?? 0;
+    if (limit === 0) return false;
+    if (limit === Infinity) return true;
+    return tierUsage.planAnalyses < limit;
+  }, [currentTierLimits, tierUsage.planAnalyses]);
 
   const incrementAIUsage = useCallback(() => {
     setTierUsage(prev => ({
@@ -367,8 +371,8 @@ export default function PricedInApp() {
     const withWastage = subtotal * (1 + wastage / 100);
     const withMargin = withWastage * (1 + margin / 100);
     const labourWithMargin = labourSubtotal * (1 + margin / 100);
-    const materialsTotal = gst ? withMargin * 1.15 : withMargin;
-    const labourTotal = gst ? labourWithMargin * 1.15 : labourWithMargin;
+    const materialsTotal = gst ? withMargin * (1 + GST_RATE) : withMargin;
+    const labourTotal = gst ? labourWithMargin * (1 + GST_RATE) : labourWithMargin;
     return {
       withWastage,
       withMargin,
@@ -392,7 +396,7 @@ export default function PricedInApp() {
     const subtotalBeforeMargin = materialsWithWastage + labourSubtotal;
     const marginAmount = subtotalBeforeMargin * (margin / 100);
     const subtotal = subtotalBeforeMargin + marginAmount;
-    const gstAmount = gst ? subtotal * 0.15 : 0;
+    const gstAmount = gst ? subtotal * GST_RATE : 0;
 
     let csv = "ContactName,InvoiceNumber,InvoiceDate,DueDate,Description,Quantity,UnitAmount,AccountCode,TaxType\n";
     
@@ -423,7 +427,7 @@ export default function PricedInApp() {
     }, 0);
     const withWastage = materialsSubtotal * (1 + wastage / 100);
     const withMargin = (withWastage + labourSubtotal) * (1 + margin / 100);
-    const grandTotal = withMargin * (1 + (gst ? 0.15 : 0));
+    const grandTotal = withMargin * (1 + (gst ? GST_RATE : 0));
     return { materialsSubtotal, labourSubtotal, grandTotal };
   }, [cart, labourItems, labourRates, wastage, margin, gst]);
 
@@ -522,6 +526,7 @@ export default function PricedInApp() {
             tierUsage={tierUsage}
             tierLimits={currentTierLimits}
             canUseAI={canUseAI()}
+            trialDaysLeft={trialDaysLeft}
             startCheckout={startCheckout}
           />
         )}
@@ -680,6 +685,7 @@ export default function PricedInApp() {
               tierLimits={currentTierLimits}
               tierUsage={tierUsage}
               canAnalyzePlan={canAnalyzePlan()}
+              trialDaysLeft={trialDaysLeft}
               startCheckout={startCheckout}
               onHandlePlanUpload={(e) => {
                 const file = e.target.files?.[0];

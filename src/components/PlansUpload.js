@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, Upload, Zap } from 'lucide-react';
+import { FileText, Upload, Zap, Lock, Clock } from 'lucide-react';
 
 export default function PlansUpload({
   planFile,
@@ -18,11 +18,20 @@ export default function PlansUpload({
   tierLimits = {},
   tierUsage = {},
   canAnalyzePlan = false,
+  trialDaysLeft = 0,
   startCheckout
 }) {
   const planAnalysesUsed = tierUsage?.planAnalyses || 0;
-  const isProfessional = userTier === 'professional';
-  const isBlocked = !canAnalyzePlan;
+  const planLimit = tierLimits?.planUploadsPerMonth ?? 0;
+  const isTrialUser = userTier === 'trial';
+  const isFreeUser = userTier === 'free';
+  const hasAccess = canAnalyzePlan;
+  const isBlocked = !hasAccess;
+
+  // Follow-up tracking for plan sessions
+  const userMessageCount = chatHistory.filter(m => m.role === 'user').length;
+  const planFollowUpsUsed = Math.max(0, userMessageCount - 1);
+  const planFollowUpLimit = tierLimits?.planFollowUpsPerUpload ?? Infinity;
 
   return (
     <div className="space-y-4">
@@ -34,14 +43,29 @@ export default function PlansUpload({
           </p>
         </div>
 
-        {/* Tier Badge */}
+        {/* Usage Badge */}
         <div className="hidden sm:block bg-white rounded-xl shadow-sm p-4 min-w-[200px]">
+          {isTrialUser && (
+            <div className="flex items-center gap-1 text-amber-600 text-xs font-medium mb-1">
+              <Clock size={12} />
+              Trial - {trialDaysLeft} days left
+            </div>
+          )}
           <p className="text-sm text-gray-600">
-            Upload PDF or image plans
+            {planLimit === Infinity
+              ? 'Unlimited plan analyses'
+              : `${planAnalysesUsed} / ${planLimit} plan analyses used`}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
-            {planAnalysesUsed} plan analyses this month
-          </p>
+          {planLimit !== Infinity && planLimit > 0 && (
+            <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+              <div
+                className={`h-1.5 rounded-full transition-all ${
+                  planAnalysesUsed >= planLimit ? 'bg-red-400' : 'bg-emerald-500'
+                }`}
+                style={{ width: `${Math.min((planAnalysesUsed / planLimit) * 100, 100)}%` }}
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -49,8 +73,14 @@ export default function PlansUpload({
       {isBlocked && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <p className="font-medium text-amber-800">Plan analysis requires a Professional subscription</p>
-            <p className="text-sm text-amber-600 mt-1">Upgrade to analyze building plans with AI and auto-generate material lists.</p>
+            <p className="font-medium text-amber-800">
+              {isFreeUser
+                ? 'Your free trial has ended. Upgrade to analyze building plans with AI.'
+                : `You've used all ${planLimit} plan analyses. Upgrade for unlimited access.`}
+            </p>
+            <p className="text-sm text-amber-600 mt-1">
+              Professional plan includes unlimited plan analyses and AI quotes.
+            </p>
           </div>
           <button
             onClick={startCheckout}
@@ -158,7 +188,7 @@ export default function PlansUpload({
       {(cart.length > 0 || labourItems.length > 0) && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
           <p className="text-emerald-800">
-            ✅ {cart.length} materials and {labourItems.length} labour items added to your quote.
+            {cart.length} materials and {labourItems.length} labour items added to your quote.
             <button
               onClick={onNavigateToQuote}
               className="ml-2 font-semibold text-emerald-600 hover:text-emerald-700"

@@ -1,4 +1,4 @@
-import { DEFAULT_LABOUR_RATES, LABOUR_ROLES, formatNZD } from './constants';
+import { DEFAULT_LABOUR_RATES, LABOUR_ROLES, formatNZD, GST_RATE } from './constants';
 
 /**
  * Convert hex color to RGB array
@@ -228,7 +228,7 @@ export async function generateQuotePDF({
   const labourWithMarkup = labourTotal * (1 + margin / 100);
   // Subtotal is the sum of marked-up values
   const subtotal = materialsWithMarkup + labourWithMarkup;
-  const gstAmount = gst ? subtotal * 0.15 : 0;
+  const gstAmount = gst ? subtotal * GST_RATE : 0;
   const total = subtotal + gstAmount;
 
   // Check if we need a new page for totals

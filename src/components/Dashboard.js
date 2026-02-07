@@ -6,7 +6,7 @@ import {
   CheckCircle, FileText, Hammer, Eye, Copy, MoreVertical, Filter,
   Home, Fence, Award, AlertCircle, ChevronDown, Calendar, Package, Users
 } from 'lucide-react';
-import { formatNZD } from '../lib/constants';
+import { formatNZD, GST_RATE } from '../lib/constants';
 
 // Project status definitions
 export const PROJECT_STATUSES = {
@@ -52,7 +52,7 @@ function calculateProjectTotal(project, labourRates = {}) {
   const labourWithMargin = labourSubtotal * (1 + margin / 100);
 
   const subtotal = materialsWithMargin + labourWithMargin;
-  return gst ? subtotal * 1.15 : subtotal;
+  return gst ? subtotal * (1 + GST_RATE) : subtotal;
 }
 
 // Get project type from name/notes

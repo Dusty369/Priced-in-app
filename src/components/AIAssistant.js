@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, lazy, Suspense } from 'react';
-import { MessageSquare, Send, Plus, CheckCircle, AlertTriangle, Search, Zap, Lock, ChevronLeft, FileText } from 'lucide-react';
+import { MessageSquare, Send, Plus, CheckCircle, AlertTriangle, Search, Zap, Lock, ChevronLeft, FileText, Clock } from 'lucide-react';
 
 const DeckTemplate = lazy(() => import('./DeckTemplate'));
 
@@ -20,6 +20,7 @@ export default function AIAssistant({
   tierUsage = { aiQuotes: 0 },
   tierLimits = { aiQuotesPerMonth: 0, name: 'Free' },
   canUseAI = false,
+  trialDaysLeft = 0,
   startCheckout
 }) {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -28,7 +29,18 @@ export default function AIAssistant({
   const aiQuotesLimit = tierLimits?.aiQuotesPerMonth || 0;
   const usagePercent = aiQuotesLimit > 0 ? (aiQuotesUsed / aiQuotesLimit) * 100 : 100;
   const isFreeUser = userTier === 'free';
+  const isTrialUser = userTier === 'trial';
+  const hasAIAccess = isTrialUser || userTier === 'professional';
   const isAtLimit = !canUseAI;
+
+  // Follow-up tracking
+  const userMessageCount = chatHistory.filter(m => m.role === 'user').length;
+  const followUpsUsed = Math.max(0, userMessageCount - 1);
+  const followUpLimit = tierLimits?.aiFollowUpsPerQuote ?? Infinity;
+  const followUpsRemaining = followUpLimit === Infinity ? null : Math.max(0, followUpLimit - followUpsUsed);
+  const isAtFollowUpLimit = followUpLimit !== Infinity && followUpsUsed >= followUpLimit && userMessageCount > 0;
+
+  const isBlocked = isAtLimit || isAtFollowUpLimit;
 
   return (
     <div className="bg-white rounded-xl shadow-lg mb-4 overflow-hidden animate-slideIn">
@@ -41,16 +53,22 @@ export default function AIAssistant({
               {isFreeUser && (
                 <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Free</span>
               )}
+              {isTrialUser && (
+                <span className="text-xs bg-amber-400/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <Clock size={10} />
+                  Trial - {trialDaysLeft}d left
+                </span>
+              )}
             </h2>
             <p className="text-sm text-white/80">
               {isFreeUser
-                ? 'Upgrade to use AI-powered estimates'
+                ? 'Your trial has ended - upgrade to continue using AI'
                 : 'Describe your project and I\'ll help you estimate'}
             </p>
           </div>
 
           {/* Usage Meter */}
-          {!isFreeUser && (
+          {hasAIAccess && (
             <div className="text-right min-w-[120px]">
               <p className="text-xs text-white/80 mb-1">
                 {aiQuotesUsed} / {aiQuotesLimit} AI quotes
@@ -63,12 +81,18 @@ export default function AIAssistant({
                   style={{ width: `${Math.min(usagePercent, 100)}%` }}
                 />
               </div>
+              {/* Follow-up counter (only show during active session) */}
+              {followUpsRemaining !== null && userMessageCount > 0 && (
+                <p className="text-xs text-white/60 mt-1">
+                  {followUpsRemaining} follow-up{followUpsRemaining !== 1 ? 's' : ''} left
+                </p>
+              )}
             </div>
           )}
         </div>
 
         {/* Templates & quick prompts */}
-        {!isFreeUser && (
+        {hasAIAccess && (
           <div className="mt-3 flex gap-2 flex-wrap">
             <button
               onClick={() => setSelectedTemplate(selectedTemplate === 'deck' ? null : 'deck')}
@@ -85,29 +109,29 @@ export default function AIAssistant({
               onClick={() => setChatInput('Bathroom renovation - 2m x 2m with shower')}
               className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
             >
-              🚿 Bathroom
+              Bathroom
             </button>
             <button
               onClick={() => setChatInput('Build a 6m timber fence with 100x100mm posts')}
               className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
             >
-              🏗️ Fence
+              Fence
             </button>
             <button
               onClick={() => setChatInput('Build a pergola 4m x 3m with timber frame')}
               className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
             >
-              ☀️ Pergola
+              Pergola
             </button>
           </div>
         )}
 
-        {/* Upgrade prompt for free users */}
+        {/* Upgrade prompt for free users (trial expired) */}
         {isFreeUser && chatHistory.length === 0 && (
           <div className="mt-3 bg-white/10 rounded-lg p-3">
             <p className="text-sm mb-2">
               <Lock size={14} className="inline mr-1" />
-              AI quotes are available on paid plans
+              Your free trial has ended. Upgrade to keep using AI quotes.
             </p>
             <div className="flex gap-2 text-xs">
               <button
@@ -120,10 +144,10 @@ export default function AIAssistant({
           </div>
         )}
       </div>
-      
+
       <div className="h-64 sm:h-96 overflow-y-auto p-3 sm:p-4 space-y-3">
         {/* Deck Template Panel */}
-        {selectedTemplate === 'deck' && !isFreeUser && (
+        {selectedTemplate === 'deck' && hasAIAccess && (
           <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
@@ -148,9 +172,9 @@ export default function AIAssistant({
           </div>
         )}
 
-        {chatHistory.length === 0 && !isFreeUser && !selectedTemplate && (
+        {chatHistory.length === 0 && hasAIAccess && !selectedTemplate && (
           <p className="text-gray-500 text-center py-8">
-            👋 Try: "I need to build a 4m x 3m deck" or "Materials for a bathroom renovation"
+            Try: &quot;I need to build a 4m x 3m deck&quot; or &quot;Materials for a bathroom renovation&quot;
           </p>
         )}
         {chatHistory.length === 0 && isFreeUser && (
@@ -158,9 +182,9 @@ export default function AIAssistant({
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Lock size={28} className="text-purple-500" />
             </div>
-            <p className="text-gray-700 font-medium mb-2">AI Assistant is a premium feature</p>
+            <p className="text-gray-700 font-medium mb-2">Your trial has ended</p>
             <p className="text-gray-500 text-sm mb-4">
-              Get instant material estimates, labour calculations, and NZ Building Code compliance checks.
+              Upgrade to Professional to get AI material estimates, labour calculations, and NZ Building Code compliance checks.
             </p>
             <p className="text-sm text-gray-400">
               You can still browse 13,500+ materials and create manual quotes on the Free plan.
@@ -209,7 +233,7 @@ export default function AIAssistant({
                               )}
                             </div>
                             <span className="text-sm text-amber-700 font-medium whitespace-nowrap">
-                              ×{item.qty}
+                              x{item.qty}
                             </span>
                           </div>
                         </div>
@@ -269,18 +293,20 @@ export default function AIAssistant({
         ))}
         {aiLoading && (
           <div className="bg-gray-100 p-3 rounded-lg mr-8 animate-pulse">
-            <p className="text-gray-500">🤔 Thinking...</p>
+            <p className="text-gray-500">Thinking...</p>
           </div>
         )}
       </div>
-      
+
       <div className="p-3 sm:p-4 border-t">
-        {/* Show upgrade prompt when at limit */}
-        {isAtLimit && !isFreeUser && (
+        {/* Show upgrade prompt when at quota limit */}
+        {isAtLimit && hasAIAccess && (
           <div className="mb-3 bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center justify-between">
             <p className="text-sm text-amber-800">
               <AlertTriangle size={14} className="inline mr-1" />
-              You've used all your AI quotes for this month.
+              {isTrialUser
+                ? `You've used all ${aiQuotesLimit} trial AI quotes.`
+                : `You've used all your AI quotes for this month.`}
             </p>
             <button
               onClick={startCheckout}
@@ -291,28 +317,38 @@ export default function AIAssistant({
           </div>
         )}
 
+        {/* Show follow-up limit reached */}
+        {isAtFollowUpLimit && !isAtLimit && (
+          <div className="mb-3 bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
+            <p className="text-sm text-blue-800">
+              <AlertTriangle size={14} className="inline mr-1" />
+              Follow-up limit reached for this session. Start a new project for another quote.
+            </p>
+          </div>
+        )}
+
         <div className="flex gap-2">
           <input
             type="text"
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !aiLoading && !isAtLimit && chatInput.trim() && onSendMessage()}
-            placeholder={isAtLimit ? 'AI quota reached - upgrade to continue' : 'Describe your project...'}
+            onKeyDown={(e) => e.key === 'Enter' && !aiLoading && !isBlocked && chatInput.trim() && onSendMessage()}
+            placeholder={isBlocked ? 'Limit reached - start new project or upgrade' : 'Describe your project...'}
             className={`flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${
-              isAtLimit ? 'bg-gray-100 text-gray-400' : ''
+              isBlocked ? 'bg-gray-100 text-gray-400' : ''
             }`}
-            disabled={aiLoading || isAtLimit}
+            disabled={aiLoading || isBlocked}
           />
           <button
             onClick={onSendMessage}
-            disabled={aiLoading || !chatInput.trim() || isAtLimit}
+            disabled={aiLoading || !chatInput.trim() || isBlocked}
             className={`px-4 py-2 rounded-lg transition active:scale-95 ${
-              isAtLimit
+              isBlocked
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed'
             }`}
           >
-            {isAtLimit ? <Lock size={20} /> : <Send size={20} />}
+            {isBlocked ? <Lock size={20} /> : <Send size={20} />}
           </button>
         </div>
       </div>

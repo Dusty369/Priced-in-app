@@ -6,7 +6,7 @@ import {
   Calculator, DollarSign, Trash2, Minus, Edit3, FileText,
   TrendingUp, Search, Clock, StickyNote, FolderPlus, ChevronDown, Lock
 } from 'lucide-react';
-import { formatNZD, LABOUR_PRESETS } from '../lib/constants';
+import { formatNZD, LABOUR_PRESETS, GST_RATE } from '../lib/constants';
 
 export default function QuotePage({
   cart,
@@ -91,19 +91,19 @@ export default function QuotePage({
   const subtotalWithMarginAndContingency = subtotalBeforeMargin + marginAmount + contingencyAmount;
   const discountAmount = subtotalWithMarginAndContingency * (discount / 100);
   const subtotalAfterDiscount = subtotalWithMarginAndContingency - discountAmount;
-  const gstAmount = gst ? subtotalAfterDiscount * 0.15 : 0;
+  const gstAmount = gst ? subtotalAfterDiscount * GST_RATE : 0;
   const grandTotal = subtotalAfterDiscount + gstAmount;
 
   // Profit calculations
   const totalCost = materialsSubtotal + labourSubtotal;
-  const profit = grandTotal - (gst ? totalCost * 1.15 : totalCost);
+  const profit = grandTotal - (gst ? totalCost * (1 + GST_RATE) : totalCost);
   const profitMargin = totalCost > 0 ? (profit / grandTotal) * 100 : 0;
 
   // Calculate margin needed for target price
   const calculateTargetMargin = (target) => {
     const targetNum = parseFloat(target);
     if (!targetNum || targetNum <= subtotalBeforeMargin) return null;
-    const beforeGst = gst ? targetNum / 1.15 : targetNum;
+    const beforeGst = gst ? targetNum / (1 + GST_RATE) : targetNum;
     const marginNeeded = ((beforeGst / subtotalBeforeMargin) - 1) * 100;
     return marginNeeded.toFixed(1);
   };
@@ -973,7 +973,7 @@ export default function QuotePage({
                 </div>
                 <div className="text-xs text-gray-500">
                   Cost: {formatNZD(totalCost)}
-                  {gst && ` + GST = ${formatNZD(totalCost * 1.15)}`}
+                  {gst && ` + GST = ${formatNZD(totalCost * (1 + GST_RATE))}`}
                 </div>
 
                 {/* Target Price Calculator */}
