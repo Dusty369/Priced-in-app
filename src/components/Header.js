@@ -1,8 +1,8 @@
 'use client';
 
-import { Package, MessageSquare, Menu, X, FileText, Sparkles } from 'lucide-react';
+import { Package, MessageSquare, Menu, X, FileText, Sparkles, Crown, ArrowUpCircle } from 'lucide-react';
 
-export default function Header({ page, setPage, currentProjectName, cart, showAI, setShowAI, mobileMenuOpen, setMobileMenuOpen }) {
+export default function Header({ page, setPage, currentProjectName, cart, showAI, setShowAI, mobileMenuOpen, setMobileMenuOpen, userTier, startCheckout, openPortal }) {
   // AI toggle only available on Quote page
   const canShowAI = page === 'quote';
 
@@ -54,6 +54,22 @@ export default function Header({ page, setPage, currentProjectName, cart, showAI
               <Sparkles size={18} /> AI
             </button>
           )}
+          {/* Pro badge or Upgrade button */}
+          {userTier === 'professional' ? (
+            <button
+              onClick={openPortal}
+              className="px-3 py-1.5 rounded-lg font-medium text-xs bg-amber-400 text-amber-900 hover:bg-amber-300 transition-colors duration-150 flex items-center gap-1"
+            >
+              <Crown size={14} /> Pro
+            </button>
+          ) : (
+            <button
+              onClick={startCheckout}
+              className="px-3 py-1.5 rounded-lg font-medium text-xs bg-white/20 hover:bg-white/30 transition-colors duration-150 flex items-center gap-1"
+            >
+              <ArrowUpCircle size={14} /> Upgrade
+            </button>
+          )}
         </nav>
 
         {/* Mobile menu button */}
@@ -100,6 +116,22 @@ export default function Header({ page, setPage, currentProjectName, cart, showAI
               className={`px-4 py-3 rounded-lg text-left font-medium transition-colors duration-150 flex items-center gap-2 ${showAI ? 'bg-purple-500/80' : 'hover:bg-white/10'}`}
             >
               <Sparkles size={20} /> AI Assistant
+            </button>
+          )}
+          {/* Pro badge or Upgrade button */}
+          {userTier === 'professional' ? (
+            <button
+              onClick={() => { openPortal(); setMobileMenuOpen(false); }}
+              className="px-4 py-3 rounded-lg text-left font-medium transition-colors duration-150 flex items-center gap-2 bg-amber-400/20"
+            >
+              <Crown size={20} /> Pro Plan
+            </button>
+          ) : (
+            <button
+              onClick={() => { startCheckout(); setMobileMenuOpen(false); }}
+              className="px-4 py-3 rounded-lg text-left font-medium transition-colors duration-150 flex items-center gap-2 hover:bg-white/10"
+            >
+              <ArrowUpCircle size={20} /> Upgrade to Pro
             </button>
           )}
         </nav>

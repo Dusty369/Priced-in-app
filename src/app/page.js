@@ -12,6 +12,7 @@ import { validateQuote, getValidationSummary } from '../lib/quoteValidation';
 import { useAIChat } from '../hooks/useAIChat';
 import { useProjects } from '../hooks/useProjects';
 import { useCart } from '../hooks/useCart';
+import { useSubscription } from '../hooks/useSubscription';
 
 // Lazy load heavy components
 const MaterialsPage = lazy(() => import('../components/MaterialsPage'));
@@ -29,7 +30,6 @@ import {
   COMPANY_INFO_KEY,
   MATERIAL_PRESETS_KEY,
   PLAN_USAGE_KEY,
-  USER_TIER_KEY,
   TIER_USAGE_KEY,
   TIER_LIMITS
 } from '../lib/constants';
@@ -125,7 +125,7 @@ export default function PricedInApp() {
   const [showCompanySettings, setShowCompanySettings] = useState(false);
   const [companyInfo, setCompanyInfo] = useState(DEFAULT_COMPANY_INFO);
   const [materialPresets, setMaterialPresets] = useState([]);
-  const [userTier, setUserTier] = useState('free');
+  const { tier: userTier, loading: subscriptionLoading, customerId: stripeCustomerId, subscription: stripeSubscription, startCheckout, openPortal, refreshStatus } = useSubscription();
   const [planUsage, setPlanUsage] = useState({ month: new Date().toISOString().slice(0, 7), plans: 0 });
   const [tierUsage, setTierUsage] = useState({
     month: new Date().toISOString().slice(0, 7),
@@ -157,9 +157,6 @@ export default function PricedInApp() {
 
     const savedPresets = localStorage.getItem(MATERIAL_PRESETS_KEY);
     if (savedPresets) setMaterialPresets(JSON.parse(savedPresets));
-
-    const savedTier = localStorage.getItem(USER_TIER_KEY);
-    if (savedTier) setUserTier(savedTier);
 
     const savedUsage = localStorage.getItem(PLAN_USAGE_KEY);
     if (savedUsage) {
@@ -206,11 +203,6 @@ export default function PricedInApp() {
   useEffect(() => {
     localStorage.setItem(PLAN_USAGE_KEY, JSON.stringify(planUsage));
   }, [planUsage]);
-
-  // Persist user tier
-  useEffect(() => {
-    localStorage.setItem(USER_TIER_KEY, userTier);
-  }, [userTier]);
 
   // Persist tier usage
   useEffect(() => {
@@ -495,15 +487,18 @@ export default function PricedInApp() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      <Header 
-        page={page} 
-        setPage={setPage} 
-        currentProjectName={currentProjectName} 
+      <Header
+        page={page}
+        setPage={setPage}
+        currentProjectName={currentProjectName}
         cart={cart}
         showAI={showAI}
         setShowAI={setShowAI}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        userTier={userTier}
+        startCheckout={startCheckout}
+        openPortal={openPortal}
       />
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
@@ -527,6 +522,7 @@ export default function PricedInApp() {
             tierUsage={tierUsage}
             tierLimits={currentTierLimits}
             canUseAI={canUseAI()}
+            startCheckout={startCheckout}
           />
         )}
 
@@ -684,6 +680,7 @@ export default function PricedInApp() {
               tierLimits={currentTierLimits}
               tierUsage={tierUsage}
               canAnalyzePlan={canAnalyzePlan()}
+              startCheckout={startCheckout}
               onHandlePlanUpload={(e) => {
                 const file = e.target.files?.[0];
                 if (!file) return;

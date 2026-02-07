@@ -19,14 +19,15 @@ export default function AIAssistant({
   userTier = 'free',
   tierUsage = { aiQuotes: 0 },
   tierLimits = { aiQuotesPerMonth: 0, name: 'Free' },
-  canUseAI = false
+  canUseAI = false,
+  startCheckout
 }) {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const aiQuotesUsed = tierUsage?.aiQuotes || 0;
   const aiQuotesLimit = tierLimits?.aiQuotesPerMonth || 0;
   const usagePercent = aiQuotesLimit > 0 ? (aiQuotesUsed / aiQuotesLimit) * 100 : 100;
-  const isFreeUser = false; // TODO: restore userTier === 'free' when tier system is implemented
+  const isFreeUser = userTier === 'free';
   const isAtLimit = !canUseAI;
 
   return (
@@ -109,11 +110,11 @@ export default function AIAssistant({
               AI quotes are available on paid plans
             </p>
             <div className="flex gap-2 text-xs">
-              <button className="px-3 py-1.5 bg-white text-purple-600 rounded font-medium hover:bg-white/90 transition">
-                Starter - $29/mo (5 AI quotes)
-              </button>
-              <button className="px-3 py-1.5 bg-amber-400 text-amber-900 rounded font-medium hover:bg-amber-300 transition">
-                Pro - $79/mo (25 AI quotes)
+              <button
+                onClick={startCheckout}
+                className="px-3 py-1.5 bg-amber-400 text-amber-900 rounded font-medium hover:bg-amber-300 transition"
+              >
+                Professional - $79/mo
               </button>
             </div>
           </div>
@@ -281,7 +282,10 @@ export default function AIAssistant({
               <AlertTriangle size={14} className="inline mr-1" />
               You've used all your AI quotes for this month.
             </p>
-            <button className="text-xs px-3 py-1 bg-amber-600 text-white rounded font-medium hover:bg-amber-700 transition">
+            <button
+              onClick={startCheckout}
+              className="text-xs px-3 py-1 bg-amber-600 text-white rounded font-medium hover:bg-amber-700 transition"
+            >
               Upgrade
             </button>
           </div>

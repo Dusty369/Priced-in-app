@@ -16,6 +16,8 @@ export const MATERIAL_PRESETS_KEY = 'priced-in-material-presets';
 export const PLAN_USAGE_KEY = 'priced-in-plan-usage';
 export const USER_TIER_KEY = 'priced-in-user-tier';
 export const TIER_USAGE_KEY = 'priced-in-tier-usage';
+export const DEVICE_ID_KEY = 'priced-in-device-id';
+export const STRIPE_CUSTOMER_ID_KEY = 'priced-in-stripe-customer-id';
 
 // Tier limits and features
 export const TIER_LIMITS = {
@@ -26,17 +28,6 @@ export const TIER_LIMITS = {
     manualQuotesPerMonth: Infinity,
     planPdfsPerQuote: 10,
     imagesPerQuote: 10,
-    hasBranding: true,
-    hasWatermark: false,
-    hasXeroExport: true
-  },
-  starter: {
-    name: 'Starter',
-    price: 29,
-    aiQuotesPerMonth: 5,
-    manualQuotesPerMonth: Infinity,
-    planPdfsPerQuote: 0,
-    imagesPerQuote: 1,
     hasBranding: true,
     hasWatermark: false,
     hasXeroExport: true

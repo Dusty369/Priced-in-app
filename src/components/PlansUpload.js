@@ -17,12 +17,12 @@ export default function PlansUpload({
   userTier = 'free',
   tierLimits = {},
   tierUsage = {},
-  canAnalyzePlan = false
+  canAnalyzePlan = false,
+  startCheckout
 }) {
   const planAnalysesUsed = tierUsage?.planAnalyses || 0;
-  // TODO: Re-enable tier gating when billing is live
-  const isProfessional = true;
-  const isBlocked = false;
+  const isProfessional = userTier === 'professional';
+  const isBlocked = !canAnalyzePlan;
 
   return (
     <div className="space-y-4">
@@ -45,9 +45,25 @@ export default function PlansUpload({
         </div>
       </div>
 
+      {/* Upgrade prompt when blocked */}
+      {isBlocked && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <p className="font-medium text-amber-800">Plan analysis requires a Professional subscription</p>
+            <p className="text-sm text-amber-600 mt-1">Upgrade to analyze building plans with AI and auto-generate material lists.</p>
+          </div>
+          <button
+            onClick={startCheckout}
+            className="px-4 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition whitespace-nowrap"
+          >
+            Upgrade - $79/mo
+          </button>
+        </div>
+      )}
+
       {/* Upload area */}
       <div className="bg-white rounded-xl shadow overflow-hidden">
-        <div className="p-4 sm:p-8 border-2 border-dashed text-center border-emerald-300 bg-emerald-50">
+        <div className={`p-4 sm:p-8 border-2 border-dashed text-center ${isBlocked ? 'border-gray-200 bg-gray-50 opacity-60 pointer-events-none' : 'border-emerald-300 bg-emerald-50'}`}>
           {!planPreview ? (
             <div>
               <div className="text-4xl mb-3">📐</div>
