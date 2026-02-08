@@ -106,19 +106,19 @@ export default function AIAssistant({
               Deck
             </button>
             <button
-              onClick={() => setChatInput('Bathroom renovation - 2m x 2m with shower')}
+              onClick={() => { setSelectedTemplate(null); setChatInput('Bathroom renovation - 2m x 2m with shower'); }}
               className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
             >
               Bathroom
             </button>
             <button
-              onClick={() => setChatInput('Build a 6m timber fence with 100x100mm posts')}
+              onClick={() => { setSelectedTemplate(null); setChatInput('Build a 6m timber fence with 100x100mm posts'); }}
               className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
             >
               Fence
             </button>
             <button
-              onClick={() => setChatInput('Build a pergola 4m x 3m with timber frame')}
+              onClick={() => { setSelectedTemplate(null); setChatInput('Build a pergola 4m x 3m with timber frame'); }}
               className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
             >
               Pergola
