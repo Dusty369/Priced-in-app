@@ -103,7 +103,7 @@ export default function AIAssistant({
               }`}
             >
               <FileText size={12} className="inline mr-1" />
-              Deck Template
+              Deck
             </button>
             <button
               onClick={() => setChatInput('Bathroom renovation - 2m x 2m with shower')}
@@ -148,17 +148,17 @@ export default function AIAssistant({
       <div className="h-64 sm:h-96 overflow-y-auto p-3 sm:p-4 space-y-3">
         {/* Deck Template Panel */}
         {selectedTemplate === 'deck' && hasAIAccess && (
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <div className="bg-gray-50/60 border border-gray-100 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
-                <FileText size={16} className="text-emerald-600" />
-                Deck Estimate Template
+              <h3 className="font-medium text-gray-600 text-xs flex items-center gap-2 uppercase tracking-wide">
+                <FileText size={14} className="text-gray-400" />
+                Deck Guide
               </h3>
               <button
                 onClick={() => setSelectedTemplate(null)}
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <ChevronLeft size={14} /> Back to chat
+                <ChevronLeft size={14} /> Back
               </button>
             </div>
             <Suspense fallback={<div className="py-8 text-center text-gray-500 text-sm">Loading template...</div>}>

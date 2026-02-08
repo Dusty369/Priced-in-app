@@ -96,11 +96,11 @@ export default function DeckTemplate({ onGeneratePrompt }) {
   return (
     <div className="space-y-4">
       {/* Location Section */}
-      <div className="border-b border-gray-200 pb-4">
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm">
-          <MapPin size={16} className="text-emerald-600" />
+      <div className="border-b border-gray-100 pb-4">
+        <h3 className="font-medium text-gray-600 mb-3 flex items-center gap-2 text-sm">
+          <MapPin size={16} className="text-gray-400" />
           Job Location
-          <span className="text-xs font-normal text-gray-500">(optional but recommended)</span>
+          <span className="text-xs font-normal text-gray-400">(optional but recommended)</span>
         </h3>
         <div className="grid grid-cols-2 gap-3">
           <input
@@ -108,12 +108,12 @@ export default function DeckTemplate({ onGeneratePrompt }) {
             placeholder="Suburb (e.g. Takapuna)"
             value={formData.suburb}
             onChange={(e) => update('suburb', e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            className="border border-gray-200 bg-white/70 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           />
           <select
             value={formData.city}
             onChange={(e) => update('city', e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            className="border border-gray-200 bg-white/70 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           >
             <option>Auckland</option>
             <option>Wellington</option>
@@ -140,9 +140,9 @@ export default function DeckTemplate({ onGeneratePrompt }) {
       </div>
 
       {/* Dimensions */}
-      <div className="border-b border-gray-200 pb-4">
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm">
-          <Ruler size={16} className="text-emerald-600" />
+      <div className="border-b border-gray-100 pb-4">
+        <h3 className="font-medium text-gray-600 mb-3 flex items-center gap-2 text-sm">
+          <Ruler size={16} className="text-gray-400" />
           Deck Dimensions
         </h3>
         <div className="grid grid-cols-3 gap-3">
@@ -154,7 +154,7 @@ export default function DeckTemplate({ onGeneratePrompt }) {
               onChange={(e) => update('length', parseFloat(e.target.value) || 0)}
               min="1"
               step="0.5"
-              className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="border border-gray-200 bg-white/70 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
           <div>
@@ -165,7 +165,7 @@ export default function DeckTemplate({ onGeneratePrompt }) {
               onChange={(e) => update('width', parseFloat(e.target.value) || 0)}
               min="1"
               step="0.5"
-              className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="border border-gray-200 bg-white/70 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
           <div>
@@ -176,7 +176,7 @@ export default function DeckTemplate({ onGeneratePrompt }) {
               onChange={(e) => update('height', parseInt(e.target.value) || 0)}
               min="100"
               step="100"
-              className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="border border-gray-200 bg-white/70 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -187,7 +187,7 @@ export default function DeckTemplate({ onGeneratePrompt }) {
             <select
               value={formData.postSpacing}
               onChange={(e) => update('postSpacing', parseFloat(e.target.value))}
-              className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="border border-gray-200 bg-white/70 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             >
               <option value={1.2}>1.2m</option>
               <option value={1.5}>1.5m</option>
@@ -201,7 +201,7 @@ export default function DeckTemplate({ onGeneratePrompt }) {
             <select
               value={formData.deckingThickness}
               onChange={(e) => update('deckingThickness', parseInt(e.target.value))}
-              className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="border border-gray-200 bg-white/70 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             >
               <option value={25}>25mm</option>
               <option value={32}>32mm</option>
@@ -213,7 +213,7 @@ export default function DeckTemplate({ onGeneratePrompt }) {
             <select
               value={formData.finish}
               onChange={(e) => update('finish', e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="border border-gray-200 bg-white/70 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             >
               <option value="stain">Stain/Oil</option>
               <option value="paint">Paint</option>
@@ -241,7 +241,7 @@ export default function DeckTemplate({ onGeneratePrompt }) {
                 onChange={(e) => update('handrailLength', parseFloat(e.target.value) || 0)}
                 min="0"
                 step="0.5"
-                className="w-20 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-20 border border-gray-200 bg-white/70 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
               <span className="text-xs text-gray-500">metres</span>
             </div>
@@ -258,8 +258,8 @@ export default function DeckTemplate({ onGeneratePrompt }) {
 
       {/* Auto-calculated members */}
       {deckCalcs && (
-        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <h4 className="font-semibold text-gray-900 mb-2 text-sm">Auto-Calculated Structure (NZS 3604)</h4>
+        <div className="bg-white/40 p-4 rounded-lg border border-gray-100">
+          <h4 className="font-medium text-gray-600 mb-2 text-sm">Auto-Calculated Structure (NZS 3604)</h4>
           <div className="space-y-1.5 text-sm text-gray-700">
             <p>Bearers: <strong>{deckCalcs.bearerSize} H3.2 SG8</strong>
               {deckCalcs.doubleBearer && <span className="text-orange-600 font-medium ml-1">(DOUBLED)</span>}
@@ -293,7 +293,7 @@ export default function DeckTemplate({ onGeneratePrompt }) {
       <button
         onClick={generatePrompt}
         disabled={!deckCalcs}
-        className="w-full flex items-center justify-center gap-2 bg-emerald-600 text-white py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-2 bg-emerald-600/90 text-white py-2.5 rounded-lg font-medium hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Zap size={18} />
         Generate Estimate
