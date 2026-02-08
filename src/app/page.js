@@ -215,9 +215,10 @@ export default function PricedInApp() {
 
   // Tier enforcement functions
   const canUseAI = useCallback(() => {
+    if (subscriptionLoading) return true; // Optimistic while checking subscription
     if (currentTierLimits.aiQuotesPerMonth === 0) return false;
     return tierUsage.aiQuotes < currentTierLimits.aiQuotesPerMonth;
-  }, [currentTierLimits, tierUsage.aiQuotes]);
+  }, [subscriptionLoading, currentTierLimits, tierUsage.aiQuotes]);
 
   const canSaveQuote = useCallback(() => {
     if (currentTierLimits.manualQuotesPerMonth === Infinity) return true;
@@ -225,11 +226,12 @@ export default function PricedInApp() {
   }, [currentTierLimits, tierUsage.manualQuotes]);
 
   const canAnalyzePlan = useCallback(() => {
+    if (subscriptionLoading) return true; // Optimistic while checking subscription
     const limit = currentTierLimits.planUploadsPerMonth ?? 0;
     if (limit === 0) return false;
     if (limit === Infinity) return true;
     return tierUsage.planAnalyses < limit;
-  }, [currentTierLimits, tierUsage.planAnalyses]);
+  }, [subscriptionLoading, currentTierLimits, tierUsage.planAnalyses]);
 
   const incrementAIUsage = useCallback(() => {
     setTierUsage(prev => ({
@@ -506,10 +508,9 @@ export default function PricedInApp() {
       />
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
-        {/* AI Assistant - always show on Quote page */}
-        {page === 'quote' && (
+        {/* AI Assistant - toggled via Header */}
+        {page === 'quote' && showAI && (
           <AIAssistant
-            showAI={showAI}
             chatHistory={chatHistory}
             chatInput={chatInput}
             setChatInput={setChatInput}
@@ -526,6 +527,7 @@ export default function PricedInApp() {
             tierUsage={tierUsage}
             tierLimits={currentTierLimits}
             canUseAI={canUseAI()}
+            subscriptionLoading={subscriptionLoading}
             trialDaysLeft={trialDaysLeft}
             startCheckout={startCheckout}
           />
@@ -685,6 +687,7 @@ export default function PricedInApp() {
               tierLimits={currentTierLimits}
               tierUsage={tierUsage}
               canAnalyzePlan={canAnalyzePlan()}
+              subscriptionLoading={subscriptionLoading}
               trialDaysLeft={trialDaysLeft}
               startCheckout={startCheckout}
               onHandlePlanUpload={(e) => {

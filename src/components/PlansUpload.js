@@ -18,13 +18,14 @@ export default function PlansUpload({
   tierLimits = {},
   tierUsage = {},
   canAnalyzePlan = false,
+  subscriptionLoading = false,
   trialDaysLeft = 0,
   startCheckout
 }) {
   const planAnalysesUsed = tierUsage?.planAnalyses || 0;
   const planLimit = tierLimits?.planUploadsPerMonth ?? 0;
   const isTrialUser = userTier === 'trial';
-  const isFreeUser = userTier === 'free';
+  const isFreeUser = !subscriptionLoading && userTier === 'free';
   const hasAccess = canAnalyzePlan;
   const isBlocked = !hasAccess;
 

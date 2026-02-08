@@ -6,7 +6,6 @@ import { MessageSquare, Send, Plus, CheckCircle, AlertTriangle, Search, Zap, Loc
 const DeckTemplate = lazy(() => import('./DeckTemplate'));
 
 export default function AIAssistant({
-  showAI,
   chatInput,
   setChatInput,
   chatHistory,
@@ -20,6 +19,7 @@ export default function AIAssistant({
   tierUsage = { aiQuotes: 0 },
   tierLimits = { aiQuotesPerMonth: 0, name: 'Free' },
   canUseAI = false,
+  subscriptionLoading = false,
   trialDaysLeft = 0,
   startCheckout
 }) {
@@ -28,9 +28,9 @@ export default function AIAssistant({
   const aiQuotesUsed = tierUsage?.aiQuotes || 0;
   const aiQuotesLimit = tierLimits?.aiQuotesPerMonth || 0;
   const usagePercent = aiQuotesLimit > 0 ? (aiQuotesUsed / aiQuotesLimit) * 100 : 100;
-  const isFreeUser = userTier === 'free';
+  const isFreeUser = !subscriptionLoading && userTier === 'free';
   const isTrialUser = userTier === 'trial';
-  const hasAIAccess = isTrialUser || userTier === 'professional';
+  const hasAIAccess = subscriptionLoading || isTrialUser || userTier === 'professional';
   const isAtLimit = !canUseAI;
 
   // Follow-up tracking
