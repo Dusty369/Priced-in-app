@@ -349,7 +349,7 @@ export default function AIAssistant({
                   : 'bg-gray-100 mr-4 sm:mr-8'
               }`}>
                 <div className="text-sm whitespace-pre-wrap">
-                  {(typeof msg.content === 'string' ? msg.content : String(msg.content || '')).split(/(\*\*[^*]+\*\*)/).map((part, i) => {
+                  {(typeof msg.content === 'string' ? msg.content : Array.isArray(msg.content) ? msg.content.map(c => c.text || '').join('') : (msg.content?.text || JSON.stringify(msg.content) || '')).split(/(\*\*[^*]+\*\*)/).map((part, i) => {
                     if (part.startsWith('**') && part.endsWith('**')) {
                       return <strong key={i}>{part.slice(2, -2)}</strong>;
                     }
