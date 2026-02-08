@@ -13,7 +13,7 @@ export default function DeckTemplate({ onGeneratePrompt }) {
     width: 4,
     height: 800,
     postSpacing: 1.8,
-    deckingThickness: 32,
+    deckingType: '138x32-pine',
     finish: 'stain',
     handrail: false,
     handrailLength: 0
@@ -25,9 +25,13 @@ export default function DeckTemplate({ onGeneratePrompt }) {
 
   // Auto-calculate when dimensions change
   useEffect(() => {
-    const calcs = calculateDeckMembers(formData);
+    const thicknessMap = { '90x18-kwila': 18, '140x18-kwila': 18, '138x32-pine': 32 };
+    const calcs = calculateDeckMembers({
+      ...formData,
+      deckingThickness: thicknessMap[formData.deckingType] || 32,
+    });
     setDeckCalcs(calcs);
-  }, [formData.length, formData.width, formData.height, formData.postSpacing, formData.deckingThickness]);
+  }, [formData.length, formData.width, formData.height, formData.postSpacing, formData.deckingType]);
 
   // Lookup zones when location changes
   useEffect(() => {
@@ -60,7 +64,12 @@ export default function DeckTemplate({ onGeneratePrompt }) {
     prompt += `- ${deckCalcs.joistSize} H3.2 SG8 joists at ${deckCalcs.joistSpacing}mm centres\n`;
     prompt += `- ${deckCalcs.postSize} H5 posts at ${formData.height}mm height\n`;
     prompt += `- Foundation: ${deckCalcs.foundationType}\n`;
-    prompt += `- ${formData.deckingThickness}x140 H3.2 decking boards\n\n`;
+    const deckingLabels = {
+      '90x18-kwila': '90x18mm Kwila decking boards',
+      '140x18-kwila': '140x18mm Kwila decking boards',
+      '138x32-pine': '138x32mm H3.2 Pine decking boards',
+    };
+    prompt += `- ${deckingLabels[formData.deckingType] || formData.deckingType}\n\n`;
 
     if (fixings) {
       prompt += `FIXINGS (${fixings.warning}):\n`;
@@ -197,15 +206,15 @@ export default function DeckTemplate({ onGeneratePrompt }) {
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-600 mb-1 block">Decking (mm)</label>
+            <label className="text-xs text-gray-600 mb-1 block">Decking</label>
             <select
-              value={formData.deckingThickness}
-              onChange={(e) => update('deckingThickness', parseInt(e.target.value))}
+              value={formData.deckingType}
+              onChange={(e) => update('deckingType', e.target.value)}
               className="border border-gray-200 bg-white/70 rounded-lg px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             >
-              <option value={25}>25mm</option>
-              <option value={32}>32mm</option>
-              <option value={40}>40mm (kwila)</option>
+              <option value="138x32-pine">138x32 Pine</option>
+              <option value="90x18-kwila">90x18 Kwila</option>
+              <option value="140x18-kwila">140x18 Kwila</option>
             </select>
           </div>
           <div>

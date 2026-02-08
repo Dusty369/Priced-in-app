@@ -4,6 +4,9 @@ import { useState, lazy, Suspense } from 'react';
 import { MessageSquare, Send, Plus, CheckCircle, AlertTriangle, Search, Zap, Lock, ChevronLeft, FileText, Clock } from 'lucide-react';
 
 const DeckTemplate = lazy(() => import('./DeckTemplate'));
+const BathroomTemplate = lazy(() => import('./BathroomTemplate'));
+const FenceTemplate = lazy(() => import('./FenceTemplate'));
+const PergolaTemplate = lazy(() => import('./PergolaTemplate'));
 
 export default function AIAssistant({
   showAI,
@@ -106,20 +109,32 @@ export default function AIAssistant({
               Deck
             </button>
             <button
-              onClick={() => { setSelectedTemplate(null); setChatInput('Bathroom renovation - 2m x 2m with shower'); }}
-              className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
+              onClick={() => setSelectedTemplate(selectedTemplate === 'bathroom' ? null : 'bathroom')}
+              className={`text-xs px-2.5 py-1.5 rounded border transition ${
+                selectedTemplate === 'bathroom'
+                  ? 'bg-white text-purple-700 border-white font-medium'
+                  : 'bg-white/20 hover:bg-white/30 border-white/20'
+              }`}
             >
               Bathroom
             </button>
             <button
-              onClick={() => { setSelectedTemplate(null); setChatInput('Build a 6m timber fence with 100x100mm posts'); }}
-              className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
+              onClick={() => setSelectedTemplate(selectedTemplate === 'fence' ? null : 'fence')}
+              className={`text-xs px-2.5 py-1.5 rounded border transition ${
+                selectedTemplate === 'fence'
+                  ? 'bg-white text-purple-700 border-white font-medium'
+                  : 'bg-white/20 hover:bg-white/30 border-white/20'
+              }`}
             >
               Fence
             </button>
             <button
-              onClick={() => { setSelectedTemplate(null); setChatInput('Build a pergola 4m x 3m with timber frame'); }}
-              className="text-xs px-2.5 py-1.5 bg-white/20 hover:bg-white/30 rounded border border-white/20 transition"
+              onClick={() => setSelectedTemplate(selectedTemplate === 'pergola' ? null : 'pergola')}
+              className={`text-xs px-2.5 py-1.5 rounded border transition ${
+                selectedTemplate === 'pergola'
+                  ? 'bg-white text-purple-700 border-white font-medium'
+                  : 'bg-white/20 hover:bg-white/30 border-white/20'
+              }`}
             >
               Pergola
             </button>
@@ -163,6 +178,84 @@ export default function AIAssistant({
             </div>
             <Suspense fallback={<div className="py-8 text-center text-gray-500 text-sm">Loading template...</div>}>
               <DeckTemplate
+                onGeneratePrompt={(prompt) => {
+                  setChatInput(prompt);
+                  setSelectedTemplate(null);
+                }}
+              />
+            </Suspense>
+          </div>
+        )}
+
+        {/* Bathroom Template Panel */}
+        {selectedTemplate === 'bathroom' && hasAIAccess && (
+          <div className="bg-gray-50/60 border border-gray-100 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-gray-600 text-xs flex items-center gap-2 uppercase tracking-wide">
+                <FileText size={14} className="text-gray-400" />
+                Bathroom Guide
+              </h3>
+              <button
+                onClick={() => setSelectedTemplate(null)}
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <ChevronLeft size={14} /> Back
+              </button>
+            </div>
+            <Suspense fallback={<div className="py-8 text-center text-gray-500 text-sm">Loading template...</div>}>
+              <BathroomTemplate
+                onGeneratePrompt={(prompt) => {
+                  setChatInput(prompt);
+                  setSelectedTemplate(null);
+                }}
+              />
+            </Suspense>
+          </div>
+        )}
+
+        {/* Fence Template Panel */}
+        {selectedTemplate === 'fence' && hasAIAccess && (
+          <div className="bg-gray-50/60 border border-gray-100 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-gray-600 text-xs flex items-center gap-2 uppercase tracking-wide">
+                <FileText size={14} className="text-gray-400" />
+                Fence Guide
+              </h3>
+              <button
+                onClick={() => setSelectedTemplate(null)}
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <ChevronLeft size={14} /> Back
+              </button>
+            </div>
+            <Suspense fallback={<div className="py-8 text-center text-gray-500 text-sm">Loading template...</div>}>
+              <FenceTemplate
+                onGeneratePrompt={(prompt) => {
+                  setChatInput(prompt);
+                  setSelectedTemplate(null);
+                }}
+              />
+            </Suspense>
+          </div>
+        )}
+
+        {/* Pergola Template Panel */}
+        {selectedTemplate === 'pergola' && hasAIAccess && (
+          <div className="bg-gray-50/60 border border-gray-100 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-gray-600 text-xs flex items-center gap-2 uppercase tracking-wide">
+                <FileText size={14} className="text-gray-400" />
+                Pergola Guide
+              </h3>
+              <button
+                onClick={() => setSelectedTemplate(null)}
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <ChevronLeft size={14} /> Back
+              </button>
+            </div>
+            <Suspense fallback={<div className="py-8 text-center text-gray-500 text-sm">Loading template...</div>}>
+              <PergolaTemplate
                 onGeneratePrompt={(prompt) => {
                   setChatInput(prompt);
                   setSelectedTemplate(null);
