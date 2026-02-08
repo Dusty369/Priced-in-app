@@ -32,6 +32,7 @@ cp .env.local.example .env.local
 
 ## Deployment
 
+- **Live URL**: https://app.pricedin.co.nz
 - Hosted on Railway, auto-deploys from `main` branch
 - Repo: https://github.com/Dusty369/Priced-in-app.git
 - Push to main triggers automatic deployment
